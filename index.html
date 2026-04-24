@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>樹木診断・点検システム（26.1）</title>
+  <link rel="manifest" href="manifest.json">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Noto Sans JP', sans-serif; background: #f4f6f0; color: #1a1a1a; padding-bottom: 30px; }
+    .hdr { background: linear-gradient(145deg, #1e3a0e, #2d5016); color: white; padding: 18px 16px; border-radius: 0 0 28px 28px; }
+    .tabs { display: flex; gap: 6px; margin: 16px 12px; background: white; padding: 6px; border-radius: 50px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); flex-wrap: wrap; }
+    .tab-btn { flex:1; padding: 10px 4px; border: none; background: transparent; border-radius: 40px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
+    .tab-btn.active { background: #4a7c2f; color: white; }
+    .content { padding: 0 12px; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .card { background: white; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden; }
+    .card-hdr { padding: 14px 18px; font-weight: 700; background: #e8f3df; border-bottom: 2px solid rgba(0,0,0,0.05); display: flex; align-items: center; gap: 10px; }
+    .card-hdr.brown { background: #f3ede5; }
+    .card-hdr.blue { background: #e3f2fd; }
+    .sn { background: #2d5016; color: white; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
+    .card-body { padding: 16px; }
+    .frow { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
+    .c2 > * { flex: 1 1 calc(50% - 6px); min-width: 140px; }
+    .fg { display: flex; flex-direction: column; }
+    .lbl { font-weight: 600; font-size: 0.9rem; margin-bottom: 5px; color: #555; display: flex; align-items: center; gap: 4px; }
+    .req { color: #c62828; margin-left: 3px; }
+    .inp { padding: 12px 14px; border: 1.5px solid #ddd; border-radius: 14px; font-size: 1rem; background: #fdfdfd; }
+    .rgroup { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 5px; }
+    .rbtn { flex: 1 0 70px; padding: 8px 4px; background: #f2f2f2; border: 1.5px solid #ccc; border-radius: 30px; font-weight: 600; font-size: 0.9rem; cursor: pointer; text-align: center; line-height: 1.3; transition: all 0.1s; }
+    .rbtn.sel { background: #4a7c2f; border-color: #2d5016; color: white; }
+    .rbtn small { display: block; font-weight: 400; font-size: 0.65rem; opacity: 0.85; margin-top: 2px; }
+    /* 無効ボタン（該当なし） */
+    .rbtn-inactive {
+      background: #e8e8e8;
+      color: #b0b0b0;
+      border-color: #ddd;
+      cursor: not-allowed;
+      opacity: 0.55;
+      pointer-events: none;
+    }
+    .rbtn-inactive small { color: #b0b0b0; }
+    .btn-pri { background: #2d5016; color: white; border: none; padding: 16px; border-radius: 50px; font-weight: 700; font-size: 1.2rem; width: 100%; cursor: pointer; }
+    .btn-sec { background: #eee; border: 1px solid #bbb; padding: 12px; border-radius: 40px; font-weight: 600; cursor: pointer; }
+    .btn-cancel { background: #ffcdd2; border: 1px solid #c62828; color: #b71c1c; }
+    .submit-area { display: flex; gap: 12px; margin: 20px 0; flex-wrap: wrap; }
+    .photo-area { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+    .photo-item { position: relative; width: 90px; height: 90px; }
+    .photo-thumb { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; border: 2px solid #ccc; background: #eee; }
+    .photo-del { position: absolute; top: -5px; right: -5px; background: #c62828; color: white; border: none; width: 26px; height: 26px; border-radius: 50%; font-weight: bold; cursor: pointer; z-index: 10; }
+    .photo-save { position: absolute; bottom: -5px; right: -5px; background: #2d5016; color: white; border: none; width: 26px; height: 26px; border-radius: 50%; font-weight: bold; cursor: pointer; font-size: 14px; z-index: 10; }
+    .photo-edit { position: absolute; bottom: -5px; left: -5px; background: #1565c0; color: white; border: none; width: 26px; height: 26px; border-radius: 50%; font-weight: bold; cursor: pointer; font-size: 14px; z-index: 10; }
+    .grade-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: 700; }
+    .grade-A { background: #2e7d32; color: white; }
+    .grade-B { background: #f9a825; color: black; }
+    .grade-C { background: #e65100; color: white; }
+    .grade-D { background: #b71c1c; color: white; }
+    .record-item { background: white; border-radius: 20px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .search-bar { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; }
+    .search-bar .inp { flex: 1; }
+    .search-bar select.inp { max-width: 130px; font-size: 0.85rem; padding: 12px 8px; }
+    .record-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .btn-small { padding: 6px 14px; border-radius: 30px; border: none; background: #e0e0e0; font-weight: 500; cursor: pointer; }
+    #map, #allMap { height: 220px; width: 100%; border-radius: 14px; margin-top: 12px; border: 1px solid #ccc; z-index: 1; }
+    #allMap { height: 400px; }
+    .loc-photo-preview { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; border: 1px solid #ccc; margin-top: 8px; }
+    #memoCanvas { border: 1px solid #ccc; border-radius: 12px; margin-top: 8px; touch-action: none; }
+    #photoEditModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; display: none; align-items: center; justify-content: center; }
+    #photoEditModal.open { display: flex; }
+    .pe-container { background: #1e1e1e; border-radius: 20px; width: 95vw; max-width: 600px; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+    .pe-toolbar { display: flex; gap: 4px; padding: 10px; background: #2a2a2a; flex-wrap: wrap; align-items: center; }
+    .pe-btn { padding: 6px 10px; border-radius: 6px; border: none; background: #3a3a3a; color: #ccc; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
+    .pe-btn.active { background: #4a7c2f; color: white; }
+    .pe-colors { display: flex; gap: 4px; align-items: center; margin-left: 8px; flex-wrap: wrap; }
+    .pe-swatch { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+    .pe-swatch.active { border-color: white; }
+    .pe-size-wrap { display: flex; align-items: center; gap: 6px; margin-left: 8px; }
+    .pe-size-lbl { color: #aaa; font-size: 0.75rem; }
+    #peSizeSlider { width: 80px; }
+    #peTextRow { display: none; gap: 6px; align-items: center; padding: 6px 10px; background: #2a2a2a; }
+    #peTextRow.vis { display: flex; }
+    #peTextInput { flex: 1; padding: 6px 10px; background: #444; border: 1px solid #555; color: white; border-radius: 6px; }
+    #peFontSize { width: 50px; text-align: center; background: #444; border: 1px solid #555; color: white; border-radius: 6px; }
+    .pe-canvas-wrap { flex: 1 1 auto; overflow: auto; background: #111; padding: 10px; display: flex; align-items: center; justify-content: center; min-height: 0; }
+    #editCanvas { max-width: 100%; max-height: 100%; border-radius: 8px; display: block; }
+    .pe-footer { display: flex; gap: 8px; padding: 10px; background: #2a2a2a; justify-content: flex-end; flex-shrink: 0; }
+    .pe-save-btn { background: #2d5016; color: white; padding: 8px 16px; border: none; border-radius: 20px; font-weight: 600; }
+    .pe-close-btn { background: #555; color: white; padding: 8px 16px; border: none; border-radius: 20px; }
+    @media print { body { background: white; padding: 0; } .hdr, .tabs, .submit-area, .photo-del, .photo-save, .photo-edit, .btn-sec, .btn-pri, .btn-cancel, .search-bar, .record-actions, .tab-btn { display: none !important; } .card { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; } .content { padding: 0; } .tab-panel { display: block !important; } #map, #allMap { height: 350px !important; border: 1px solid #000; break-inside: avoid; } .card-body { padding: 8px; } }
+    .print-map-only body * { visibility: hidden !important; } .print-map-only #allMap, .print-map-only #allMap * { visibility: visible !important; } .print-map-only #allMap { position: absolute !important; top: 0; left: 0; width: 100vw !important; height: 100vh !important; margin: 0; border: none; border-radius: 0; }
+  </style>
+</head>
+<body>
+
+<header class="hdr">
+  <h1>樹木点検・診断システム</h1>
+  <div style="font-size:0.9rem;">26.1（該当なしボタン無効化）</div>
+  <div style="font-size:0.72rem; color:rgba(255,255,255,0.8); margin-top:4px; line-height:1.4;">
+    ※診断結果は参考になります。専門家(樹木医等)の判断を併せてご検討ください。
+  </div>
+  <a href="manual.html" style="display:inline-block; margin-top:8px; padding:4px 14px; border:1px solid rgba(255,255,255,0.5); border-radius:20px; color:white; font-size:0.8rem; text-decoration:none;">📘 使い方ガイド</a> 
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="inspect">📋 点検入力</button>
+  <button class="tab-btn" data-tab="records">📚 記録一覧</button>
+  <button class="tab-btn" data-tab="allmap">🗺️ 全体マップ</button>
+  <button class="tab-btn" data-tab="guide">📖 判定基準</button>
+</div>
+
+<div class="content">
+  <div class="tab-panel active" id="tab-inspect">
+    <div class="card">
+      <div class="card-hdr green"><span class="sn">Ⅰ-1</span>調査木位置図・基本情報</div>
+      <div class="card-body">
+        <div class="frow c2">
+          <div class="fg"><label class="lbl">樹木No.<span class="req">*</span></label><input class="inp" id="treeNo" placeholder="例：S-001"></div>
+          <div class="fg"><label class="lbl">調査日<span class="req">*</span></label><input type="date" class="inp" id="surveyDate"></div>
+          <div class="fg"><label class="lbl">天候</label><select class="inp" id="weather"><option>晴れ</option><option>曇り</option><option>雨</option></select></div>
+          <div class="fg"><label class="lbl">調査者<span class="req">*</span></label><input class="inp" id="inspector"></div>
+        </div>
+        <div class="frow c2">
+          <div class="fg"><label class="lbl">樹種名<span class="req">*</span></label><input class="inp" id="species"></div>
+          <div class="fg"><label class="lbl">科名</label><input class="inp" id="family"></div>
+          <div class="fg"><label class="lbl">学名</label><input class="inp" id="scientificName"></div>
+          <div class="fg"><label class="lbl">愛称</label><input class="inp" id="nickname"></div>
+        </div>
+        <div class="fg"><label class="lbl">所在地</label><input class="inp" id="location" placeholder="例：○○市△△公園"></div>
+        <div class="frow c2" style="margin-top:12px;">
+          <div class="fg"><label class="lbl">樹高 (m)</label><input type="number" step="0.1" class="inp" id="treeHeight"></div>
+          <div class="fg"><label class="lbl">幹周 (cm)</label><input type="number" class="inp" id="trunkGirth"></div>
+        </div>
+        <div class="frow c2">
+          <div class="fg"><label class="lbl">緯度</label><input class="inp" id="latitude" placeholder="例：35.123456" step="any"></div>
+          <div class="fg"><label class="lbl">経度</label><input class="inp" id="longitude" placeholder="例：139.123456" step="any"></div>
+        </div>
+        <button id="gpsButton" onclick="getGPS()" style="margin-top:8px;padding:10px 16px;background:#4a7c2f;color:#fff;border:none;border-radius:40px;font-weight:600;cursor:pointer;">📍 現在位置を取得</button>
+        <div id="map"></div>
+        <div style="margin-top: 16px;">
+          <label class="lbl">📸 位置写真</label>
+          <input type="file" id="locPhotoInput" accept="image/*" capture="environment" style="display:none;">
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button class="btn-sec" onclick="takeLocationPhoto()">📷 撮影</button>
+            <button class="btn-sec" onclick="selectLocationPhoto()">🖼️ アルバム</button>
+            <button class="btn-sec" onclick="clearLocationPhoto()" style="background:#ffcdd2;">🗑️ クリア</button>
+          </div>
+          <img id="locPhotoPreview" class="loc-photo-preview" style="display:none;">
+        </div>
+        <div style="margin-top: 16px;">
+          <label class="lbl">🖊️ 手書きメモ</label>
+          <canvas id="memoCanvas" width="300" height="150" style="width:100%; height:auto;"></canvas>
+          <div style="display:flex; gap:8px; margin-top:4px;">
+            <button class="btn-sec" onclick="clearMemo()">🗑️ クリア</button>
+            <button class="btn-sec" onclick="saveMemo()">💾 メモ保存</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr brown"><span class="sn">Ⅰ-2</span>地上部の衰退度判定（活力度）</div>
+      <div class="card-body" id="decline-items"></div>
+      <div style="padding: 0 16px 16px;">
+        <div style="background:#f9f5e9; padding:12px; border-radius:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong>衰退度（平均評点）</strong>
+            <span style="font-size:1.5rem; font-weight:800;" id="declineAvgDisplay">-</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-top:8px;">
+            <span>判定区分</span>
+            <span style="font-weight:700;" id="declineLevelDisplay">-</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr blue"><span class="sn">Ⅰ-3</span>倒木、枝折れ等危険度判定（健全度）</div>
+      <div class="card-body" id="health-items"></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr brown"><span class="sn">🍄</span>腐朽菌・子実体</div>
+      <div class="card-body">
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          <label><input type="checkbox" value="ベッコウタケ" class="fungus-check"> ベッコウタケ</label>
+          <label><input type="checkbox" value="コフキサルノコシカケ" class="fungus-check"> コフキサルノコシカケ</label>
+          <label><input type="checkbox" value="カワラタケ" class="fungus-check"> カワラタケ</label>
+          <label><input type="checkbox" value="カイメンタケ" class="fungus-check"> カイメンタケ</label>
+          <label><input type="checkbox" value="その他" class="fungus-check"> その他</label>
+        </div>
+        <input class="inp" id="fungusOther" placeholder="その他のキノコ名" style="margin-top:8px;">
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr green">📸 写真記録（編集可能）</div>
+      <div class="card-body">
+        <input type="file" id="photoInput" accept="image/*" multiple style="display:none;">
+        <div style="display:flex;gap:8px;">
+          <button class="btn-sec" onclick="takePhoto()">📷 カメラ</button>
+          <button class="btn-sec" onclick="selectFromAlbum()">🖼️ アルバム</button>
+        </div>
+        <div id="photoContainer" class="photo-area"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hdr green">📊 総合判定・診断</div>
+      <div class="card-body">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px; background:#f0f7ea; padding:12px; border-radius:12px;">
+          <span style="font-size:2.5rem;font-weight:800;" id="overallGradeDisplay">-</span>
+          <div>
+            <div><strong>総合判定</strong></div>
+            <div id="overallLevelDisplay" style="font-weight:600;"></div>
+          </div>
+        </div>
+        <div style="margin:12px 0 0 0; padding:10px 12px; background:#fff8e1; border-left:4px solid #f9a825; border-radius:8px; font-size:0.78rem; color:#5d4037;">
+          ⚠️ 本システムの診断は<span style="font-weight:700;">目安</span>です。倒木など重大な危険が疑われる場合は、必ず<span style="font-weight:700;">専門家(樹木医等) にご相談</span>ください。本システムの利用により生じた損害について、開発者は一切の責任を負いません。
+        </div>
+        <textarea class="inp" id="overallComment" rows="3" placeholder="総合所見（診断結果・具体的な状態等）" style="margin-top:14px;"></textarea>
+        <div style="margin-top:12px;">
+          <label class="lbl">必要な措置</label>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            <label><input type="checkbox" value="伐採" class="measure-check"> 伐採</label><label><input type="checkbox" value="剪定" class="measure-check"> 剪定</label>
+            <label><input type="checkbox" value="支柱補修" class="measure-check"> 支柱補修</label><label><input type="checkbox" value="土壌改良" class="measure-check"> 土壌改良</label>
+            <label><input type="checkbox" value="施肥" class="measure-check"> 施肥</label><label><input type="checkbox" value="薬剤処理" class="measure-check"> 薬剤処理</label>
+            <label><input type="checkbox" value="経過観察" class="measure-check"> 経過観察</label>
+          </div>
+        </div>
+        <div class="submit-area">
+          <button class="btn-pri" onclick="saveRecord()">💾 保存</button>
+          <button class="btn-sec" onclick="resetForm()">🔄 リセット</button>
+          <button class="btn-sec" onclick="exportToExcel()">📊 詳細Excel</button>
+          <button class="btn-sec" onclick="copyFormData()">📋 コピー</button>
+          <button class="btn-sec" onclick="pasteFormData()">📌 貼り付け</button>
+          <button class="btn-sec btn-cancel" id="cancelEditBtn" style="display:none;" onclick="cancelEdit()">❌ キャンセル</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-records">
+    <div class="card">
+      <div class="card-body">
+        <div class="search-bar">
+          <input type="text" class="inp" id="searchInput" placeholder="樹種・場所・点検者で検索">
+          <select class="inp" id="sortSelect">
+            <option value="date-desc">日付(新→古)</option>
+            <option value="date-asc">日付(古→新)</option>
+            <option value="grade">判定順</option>
+          </select>
+        </div>
+        <div id="recordsList"></div>
+        <div style="margin-top:16px; display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn-sec" onclick="printInspectionPage()">🖨️ 現在画面を印刷</button>
+          <button class="btn-sec" onclick="exportAllToExcel()">📊 全件Excel出力</button>
+          <button class="btn-sec" onclick="exportAllToJSON()">📦 JSONバックアップ</button>
+          <button class="btn-sec" onclick="exportSummaryToExcel()">📋 一覧表Excel出力</button>
+          <button class="btn-sec" onclick="exportAllToCSV()">📄 CSV出力</button>
+          <input type="file" id="jsonImportInput" accept=".json,application/json" style="display:none;">
+          <button class="btn-sec" onclick="document.getElementById('jsonImportInput').click()">📂 JSON復元</button>
+          <button class="btn-sec" onclick="removeInvalidRecords()" style="background:#ffcdd2;">🧹 無効記録削除</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-allmap">
+    <div class="card">
+      <div class="card-hdr green">🗺️ 全樹木位置マップ</div>
+      <div class="card-body">
+        <div id="allMap"></div>
+        <div style="margin-top:12px; display:flex; gap:8px;">
+          <button class="btn-sec" onclick="printAllMap()">🖨️ マップ印刷</button>
+          <button class="btn-sec" onclick="saveAllMapAsImage()">📸 画像保存</button>
+        </div>
+        <p style="margin-top:8px; font-size:0.8rem;">ピンをタップ → 「編集画面へ」で点検入力に移動</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-guide">
+    <div class="card"><div class="card-body">
+      <h3>活力度 0〜4</h3><p>各項目の状態を0(最良)〜4(最悪)で評価</p>
+      <h3>健全度 A〜D</h3><p>A:異常なし B:軽微な異常 C:危険性あり D:非常に危険</p>
+      <h3>総合判定基準</h3>
+      <table style="width:100%; border-collapse:collapse; margin-top:12px;">
+        <tr><th style="border:1px solid #ccc; padding:4px;">活力度</th><th style="border:1px solid #ccc; padding:4px;">健全度</th><th style="border:1px solid #ccc; padding:4px;">総合判定</th></tr>
+        <tr><td style="border:1px solid #ccc; padding:4px;">Ⅰ（0.8未満）</td><td style="border:1px solid #ccc; padding:4px;">A</td><td style="border:1px solid #ccc; padding:4px;">A 健全</td></tr>
+        <tr><td style="border:1px solid #ccc; padding:4px;">Ⅱ（0.8〜1.6）</td><td style="border:1px solid #ccc; padding:4px;">B</td><td style="border:1px solid #ccc; padding:4px;">B 健全に近い</td></tr>
+        <tr><td style="border:1px solid #ccc; padding:4px;">Ⅲ（1.6〜2.4）</td><td style="border:1px solid #ccc; padding:4px;">C</td><td style="border:1px solid #ccc; padding:4px;">C 要注意</td></tr>
+        <tr><td style="border:1px solid #ccc; padding:4px;">Ⅳ・Ⅴ（2.4以上）</td><td style="border:1px solid #ccc; padding:4px;">D</td><td style="border:1px solid #ccc; padding:4px;">D 危険木</td></tr>
+      </table>
+    </div></div>
+  </div>
+</div>
+
+<div id="photoEditModal">
+  <div class="pe-container">
+    <div class="pe-toolbar">
+      <button class="pe-btn active" id="pt-pen" onclick="setPETool('pen')">✏️ ペン</button>
+      <button class="pe-btn" id="pt-line" onclick="setPETool('line')">➖ 直線</button>
+      <button class="pe-btn" id="pt-rect" onclick="setPETool('rect')">▭ 矩形</button>
+      <button class="pe-btn" id="pt-circle" onclick="setPETool('circle')">⭕ 円</button>
+      <button class="pe-btn" id="pt-arrow" onclick="setPETool('arrow')">➡ 矢印</button>
+      <button class="pe-btn" id="pt-text" onclick="setPETool('text')">T 文字</button>
+      <button class="pe-btn" id="pt-eraser" onclick="setPETool('eraser')">🧹 消し</button>
+      <button class="pe-btn" onclick="clearPECanvas()">🗑️ 全消去</button>
+      <div class="pe-colors">
+        <span class="pe-swatch active" style="background:#ff3333;" data-color="#ff3333" onclick="setPEColor(this)"></span>
+        <span class="pe-swatch" style="background:#ff8800;" data-color="#ff8800" onclick="setPEColor(this)"></span>
+        <span class="pe-swatch" style="background:#ffdd00;" data-color="#ffdd00" onclick="setPEColor(this)"></span>
+        <span class="pe-swatch" style="background:#22cc44;" data-color="#22cc44" onclick="setPEColor(this)"></span>
+        <span class="pe-swatch" style="background:#0088ff;" data-color="#0088ff" onclick="setPEColor(this)"></span>
+        <span class="pe-swatch" style="background:#cc00ff;" data-color="#cc00ff" onclick="setPEColor(this)"></span>
+        <span class="pe-swatch" style="background:#ffffff;" data-color="#ffffff" onclick="setPEColor(this)"></span>
+        <input type="color" value="#ff3333" onchange="setPEColorVal(this.value)" style="width:22px;height:22px;border:none;background:none;cursor:pointer;">
+      </div>
+      <div class="pe-size-wrap">
+        <span class="pe-size-lbl">太さ</span>
+        <input type="range" id="peSizeSlider" min="1" max="40" value="5" oninput="updatePESize(this.value)">
+        <span id="peSizeLbl" style="color:#aaa;font-size:0.75rem;">5px</span>
+      </div>
+    </div>
+    <div id="peTextRow">
+      <input type="text" id="peTextInput" placeholder="文字入力後、画像をタップ">
+      <input type="number" id="peFontSize" value="28" min="8" max="120" style="width:55px;">
+      <span style="color:#aaa;">px</span>
+    </div>
+    <div class="pe-canvas-wrap">
+      <canvas id="editCanvas"></canvas>
+    </div>
+    <div class="pe-footer">
+      <button class="pe-btn" onclick="undoPE()">↩ 元に戻す</button>
+      <button class="pe-save-btn" onclick="savePECanvas()">💾 保存して閉じる</button>
+      <button class="pe-close-btn" onclick="closePEModal()">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    "use strict";
+
+    let editingId = null;
+    const scores = {};
+    const healthGrades = {};
+    let photos = [];
+    let records = [];
+    let locationPhoto = null;
+
+    let map, marker;
+    let allMap = null;
+    let markersLayer = null;
+
+    const declineItems = [
+      { id: 'vigor', name: '樹勢', desc: ['旺盛で被害なし', '幾分影響あるが目立たず', '異常が明らか', '極めて劣悪', 'ほとんど枯死'] },
+      { id: 'shape', name: '樹形', desc: ['自然樹形', '若干の乱れ', '大きく変化', '乱れ著しい', '完全に崩壊'] },
+      { id: 'density', name: '枝葉密度', desc: ['十分な量', 'やや劣る', '枯枝目立つ、やや少ない', '著しく少ない', 'ほとんど葉なし'] },
+      { id: 'shoot', name: '枝伸長量', desc: ['十分伸長', 'やや小さい', '短く細い', '極度に短小', '萌芽のみ'] },
+      { id: 'leafSize', name: '葉の大きさ', desc: ['十分な大きさ', '所々小さい', '全体にやや小', '著しく小', 'わずかで小さい'] },
+      { id: 'leafColor', name: '葉色', desc: ['濃い緑色', 'やや薄い緑', '黄変目立つ', '大部分薄緑', '薄緑・黄変のみ'] },
+      { id: 'topDieback', name: '梢端枯損', desc: ['なし', '少し', '随所にあり', 'かなり目立つ', '梢端・主枝なし'] },
+      { id: 'lowerDieback', name: '下枝枯損', desc: ['なし', '少し', '随所・切断目立つ', 'かなり目立つ', '健全枝端なし'] },
+      { id: 'largeBranch', name: '大枝欠損', desc: ['なし', '少し回復', '随所に目立つ', 'かなり目立つ', '幹上部喪失'] },
+      { id: 'pruning', name: '剪定痕', desc: ['旺盛に巻込', '巻込成長', '活力なし', 'ほとんど巻込なし', '全く巻込なし'] },
+      { id: 'barkWound', name: '樹皮傷', desc: ['ほとんどなし', '少し', '古傷残る', '腐朽著しい', '大空洞・剥がれ'] },
+      { id: 'barkTurnover', name: '新陳代謝', desc: ['活発', '一部不活発', '全体に活力なし', '著しく衰弱', '大部分壊死'] },
+      { id: 'sprout', name: '胴吹き', desc: ['なし', '枝葉多いが胴吹きあり', '枝葉少＋胴吹きあり', '枝葉極少＋胴吹き多', '枝葉極少＋胴吹き少'] },
+      { id: 'bud', name: '芽', desc: ['大きく多数', 'やや劣る', '小さい/少ない', '著しく少なく貧弱', 'ほとんど見られず'] },
+      { id: 'autumnColor', name: '紅黄葉', desc: ['鮮やか', 'やや劣る', '一部のみ', '見られない', '正常な紅黄葉なし'] },
+      { id: 'flower', name: '開花', desc: ['花つき良好', 'やや劣る', '花小さく疎', '小さい花多く疎', 'ほとんど開花なし'] },
+      { id: 'fruit', name: '結実', desc: ['実つき良好', 'やや劣る', '実小さく疎', '小さい実多く疎', 'ほとんど結実なし'] }
+    ];
+
+    const healthItems = [
+      { id: 'sway', name: '揺らぎ', grades: ['A','B','C','D'], desc: ['なし','該当なし','あり（小）','あり（大）'], inactive: { B: true } },
+      { id: 'lean', name: '不自然な傾斜', grades: ['A','B','C','D'], desc: ['なし','根付き異常なし','該当なし','地際変状あり'], inactive: { C: true } },
+      { id: 'crack', name: '亀裂', grades: ['A','B','C','D'], desc: ['なし','該当なし','あり（小）','あり（大）'], inactive: { B: true } },
+      { id: 'fungusBody', name: '子実体(キノコ)', grades: ['A','B','C','D'], desc: ['なし','該当なし','あり（小）','あり（大）'], inactive: { B: true } },
+      { id: 'cavity', name: '開口空洞', grades: ['A','B','C','D'], desc: ['なし','芯に達しない','芯に達し1/3未満','芯に達し1/3以上'] },
+      { id: 'bulge', name: '隆起', grades: ['A','B','C','D'], desc: ['なし','該当なし','あり（小）','あり（大）'], inactive: { B: true } },
+      { id: 'decayExposed', name: '腐朽部露出', grades: ['A','B','C','D'], desc: ['なし','該当なし','周囲長比1/3未満','周囲長比1/3以上'], inactive: { B: true } },
+      { id: 'barkDamage', name: '樹皮枯死･欠損', grades: ['A','B','C','D'], desc: ['なし','周囲長比1/3未満','周囲長比1/3以上','該当なし'], inactive: { D: true } },
+      { id: 'jointAbnormality', name: '結合部の変状', grades: ['A','B','C','D'], desc: ['なし','該当なし','あり（小）','あり（大）'], inactive: { B: true } },
+      { id: 'pestDamage', name: '穿孔害虫等', grades: ['A','B','C','D'], desc: ['なし','あり（小）','あり（大）','該当なし'], inactive: { D: true } },
+      { id: 'rootVisible', name: '根張り', grades: ['A','B','C','D'], desc: ['見える','該当なし','見えない','該当なし'], inactive: { B: true, D: true } },
+      { id: 'tappingSound', name: '打診音異常', grades: ['A','B','C','D'], desc: ['なし','該当なし','あり（小）','あり（大）'], inactive: { B: true } },
+      { id: 'penetrationAbnormality', name: '貫入異常', grades: ['A','B','C','D'], desc: ['なし','該当なし','あり（小）','あり（大）'], inactive: { B: true } },
+      { id: 'hangingBranch', name: 'ぶら下がり枝', grades: ['A','B','C','D'], desc: ['なし','あり（小）','あり（大）','該当なし'], inactive: { D: true } }
+    ];
+
+    function updateEditModeUI() {
+      const cancelBtn = document.getElementById('cancelEditBtn');
+      if (cancelBtn) cancelBtn.style.display = editingId ? 'block' : 'none';
+    }
+
+    window.cancelEdit = function() {
+      if (editingId && confirm('編集をキャンセルしますか？')) {
+        editingId = null;
+        resetForm();
+        updateEditModeUI();
+        showTab('records');
+      }
+    };
+
+    function buildUI() {
+      const dCont = document.getElementById('decline-items');
+      if (dCont) {
+        dCont.innerHTML = declineItems.map(item => `
+          <div class="fg"><label class="lbl">${item.name}</label>
+            <div class="rgroup">
+              ${[0,1,2,3,4].map(v => `<button class="rbtn" data-type="decline" data-id="${item.id}" data-val="${v}" onclick="setScore(this)">${v}<small>${item.desc[v]}</small></button>`).join('')}
+            </div>
+          </div>
+        `).join('');
+      }
+      const hCont = document.getElementById('health-items');
+      if (hCont) {
+        hCont.innerHTML = healthItems.map(item => `
+          <div class="fg"><label class="lbl">${item.name}</label>
+            <div class="rgroup">
+              ${item.grades.map((g, i) => {
+                const isInactive = item.inactive && item.inactive[g];
+                return `<button class="rbtn ${isInactive ? 'rbtn-inactive' : ''}" 
+                  data-type="health" data-id="${item.id}" data-val="${g}" 
+                  ${isInactive ? 'disabled' : ''} 
+                  onclick="${isInactive ? '' : 'setScore(this)'}">${g}<small>${item.desc[i]}</small></button>`;
+              }).join('')}
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    window.setScore = function(btn) {
+      const type = btn.dataset.type, id = btn.dataset.id, val = btn.dataset.val;
+      const isSelected = btn.classList.contains('sel');
+      document.querySelectorAll(`[data-type="${type}"][data-id="${id}"]`).forEach(b => b.classList.remove('sel'));
+      if (isSelected) {
+        if (type === 'decline') delete scores[id];
+        else delete healthGrades[id];
+      } else {
+        btn.classList.add('sel');
+        if (type === 'decline') scores[id] = parseInt(val);
+        else healthGrades[id] = val;
+      }
+      updateOverall();
+    };
+
+    function calcDeclineAvg() { let sum=0, cnt=0; declineItems.forEach(i=>{ if(scores[i.id]!==undefined){ sum+=scores[i.id]; cnt++; } }); return cnt? sum/cnt : 0; }
+    function worstHealth() { const order = {A:0,B:1,C:2,D:3}; let worst='A'; healthItems.forEach(i=>{ const g=healthGrades[i.id]; if(g && order[g]>order[worst]) worst=g; }); return worst; }
+    function updateOverall() {
+      const avg = calcDeclineAvg(), worst = worstHealth();
+      let grade='-', text='', declineLevel = '';
+      if (avg < 0.8) declineLevel = 'Ⅰ（良）';
+      else if (avg < 1.6) declineLevel = 'Ⅱ（やや不良）';
+      else if (avg < 2.4) declineLevel = 'Ⅲ（不良）';
+      else if (avg < 3.2) declineLevel = 'Ⅳ（著しく不良）';
+      else declineLevel = 'Ⅴ（枯死寸前）';
+      if(worst==='D' || avg>=3.2) { grade='D'; text='危険木（緊急対応）'; }
+      else if(worst==='C' || avg>=2.4) { grade='C'; text='要注意'; }
+      else if(worst==='B' || avg>=1.6) { grade='B'; text='健全に近い（経過観察）'; }
+      else { grade='A'; text='健全'; }
+      document.getElementById('declineAvgDisplay').textContent = avg.toFixed(2);
+      document.getElementById('declineLevelDisplay').textContent = declineLevel;
+      document.getElementById('overallGradeDisplay').textContent = grade;
+      document.getElementById('overallLevelDisplay').textContent = text;
+    }
+
+    function createLabelIcon(text) {
+      return L.divIcon({
+        html: `<div style="position: relative; display: inline-block;">
+                <div style="background: rgba(255, 255, 255, 0.85); border: 1.5px solid #2d5016; border-radius: 12px; padding: 2px 6px; font-weight: bold; font-size: 9px; color: #2d5016; box-shadow: 0 1px 3px rgba(0,0,0,0.2); white-space: nowrap; backdrop-filter: blur(2px);">${text}</div>
+                <div style="position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%); width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid #2d5016;"></div>
+              </div>`,
+        className: 'custom-marker', iconSize: [60, 24], iconAnchor: [30, 30], popupAnchor: [0, -20]
+      });
+    }
+
+    window.takePhoto = () => { const inp=document.getElementById('photoInput'); inp.setAttribute('capture','environment'); inp.click(); };
+    window.selectFromAlbum = () => { const inp=document.getElementById('photoInput'); inp.removeAttribute('capture'); inp.click(); };
+    document.getElementById('photoInput').addEventListener('change', e => {
+      Array.from(e.target.files).forEach(f => { const r=new FileReader(); r.onload=ev=>{ photos.push(ev.target.result); renderPhotos(); }; r.readAsDataURL(f); });
+      e.target.value = '';
+    });
+    function renderPhotos() {
+      const cont = document.getElementById('photoContainer');
+      if(cont) cont.innerHTML = photos.map((p,i)=> `
+        <div class="photo-item">
+          <img src="${p}" class="photo-thumb" onclick="openPhotoEditor(${i})">
+          <button class="photo-del" onclick="removePhoto(${i})">✕</button>
+          <button class="photo-save" onclick="savePhoto(${i})" title="保存">💾</button>
+          <button class="photo-edit" onclick="openPhotoEditor(${i})" title="編集">✏️</button>
+        </div>
+      `).join('');
+    }
+    window.removePhoto = (i) => { photos.splice(i,1); renderPhotos(); };
+    window.savePhoto = (i) => { const a=document.createElement('a'); a.href=photos[i]; a.download=`photo_${Date.now()}.png`; a.click(); };
+
+    let peIndex = -1, peTool = 'pen', peColor = '#ff3333', peSize = 5;
+    let peDrawing = false, peStartX = 0, peStartY = 0;
+    let peUndoStack = [], peOrigData = null, peTempSnapshot = null;
+    const peCanvas = document.getElementById('editCanvas');
+    const peCtx = peCanvas.getContext('2d');
+
+    window.setPETool = function(tool) { peTool = tool; document.querySelectorAll('.pe-toolbar .pe-btn').forEach(b => b.classList.remove('active')); const btn = document.getElementById('pt-' + tool); if (btn) btn.classList.add('active'); document.getElementById('peTextRow').classList.toggle('vis', tool === 'text'); peCanvas.style.cursor = tool === 'text' ? 'text' : tool === 'eraser' ? 'cell' : 'crosshair'; };
+    window.setPEColor = function(el) { peColor = el.dataset.color; document.querySelectorAll('.pe-swatch').forEach(s => s.classList.remove('active')); el.classList.add('active'); };
+    window.setPEColorVal = function(v) { peColor = v; document.querySelectorAll('.pe-swatch').forEach(s => s.classList.remove('active')); };
+    window.updatePESize = function(v) { peSize = +v; document.getElementById('peSizeLbl').textContent = v + 'px'; };
+    function peSaveUndo() { peUndoStack.push(peCtx.getImageData(0,0,peCanvas.width,peCanvas.height)); if(peUndoStack.length > 20) peUndoStack.shift(); }
+    window.undoPE = function() { if(peUndoStack.length) peCtx.putImageData(peUndoStack.pop(),0,0); };
+    window.clearPECanvas = function() { if(confirm('描画を全消去しますか？')) { peSaveUndo(); if(peOrigData) peCtx.putImageData(peOrigData,0,0); } };
+    function getPEPos(e) { const rect = peCanvas.getBoundingClientRect(); const sx = peCanvas.width / rect.width, sy = peCanvas.height / rect.height; const cx = e.touches ? e.touches[0].clientX : e.clientX; const cy = e.touches ? e.touches[0].clientY : e.clientY; return { x: (cx - rect.left) * sx, y: (cy - rect.top) * sy }; }
+    peCanvas.addEventListener('mousedown', peStartHandler); peCanvas.addEventListener('touchstart', peStartHandler, { passive: false }); peCanvas.addEventListener('mousemove', peMoveHandler); peCanvas.addEventListener('touchmove', peMoveHandler, { passive: false }); peCanvas.addEventListener('mouseup', peEndHandler); peCanvas.addEventListener('touchend', peEndHandler);
+    function peStartHandler(e) { e.preventDefault(); if (peTool === 'text') { placeText(e); return; } peDrawing = true; const p = getPEPos(e); peStartX = p.x; peStartY = p.y; peSaveUndo(); if (peTool === 'pen' || peTool === 'eraser') { peCtx.beginPath(); peCtx.moveTo(peStartX, peStartY); } else { peTempSnapshot = peCtx.getImageData(0, 0, peCanvas.width, peCanvas.height); } }
+    function peMoveHandler(e) { e.preventDefault(); if (!peDrawing) return; const p = getPEPos(e); if (peTool === 'pen') { peCtx.lineTo(p.x, p.y); peCtx.strokeStyle = peColor; peCtx.lineWidth = peSize; peCtx.lineCap = 'round'; peCtx.lineJoin = 'round'; peCtx.stroke(); } else if (peTool === 'eraser') { peCtx.globalCompositeOperation = 'destination-out'; peCtx.lineTo(p.x, p.y); peCtx.lineWidth = peSize * 3; peCtx.stroke(); peCtx.globalCompositeOperation = 'source-over'; } else { if (peTempSnapshot) peCtx.putImageData(peTempSnapshot, 0, 0); drawShape(peTool, peStartX, peStartY, p.x, p.y); } }
+    function peEndHandler() { peDrawing = false; peTempSnapshot = null; peCtx.beginPath(); }
+    function drawShape(tool, x1, y1, x2, y2) { peCtx.strokeStyle = peColor; peCtx.fillStyle = peColor; peCtx.lineWidth = peSize; peCtx.lineCap = 'round'; if (tool === 'line') { peCtx.beginPath(); peCtx.moveTo(x1,y1); peCtx.lineTo(x2,y2); peCtx.stroke(); } else if (tool === 'rect') { peCtx.beginPath(); peCtx.strokeRect(x1, y1, x2-x1, y2-y1); } else if (tool === 'circle') { const rx=Math.abs(x2-x1)/2, ry=Math.abs(y2-y1)/2; const cx=(x1+x2)/2, cy=(y1+y2)/2; peCtx.beginPath(); peCtx.ellipse(cx,cy,rx,ry,0,0,2*Math.PI); peCtx.stroke(); } else if (tool === 'arrow') { const headLen = Math.max(peSize*4, 20); const angle = Math.atan2(y2-y1, x2-x1); peCtx.beginPath(); peCtx.moveTo(x1,y1); peCtx.lineTo(x2,y2); peCtx.stroke(); peCtx.beginPath(); peCtx.moveTo(x2, y2); peCtx.lineTo(x2 - headLen * Math.cos(angle - Math.PI/6), y2 - headLen * Math.sin(angle - Math.PI/6)); peCtx.lineTo(x2 - headLen * Math.cos(angle + Math.PI/6), y2 - headLen * Math.sin(angle + Math.PI/6)); peCtx.closePath(); peCtx.fill(); } }
+    function placeText(e) { const text = document.getElementById('peTextInput').value.trim(); if (!text) { alert('テキストを入力'); return; } const fs = parseInt(document.getElementById('peFontSize').value) || 28; peSaveUndo(); const p = getPEPos(e); peCtx.font = `bold ${fs}px 'Noto Sans JP', sans-serif`; peCtx.fillStyle = peColor; peCtx.shadowColor = 'rgba(0,0,0,0.6)'; peCtx.shadowBlur = 3; peCtx.fillText(text, p.x, p.y); peCtx.shadowBlur = 0; }
+    window.openPhotoEditor = function(index) { peIndex = index; peUndoStack = []; const img = new Image(); img.onload = function() { const maxW = Math.min(img.width, window.innerWidth - 40); const maxH = Math.min(img.height, window.innerHeight * 0.45); const scale = Math.min(maxW / img.width, maxH / img.height); peCanvas.width = img.width * scale; peCanvas.height = img.height * scale; peCtx.clearRect(0, 0, peCanvas.width, peCanvas.height); peCtx.drawImage(img, 0, 0, peCanvas.width, peCanvas.height); peOrigData = peCtx.getImageData(0, 0, peCanvas.width, peCanvas.height); setPETool('pen'); updatePESize(5); document.getElementById('peSizeSlider').value = 5; document.getElementById('photoEditModal').classList.add('open'); }; img.src = photos[index]; };
+    window.savePECanvas = function() { if (peIndex >= 0) { photos[peIndex] = peCanvas.toDataURL('image/jpeg', 0.9); renderPhotos(); } closePEModal(); };
+    window.closePEModal = function() { document.getElementById('photoEditModal').classList.remove('open'); peIndex = -1; };
+
+    window.takeLocationPhoto = () => { const inp=document.getElementById('locPhotoInput'); inp.setAttribute('capture','environment'); inp.click(); };
+    window.selectLocationPhoto = () => { const inp=document.getElementById('locPhotoInput'); inp.removeAttribute('capture'); inp.click(); };
+    document.getElementById('locPhotoInput').addEventListener('change', e => { const file = e.target.files[0]; if (file) { const r=new FileReader(); r.onload=ev=>{ locationPhoto=ev.target.result; const preview=document.getElementById('locPhotoPreview'); preview.src=locationPhoto; preview.style.display='block'; }; r.readAsDataURL(file); } e.target.value = ''; });
+    window.clearLocationPhoto = () => { locationPhoto=null; document.getElementById('locPhotoPreview').style.display='none'; };
+
+    const memoCanvas = document.getElementById('memoCanvas'); const memoCtx = memoCanvas.getContext('2d'); let memoDrawing = false;
+    memoCanvas.addEventListener('pointerdown', e => { memoDrawing=true; memoCtx.beginPath(); memoCtx.moveTo(e.offsetX, e.offsetY); });
+    memoCanvas.addEventListener('pointermove', e => { if(!memoDrawing) return; memoCtx.lineTo(e.offsetX, e.offsetY); memoCtx.strokeStyle='#333'; memoCtx.lineWidth=3; memoCtx.stroke(); });
+    memoCanvas.addEventListener('pointerup', () => { memoDrawing=false; });
+    memoCanvas.addEventListener('pointerleave', () => { memoDrawing=false; });
+    window.clearMemo = () => { memoCtx.clearRect(0,0,memoCanvas.width,memoCanvas.height); };
+    window.saveMemo = () => { const dataUrl=memoCanvas.toDataURL('image/png'); const a=document.createElement('a'); a.href=dataUrl; a.download=`memo_${Date.now()}.png`; a.click(); };
+
+    function initMap() { const defaultLat=35.681236, defaultLng=139.767125; map = L.map('map').setView([defaultLat, defaultLng], 17); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'©OSM',crossOrigin:true}).addTo(map); const treeNo = document.getElementById('treeNo').value || '●'; marker = L.marker([defaultLat, defaultLng], { draggable:true, icon:createLabelIcon(treeNo) }).addTo(map); marker.on('dragend', e => { const pos = marker.getLatLng(); document.getElementById('latitude').value = pos.lat.toFixed(6); document.getElementById('longitude').value = pos.lng.toFixed(6); }); map.on('click', e => { marker.setLatLng(e.latlng); document.getElementById('latitude').value = e.latlng.lat.toFixed(6); document.getElementById('longitude').value = e.latlng.lng.toFixed(6); }); document.getElementById('treeNo').addEventListener('input', function(){ marker.setIcon(createLabelIcon(this.value||'●')); }); document.getElementById('latitude').value = defaultLat.toFixed(6); document.getElementById('longitude').value = defaultLng.toFixed(6); }
+    function initAllMap() { if(allMap) return; allMap = L.map('allMap').setView([35.681236, 139.767125], 12); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'©OSM',crossOrigin:true}).addTo(allMap); markersLayer = L.layerGroup().addTo(allMap); updateAllMapMarkers(); }
+    window.jumpToEdit = function(id) { if(typeof editRecord === 'function') editRecord(id); showTab('inspect'); };
+    function updateAllMapMarkers() { if(!markersLayer) return; markersLayer.clearLayers(); const valid = records.filter(r => r?.id && r.latitude && r.longitude); valid.forEach(r => { const lat=parseFloat(r.latitude), lng=parseFloat(r.longitude); if(isNaN(lat)||isNaN(lng)) return; const popupContent = `<b>${r.treeNo} : ${r.species}</b><br>${r.location||''}<br>調査日: ${r.surveyDate}<br>判定: ${r.overall}<br><button onclick="window.jumpToEdit('${r.id}')" style="margin-top:6px;padding:4px 12px;background:#4a7c2f;color:white;border:none;border-radius:20px;font-size:12px;cursor:pointer;">✏️ 編集画面へ</button>`; L.marker([lat,lng],{icon:createLabelIcon(r.treeNo||'●')}).bindPopup(popupContent).addTo(markersLayer); }); if(valid.length) { const bounds = L.featureGroup(valid.map(r=>L.marker([parseFloat(r.latitude),parseFloat(r.longitude)]))).getBounds(); if(bounds.isValid()) allMap.fitBounds(bounds.pad(0.1)); } }
+    window.getGPS = () => { if(!navigator.geolocation){alert('非対応');return;} const btn=document.getElementById('gpsButton'); btn.textContent='取得中...'; btn.disabled=true; navigator.geolocation.getCurrentPosition(pos=>{ const {latitude:lat,longitude:lng}=pos.coords; document.getElementById('latitude').value=lat.toFixed(6); document.getElementById('longitude').value=lng.toFixed(6); if(map&&marker){map.setView([lat,lng],17);marker.setLatLng([lat,lng]);} btn.textContent='📍 現在位置を取得'; btn.disabled=false; },()=>{alert('取得失敗');btn.textContent='📍 現在位置を取得';btn.disabled=false;}); };
+    function collectData() { const memoDataUrl = memoCanvas.toDataURL('image/png'); return { id: editingId || Date.now()+'-'+Math.random().toString(36), treeNo: document.getElementById('treeNo').value, surveyDate: document.getElementById('surveyDate').value, weather: document.getElementById('weather').value, inspector: document.getElementById('inspector').value, species: document.getElementById('species').value, family: document.getElementById('family').value, scientificName: document.getElementById('scientificName').value, nickname: document.getElementById('nickname').value, location: document.getElementById('location').value, treeHeight: document.getElementById('treeHeight').value, trunkGirth: document.getElementById('trunkGirth').value, latitude: document.getElementById('latitude').value, longitude: document.getElementById('longitude').value, locationPhoto: locationPhoto, scores: {...scores}, health: {...healthGrades}, fungus: [...document.querySelectorAll('.fungus-check:checked')].map(c=>c.value), fungusOther: document.getElementById('fungusOther').value, comment: document.getElementById('overallComment').value, measures: [...document.querySelectorAll('.measure-check:checked')].map(c=>c.value), photos: [...photos], avg: calcDeclineAvg(), worstHealth: worstHealth(), overall: document.getElementById('overallGradeDisplay').textContent, memo: memoDataUrl }; }
+    window.saveRecord = () => { if(!document.getElementById('treeNo').value || !document.getElementById('surveyDate').value || !document.getElementById('inspector').value || !document.getElementById('species').value) { alert('必須項目を入力'); return; } const data = collectData(); if(editingId) { const idx=records.findIndex(r=>r.id===editingId); if(idx!==-1) records[idx]=data; editingId=null; } else records.unshift(data); localStorage.setItem('treeRecords', JSON.stringify(records)); alert('✅ 保存しました'); updateAllMapMarkers(); resetForm(); updateEditModeUI(); renderRecordsList(); showTab('records'); };
+    window.resetForm = function() { document.getElementById('treeNo').value=''; document.getElementById('surveyDate').value=new Date().toISOString().split('T')[0]; document.getElementById('weather').value='晴れ'; document.getElementById('inspector').value=''; document.getElementById('species').value=''; document.getElementById('family').value=''; document.getElementById('scientificName').value=''; document.getElementById('nickname').value=''; document.getElementById('location').value=''; document.getElementById('treeHeight').value=''; document.getElementById('trunkGirth').value=''; document.getElementById('latitude').value='35.681236'; document.getElementById('longitude').value='139.767125'; if(map&&marker){map.setView([35.681236,139.767125],17);marker.setLatLng([35.681236,139.767125]);marker.setIcon(createLabelIcon('●'));} clearLocationPhoto(); document.getElementById('overallComment').value=''; document.getElementById('fungusOther').value=''; Object.keys(scores).forEach(k=>delete scores[k]); Object.keys(healthGrades).forEach(k=>delete healthGrades[k]); document.querySelectorAll('.rbtn').forEach(b=>b.classList.remove('sel')); photos=[]; renderPhotos(); document.querySelectorAll('.fungus-check').forEach(cb=>cb.checked=false); document.querySelectorAll('.measure-check').forEach(cb=>cb.checked=false); clearMemo(); updateOverall(); editingId=null; updateEditModeUI(); };
+    window.copyFormData = async () => { const d=collectData(); delete d.id; delete d.memo; try{await navigator.clipboard.writeText(JSON.stringify(d));alert('コピーしました');}catch(e){prompt('手動コピー',JSON.stringify(d));} };
+    window.pasteFormData = async () => { try{ const t=await navigator.clipboard.readText(); const d=JSON.parse(t); const map={'treeNo':'treeNo','surveyDate':'surveyDate','weather':'weather','inspector':'inspector','species':'species','family':'family','scientificName':'scientificName','nickname':'nickname','location':'location','treeHeight':'treeHeight','trunkGirth':'trunkGirth','latitude':'latitude','longitude':'longitude','comment':'overallComment','fungusOther':'fungusOther'}; Object.entries(map).forEach(([dk,fk])=>{if(d[dk])document.getElementById(fk).value=d[dk];}); alert('貼り付けました'); }catch{alert('貼り付け失敗');} };
+    function renderRecordsList() { const valid=records.filter(r=>r?.id); const q=document.getElementById('searchInput').value.toLowerCase(); let f=valid.filter(r=>(r.species||'').toLowerCase().includes(q)||(r.location||'').toLowerCase().includes(q)||(r.inspector||'').toLowerCase().includes(q)); const s=document.getElementById('sortSelect').value; if(s==='date-desc')f.sort((a,b)=>a.surveyDate<b.surveyDate?1:-1); else if(s==='date-asc')f.sort((a,b)=>a.surveyDate>b.surveyDate?1:-1); else{const o={A:1,B:2,C:3,D:4};f.sort((a,b)=>(o[a.overall]||5)-(o[b.overall]||5));} document.getElementById('recordsList').innerHTML = f.map(r=>`<div class="record-item"><div style="display:flex;justify-content:space-between;"><strong>${r.species} (${r.treeNo})</strong><span class="grade-badge grade-${r.overall}">${r.overall}</span></div><div>📍 ${r.location} 📅 ${r.surveyDate}</div><div>👤 ${r.inspector}</div><div class="record-actions"><button class="btn-small" onclick="editRecord('${r.id}')">✏️ 編集</button><button class="btn-small" onclick="deleteRecord('${r.id}')">🗑️ 削除</button><button class="btn-small" onclick="printRecord('${r.id}')">📊 詳細Excel</button></div></div>`).join('')||'<p>記録がありません</p>'; }
+    window.editRecord = (id) => { const r=records.find(r=>r.id===id); if(!r)return; editingId=r.id; document.getElementById('treeNo').value=r.treeNo||''; document.getElementById('surveyDate').value=r.surveyDate||''; document.getElementById('weather').value=r.weather||'晴れ'; document.getElementById('inspector').value=r.inspector||''; document.getElementById('species').value=r.species||''; document.getElementById('family').value=r.family||''; document.getElementById('scientificName').value=r.scientificName||''; document.getElementById('nickname').value=r.nickname||''; document.getElementById('location').value=r.location||''; document.getElementById('treeHeight').value=r.treeHeight||''; document.getElementById('trunkGirth').value=r.trunkGirth||''; document.getElementById('latitude').value=r.latitude||'35.681236'; document.getElementById('longitude').value=r.longitude||'139.767125'; if(map&&marker){const la=parseFloat(r.latitude)||35.681236,ln=parseFloat(r.longitude)||139.767125;map.setView([la,ln],17);marker.setLatLng([la,ln]);marker.setIcon(createLabelIcon(r.treeNo||'●'));} locationPhoto=r.locationPhoto||null; const pv=document.getElementById('locPhotoPreview'); if(locationPhoto){pv.src=locationPhoto;pv.style.display='block';}else pv.style.display='none'; document.getElementById('overallComment').value=r.comment||''; document.getElementById('fungusOther').value=r.fungusOther||''; Object.assign(scores,r.scores||{}); Object.assign(healthGrades,r.health||{}); document.querySelectorAll('.rbtn').forEach(b=>b.classList.remove('sel')); declineItems.forEach(it=>{if(scores[it.id]!==undefined)document.querySelector(`[data-type="decline"][data-id="${it.id}"][data-val="${scores[it.id]}"]`)?.classList.add('sel');}); healthItems.forEach(it=>{if(healthGrades[it.id])document.querySelector(`[data-type="health"][data-id="${it.id}"][data-val="${healthGrades[it.id]}"]`)?.classList.add('sel');}); photos=r.photos||[]; renderPhotos(); document.querySelectorAll('.fungus-check').forEach(cb=>cb.checked=(r.fungus||[]).includes(cb.value)); document.querySelectorAll('.measure-check').forEach(cb=>cb.checked=(r.measures||[]).includes(cb.value)); updateOverall(); updateEditModeUI(); showTab('inspect'); };
+    window.deleteRecord = (id) => { if(confirm('削除しますか？')){records=records.filter(r=>r.id!==id);localStorage.setItem('treeRecords',JSON.stringify(records));updateAllMapMarkers();renderRecordsList();} };
+    window.removeInvalidRecords = () => { records=records.filter(r=>r?.id);localStorage.setItem('treeRecords',JSON.stringify(records));updateAllMapMarkers();renderRecordsList();alert('無効記録を削除しました'); };
+    function setColWidths(ws, widths) { ws['!cols'] = widths.map(w => ({ wch: w })); }
+    function sanitizeSheetName(name) { return name.replace(/[:\\\/\?\*\[\]]/g, '_').slice(0,31); }
+    function dlBlob(blob, filename) { const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000); }
+    window.printRecord = function(id) { const r=records.find(r=>r.id===id); if(!r) return; const wb=XLSX.utils.book_new(); const ws1 = XLSX.utils.aoa_to_sheet([ ['様式Ⅰ-1　調査木位置図', '', '', '', '', '', '', ''], ['樹木No.', r.treeNo, '調査日', r.surveyDate, '天候', r.weather, '調査者', r.inspector], ['樹種名', r.species, '', '', '科名', r.family, '', ''], ['学名', r.scientificName, '', '', '樹木の名称(愛称)', r.nickname, '', ''], ['所在地', r.location, '', '', '', '', '', ''], ['樹高(m)', r.treeHeight, '幹周(cm)', r.trunkGirth, '', '', '', ''], ['緯度', r.latitude, '経度', r.longitude, '', '', '', ''], ['地図（1/25,000）', '', '', '', '', '', '', ''], ['※ Leaflet地図は印刷または画像保存', '', '', '', '', '', '', ''], ['写真枚数', (r.photos||[]).length, '写真はJSONバックアップに含まれます', '', '', '', '', ''] ]); setColWidths(ws1, [20,20,15,20,15,20,15,20]); XLSX.utils.book_append_sheet(wb, ws1, '様式Ⅰ-1_位置図'); const ws2 = XLSX.utils.aoa_to_sheet([ ['様式Ⅰ-2　地上部の衰退度判定票', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''], ['評価項目', '0', '', '1', '', '2', '', '3', '', '4', '', '評点'], ...declineItems.map(it => [it.name, ...it.desc, '', r.scores?.[it.id]??'']), ['衰退度(平均)', '', '', '', '', '', '', '', '', '', '', r.avg?.toFixed(2)??''], ['判定区分', '', '', '', '', '', '', '', '', '', '', (()=>{ const a=r.avg||0; return a<0.8?'Ⅰ（良）':a<1.6?'Ⅱ（やや不良）':a<2.4?'Ⅲ（不良）':a<3.2?'Ⅳ（著しく不良）':'Ⅴ（枯死寸前）'; })()] ]); setColWidths(ws2, [15,15,10,15,10,15,10,15,10,15,10,10]); XLSX.utils.book_append_sheet(wb, ws2, '様式Ⅰ-2_衰退度'); const ws3 = XLSX.utils.aoa_to_sheet([ ['様式Ⅰ-3　倒木、枝折れ等危険度判定票', '', '', '', '', '', ''], ['項目', '', 'A(0)', 'B(1)', 'C(2)', 'D(3)', '判定'], ...healthItems.map(it => [it.name, '', it.desc[0], it.desc[1], it.desc[2], it.desc[3], r.health?.[it.id]??'']), ['腐朽菌', '', '', '', '', '', [...(r.fungus||[]), r.fungusOther].filter(Boolean).join('、')], ['総合判定', '', '', '', '', '', r.overall], ['所見', '', '', '', '', '', r.comment], ['必要な措置', '', '', '', '', '', (r.measures||[]).join('、')] ]); setColWidths(ws3, [20,5,30,30,30,30,15]); XLSX.utils.book_append_sheet(wb, ws3, '様式Ⅰ-3_危険度'); dlBlob(new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:'application/octet-stream'}), `詳細_${r.treeNo}.xlsx`); };
+    window.exportToExcel = () => { const d=collectData(); if(!d.treeNo){alert('樹木Noを入力');return;} printRecord(d.id); };
+    window.exportSummaryToExcel = () => { if(!records.filter(r=>r?.id).length){alert('データなし');return;} const wb=XLSX.utils.book_new(); const rows=[['調査日','樹木No','樹種','場所','点検者','樹高','幹周','緯度','経度','判定','所見','必要な措置']]; records.filter(r=>r?.id).forEach(r=>rows.push([r.surveyDate,r.treeNo,r.species,r.location,r.inspector,r.treeHeight,r.trunkGirth,r.latitude,r.longitude,r.overall,r.comment,(r.measures||[]).join('、')])); const ws=XLSX.utils.aoa_to_sheet(rows); setColWidths(ws,[12,10,15,20,12,8,8,12,12,8,30,30]); XLSX.utils.book_append_sheet(wb,ws,'一覧表'); dlBlob(new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:'application/octet-stream'}),'樹木点検一覧.xlsx'); };
+    window.exportAllToExcel = () => { const valid=records.filter(r=>r?.id); if(!valid.length){alert('データなし');return;} const wb=XLSX.utils.book_new(); valid.forEach(r=>{const ws=XLSX.utils.aoa_to_sheet([['樹木No',r.treeNo],['調査日',r.surveyDate],['天候',r.weather],['調査者',r.inspector],['樹種',r.species],['科名',r.family],['学名',r.scientificName],['愛称',r.nickname],['所在地',r.location],['樹高(m)',r.treeHeight],['幹周(cm)',r.trunkGirth],['緯度',r.latitude],['経度',r.longitude],['総合判定',r.overall],['所見',r.comment],['腐朽菌',[...(r.fungus||[]),r.fungusOther].filter(Boolean).join('、')],['必要な措置',(r.measures||[]).join('、')]]);setColWidths(ws,[20,40]);XLSX.utils.book_append_sheet(wb,ws,sanitizeSheetName(r.treeNo||r.id));}); const summary=[['調査日','樹木No','樹種','場所','点検者','樹高','幹周','緯度','経度','判定','所見','必要な措置']]; valid.forEach(r=>summary.push([r.surveyDate,r.treeNo,r.species,r.location,r.inspector,r.treeHeight,r.trunkGirth,r.latitude,r.longitude,r.overall,r.comment,(r.measures||[]).join('、')])); const wsSum=XLSX.utils.aoa_to_sheet(summary);setColWidths(wsSum,[12,10,15,20,12,8,8,12,12,8,30,30]);XLSX.utils.book_append_sheet(wb,wsSum,'一覧表'); dlBlob(new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:'application/octet-stream'}),'全件樹木診断.xlsx'); };
+    window.exportAllToJSON = () => { const valid=records.filter(r=>r?.id); if(!valid.length){alert('データなし');return;} dlBlob(new Blob([JSON.stringify(valid,null,2)],{type:'application/json'}),'backup.json'); };
+    window.exportAllToCSV = function() {
+      const valid = records.filter(r => r?.id);
+      if (!valid.length) { alert('出力する記録がありません'); return; }
+      const header = ['通し番号','樹木番号','樹種名','点検者','所在地','調査日','総合判定','必要な処置','緯度X','経度Y'];
+      const rows = valid.map((r, i) => [
+        i + 1,
+        r.treeNo || '',
+        r.species || '',
+        r.inspector || '',
+        r.location || '',
+        r.surveyDate || '',
+        r.overall || '',
+        (r.measures || []).join('、'),
+        r.latitude || '',
+        r.longitude || ''
+      ]);
+      const csvContent = [header, ...rows].map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+      const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `樹木点検一覧_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      alert('CSVを出力しました');
+    };
+    document.getElementById('jsonImportInput').addEventListener('change',function(e){ const file=e.target.files[0]; if(!file)return; const reader=new FileReader(); reader.onload=ev=>{ try{ let text=ev.target.result; if(text.charCodeAt(0)===0xFEFF)text=text.slice(1); const imported=JSON.parse(text); if(Array.isArray(imported)){ const vl=imported.filter(r=>r?.id); if(vl.length&&confirm(`${vl.length}件で上書きしますか？`)){ records=vl; localStorage.setItem('treeRecords',JSON.stringify(records)); updateAllMapMarkers(); renderRecordsList(); alert('復元完了'); }} else alert('無効な形式'); }catch{ alert('JSON解析エラー'); } e.target.value=''; }; reader.readAsText(file,'UTF-8'); });
+    window.printInspectionPage = () => window.print();
+    window.printAllMap = function() { showTab('allmap'); setTimeout(()=>{ if(allMap)allMap.invalidateSize(); document.body.classList.add('print-map-only'); window.print(); setTimeout(()=>document.body.classList.remove('print-map-only'),200); },300); };
+    window.saveAllMapAsImage = () => { const mapElement=document.getElementById('allMap'); html2canvas(mapElement,{scale:2,backgroundColor:null,useCORS:true,allowTaint:false}).then(canvas=>{ const link=document.createElement('a'); link.download='全体マップ.png'; link.href=canvas.toDataURL('image/png'); link.click(); }).catch(err=>alert('画像保存に失敗しました')); };
+    function showTab(tab) { document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active')); document.getElementById(`tab-${tab}`).classList.add('active'); document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); document.querySelector(`[data-tab="${tab}"]`).classList.add('active'); if(tab==='records') renderRecordsList(); if(tab==='allmap'){setTimeout(()=>{if(!allMap)initAllMap();else{allMap.invalidateSize();updateAllMapMarkers();}},100);} }
+    window.showTab = showTab;
+    function init() { buildUI(); initMap(); const saved=localStorage.getItem('treeRecords'); if(saved){try{records=JSON.parse(saved);}catch{}} records=records.filter(r=>r?.id); document.getElementById('surveyDate').value=new Date().toISOString().split('T')[0]; document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab))); document.getElementById('searchInput').addEventListener('input',renderRecordsList); document.getElementById('sortSelect').addEventListener('change',renderRecordsList); renderPhotos(); updateOverall(); updateEditModeUI(); }
+    init();
+  })();
+</script>
+<script>
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('/26.1shindan/sw.js',{scope:'/26.1shindan/'}).then(reg=>{
+      if(reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});
+      reg.addEventListener('updatefound',()=>{ const nw=reg.installing; nw.addEventListener('statechange',()=>{ if(nw.state==='installed'&&navigator.serviceWorker.controller){ if(confirm('最新バージョンがあります。更新しますか？')){nw.postMessage({type:'SKIP_WAITING'});window.location.reload();} } }); });
+    }).catch(()=>{});
+    navigator.serviceWorker.addEventListener('controllerchange',()=>window.location.reload());
+  }
+</script>
+</body>
+</html>
