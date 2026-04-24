@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>樹木点検システム 利用マニュアル</title>
+  <style>
+    :root {
+      --green-dark: #2d5016;
+      --green-mid: #4a7c2f;
+      --green-light: #e8f3df;
+      --brown-light: #f3ede5;
+      --blue-light: #e3f2fd;
+      --warn: #fff8e1;
+      --warn-border: #f9a825;
+      --text: #1a1a1a;
+      --muted: #555;
+      --border: #ddd;
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+      background: #f4f6f0;
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 16px;
+    }
+    .site-header {
+      background: linear-gradient(145deg, #1e3a0e, #2d5016);
+      color: white;
+      padding: 28px 20px 24px;
+      border-radius: 0 0 28px 28px;
+      text-align: center;
+    }
+    .site-header h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 6px; }
+    .site-header p  { font-size: 0.85rem; opacity: 0.85; }
+    .back-link {
+      display: inline-block;
+      margin-top: 12px;
+      color: white;
+      text-decoration: none;
+      font-size: 0.85rem;
+      border: 1px solid rgba(255,255,255,0.5);
+      border-radius: 20px;
+      padding: 6px 16px;
+    }
+    .back-link:hover { background: rgba(255,255,255,0.2); }
+    .toc {
+      background: white;
+      border-radius: var(--radius);
+      margin: 16px 14px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    }
+    .toc h2 { font-size: 1rem; color: var(--green-dark); margin-bottom: 12px; display:flex; gap:8px; align-items:center; }
+    .toc ol { padding-left: 22px; }
+    .toc li { margin-bottom: 6px; }
+    .toc a { color: var(--green-mid); text-decoration: none; font-weight: 500; }
+    .section {
+      margin: 0 14px 24px;
+    }
+    .section-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--green-dark);
+      padding: 14px 16px;
+      background: var(--green-light);
+      border-radius: var(--radius) var(--radius) 0 0;
+      border-left: 5px solid var(--green-mid);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-body {
+      background: white;
+      border-radius: 0 0 var(--radius) var(--radius);
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    }
+    .step-card {
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .step-head {
+      background: var(--green-light);
+      padding: 11px 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .step-head.brown { background: var(--brown-light); }
+    .step-head.blue  { background: var(--blue-light); }
+    .step-num {
+      background: var(--green-dark);
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+    .step-body { padding: 14px 16px; }
+    .note {
+      background: var(--warn);
+      border-left: 4px solid var(--warn-border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      color: #5d4037;
+      margin: 12px 0;
+    }
+    .tip {
+      background: #e8f5e9;
+      border-left: 4px solid #43a047;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      color: #1b5e20;
+      margin: 12px 0;
+    }
+    .badges { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+    .badge { display: flex; align-items: center; gap: 8px; border-radius: 30px; padding: 8px 16px; font-weight: 700; font-size: 0.9rem; }
+    .badge-A { background: #2e7d32; color: white; }
+    .badge-B { background: #f9a825; color: #222; }
+    .badge-C { background: #e65100; color: white; }
+    .badge-D { background: #b71c1c; color: white; }
+    table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.88rem; }
+    th { background: var(--green-dark); color: white; padding: 9px 10px; text-align: left; }
+    td { padding: 9px 10px; border-bottom: 1px solid #eee; vertical-align: top; }
+    tr:nth-child(even) td { background: #f9faf6; }
+    .faq-item { border: 1.5px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
+    .faq-q { background: #f5f5f5; padding: 13px 16px; font-weight: 700; font-size: 0.95rem; display: flex; gap: 10px; align-items: flex-start; }
+    .faq-a { padding: 12px 16px; font-size: 0.9rem; color: var(--muted); }
+    .site-footer { background: var(--green-dark); color: rgba(255,255,255,0.8); text-align: center; padding: 20px; font-size: 0.8rem; margin-top: 10px; }
+    ul.check { list-style: none; padding: 0; }
+    ul.check li::before { content: "✅ "; }
+    [id] { scroll-margin-top: 16px; }
+    @media (min-width: 600px) {
+      .section, .toc { margin-left: auto; margin-right: auto; max-width: 700px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <h1>🌳 樹木点検システム 利用マニュアル</h1>
+  <p>はじめての方でも安心して使えるよう、操作手順をやさしく解説します</p>
+  <a href="./" class="back-link">← 点検システムに戻る</a>
+</header>
+
+<nav class="toc">
+  <h2>📖 目次</h2>
+  <ol>
+    <li><a href="#sec-about">このシステムについて</a></li>
+    <li><a href="#sec-start">アプリの始め方（インストール）</a></li>
+    <li><a href="#sec-screen">画面の見かた</a></li>
+    <li><a href="#sec-flow">点検の流れ（全体像）</a></li>
+    <li><a href="#sec-input">点検入力の手順（タブ①）</a></li>
+    <li><a href="#sec-records">記録一覧の使いかた（タブ②）</a></li>
+    <li><a href="#sec-map">全体マップの使いかた（タブ③）</a></li>
+    <li><a href="#sec-criteria">判定基準の見かた（タブ④）</a></li>
+    <li><a href="#sec-export">データの出力・バックアップ</a></li>
+    <li><a href="#sec-caution">ご利用上の注意</a></li>
+  </ol>
+</nav>
+
+<section class="section" id="sec-about">
+  <div class="section-title"><span>1️⃣</span>このシステムについて</div>
+  <div class="section-body">
+    <p>「<strong>樹木点検・診断システム</strong>」は、国土交通省の点検指針（案）に沿って、公園や街路樹などの樹木の健康状態を記録・診断するためのアプリです。スマートフォンやタブレットのブラウザから無料でご利用いただけます。</p>
+    <div class="note">⚠️ 本システムの診断結果は<strong>目安</strong>です。倒木など重大な危険が疑われる場合は、必ず<strong>樹木医等の専門家</strong>にご相談ください。</div>
+    <p style="margin-top:12px;"><strong>このシステムでできること：</strong></p>
+    <ul class="check" style="margin-top:8px;">
+      <li>樹木の位置・種類・大きさを記録</li>
+      <li>活力度（元気さ）と健全度（危険度）を自動診断</li>
+      <li>写真撮影・写真への書き込み</li>
+      <li>地図上での全樹木位置表示</li>
+      <li>Excel・CSV・JSONでデータ出力</li>
+      <li>オフラインでも使用可能</li>
+    </ul>
+  </div>
+</section>
+
+<section class="section" id="sec-start">
+  <div class="section-title"><span>2️⃣</span>アプリの始め方（インストール）</div>
+  <div class="section-body">
+    <p>URLにアクセスするだけで使えます。ホーム画面に追加しておけば次回から素早く起動できます。</p>
+    <div class="step-card">
+      <div class="step-head"><div class="step-num">1</div>URLにアクセスする</div>
+      <div class="step-body"><p>案内されたURLを<strong>Safari</strong>（iPhone）または<strong>Chrome</strong>（Android）で開いてください。</p></div>
+    </div>
+    <div class="step-card">
+      <div class="step-head"><div class="step-num">2</div>ホーム画面に追加する（おすすめ）</div>
+      <div class="step-body">
+        <p><strong>iPhone（Safari）：</strong>画面下の「共有」→「ホーム画面に追加」</p>
+        <p><strong>Android（Chrome）：</strong>右上「⋮」→「ホーム画面に追加」</p>
+        <div class="tip">🌱 ホーム画面から起動するとアプリのように使えます。オフラインでも動作します。</div>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-head"><div class="step-num">3</div>初回読み込み</div>
+      <div class="step-body"><p>初回はWi-Fi環境で開いてください。地図などのデータが自動的にキャッシュされます。</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="sec-screen">
+  <div class="section-title"><span>3️⃣</span>画面の見かた</div>
+  <div class="section-body">
+    <table>
+      <thead><tr><th>タブ</th><th>できること</th></tr></thead>
+      <tbody>
+        <tr><td>📋 点検入力</td><td>樹木の情報・評価・写真などを入力して保存する</td></tr>
+        <tr><td>📚 記録一覧</td><td>保存済みの記録を一覧表示・検索・編集・削除する</td></tr>
+        <tr><td>🗺️ 全体マップ</td><td>登録した全樹木の位置を地図上で確認する</td></tr>
+        <tr><td>📖 判定基準</td><td>活力度・健全度・総合判定の基準を確認する</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section" id="sec-flow">
+  <div class="section-title"><span>4️⃣</span>点検の流れ（全体像）</div>
+  <div class="section-body">
+    <p>樹木1本あたり、以下の流れで点検・記録します。</p>
+    <div style="background:#f0f7ea; padding:16px; border-radius:12px; margin-top:12px; line-height:2.2; font-size:0.9rem; font-weight:500;">
+      ① 基本情報入力　→　② GPSで位置取得　→　③ 写真撮影・メモ　→　④ 活力度評価　→　⑤ 健全度評価　→　⑥ 腐朽菌記録　→　⑦ 総合判定・所見　→　💾 保存
+    </div>
+  </div>
+</section>
+
+<section class="section" id="sec-input">
+  <div class="section-title"><span>5️⃣</span>点検入力の手順（タブ①）</div>
+  <div class="section-body">
+    <div class="step-card">
+      <div class="step-head"><div class="step-num" style="border-radius:8px;">Ⅰ-1</div>基本情報を入力</div>
+      <div class="step-body">
+        <table>
+          <tr><td><strong>樹木No. ✱</strong></td><td>管理番号（必須）</td></tr>
+          <tr><td><strong>調査日 ✱</strong></td><td>自動入力（編集可）</td></tr>
+          <tr><td>天候</td><td>晴/曇/雨</td></tr>
+          <tr><td><strong>調査者 ✱</strong></td><td>あなたの名前（必須）</td></tr>
+          <tr><td><strong>樹種名 ✱</strong></td><td>木の種類（必須）</td></tr>
+          <tr><td>所在地</td><td>公園名や住所</td></tr>
+          <tr><td>樹高／幹周</td><td>おおよその値を記入</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-head blue"><div class="step-num" style="background:#1565c0; border-radius:8px;">📍</div>GPS・地図で位置を記録</div>
+      <div class="step-body">
+        <p>「📍 現在位置を取得」ボタンで自動入力。地図上のピンをドラッグして手動修正も可能です。</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-head"><div class="step-num" style="border-radius:8px;">📸</div>写真を撮影・追加</div>
+      <div class="step-body">
+        <p>「📷 カメラ」または「🖼️ アルバム」で写真を追加。写真をタップすると、ペン・矢印・テキストで直接書き込めます。</p>
+        <div class="tip">💡 木全体・幹元・気になる部位の3枚を撮影するのがおすすめです。</div>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-head"><div class="step-num" style="border-radius:8px;">🖊️</div>手書きメモ</div>
+      <div class="step-body"><p>白いキャンバスに指でスケッチやメモを書けます。「💾 メモ保存」で画像として保存できます。</p></div>
+    </div>
+    <div class="step-card">
+      <div class="step-head brown"><div class="step-num" style="background:#6d4c41; border-radius:8px;">Ⅰ-2</div>活力度（衰退度）を評価</div>
+      <div class="step-body">
+        <table>
+          <tr><td><strong>0</strong></td><td>正常・健全</td></tr>
+          <tr><td><strong>1</strong></td><td>わずかに異常</td></tr>
+          <tr><td><strong>2</strong></td><td>明らかに異常</td></tr>
+          <tr><td><strong>3</strong></td><td>かなり悪い</td></tr>
+          <tr><td><strong>4</strong></td><td>著しく悪い・枯死寸前</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-head blue"><div class="step-num" style="background:#1565c0; border-radius:8px;">Ⅰ-3</div>健全度・危険度を評価</div>
+      <div class="step-body">
+        <div class="badges">
+          <div class="badge badge-A">A 異常なし</div>
+          <div class="badge badge-B">B 軽微な異常</div>
+          <div class="badge badge-C">C 危険性あり</div>
+          <div class="badge badge-D">D 非常に危険</div>
+        </div>
+        <p>傾き・空洞・根の状態などを評価します。</p>
+        <div class="note">⚠️ D評価がある場合は速やかに専門家へ報告してください。</div>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-head"><div class="step-num" style="border-radius:8px;">📊</div>総合判定・所見を入力</div>
+      <div class="step-body">
+        <p>自動計算されたA～Dの判定を確認し、所見・措置を記入して「💾 保存」します。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="sec-records">
+  <div class="section-title"><span>6️⃣</span>記録一覧の使いかた（タブ②）</div>
+  <div class="section-body">
+    <p>保存済みの点検記録を一覧表示・検索・編集・削除できます。</p>
+    <p>「📊 全件Excel出力」「📄 CSV出力」「📦 JSONバックアップ」など、データ出力・バックアップもここから行えます。</p>
+    <div class="tip">📄 CSV出力は「通し番号,樹木番号,樹種名,点検者,所在地,調査日,総合判定,必要な処置,緯度X,経度Y」の形式で出力され、GISなどに取り込めます。</div>
+  </div>
+</section>
+
+<section class="section" id="sec-map">
+  <div class="section-title"><span>7️⃣</span>全体マップの使いかた（タブ③）</div>
+  <div class="section-body">
+    <p>GPSで記録した全樹木の位置を地図上に表示します。ピンをタップすると編集画面に移動できます。</p>
+  </div>
+</section>
+
+<section class="section" id="sec-criteria">
+  <div class="section-title"><span>8️⃣</span>判定基準の見かた（タブ④）</div>
+  <div class="section-body">
+    <p>活力度・健全度・総合判定の基準表を確認できます。点検中に迷ったら参照してください。</p>
+  </div>
+</section>
+
+<section class="section" id="sec-export">
+  <div class="section-title"><span>9️⃣</span>データの出力・バックアップ</div>
+  <div class="section-body">
+    <ul class="check">
+      <li><strong>JSONバックアップ</strong>：写真を含む全データを保存。定期的に取得してください。</li>
+      <li><strong>Excel出力</strong>：様式付きExcel（報告書用）または一覧表Excel。</li>
+      <li><strong>CSV出力</strong>：他システム連携用。</li>
+    </ul>
+  </div>
+</section>
+
+<section class="section" id="sec-caution">
+  <div class="section-title"><span>⚠️</span>ご利用上の注意</div>
+  <div class="section-body">
+    <div class="note" style="font-size:0.92rem; line-height:1.8;">
+      <ul style="padding-left:18px;">
+        <li>診断結果は<strong>目安</strong>です。最終判断は<strong>専門家</strong>が行ってください。</li>
+        <li>C・D判定や危険木が疑われる場合は、直ちに報告し、立入制限などの措置を検討してください。</li>
+        <li>本システムの利用により生じた損害について、開発者は一切の責任を負いません。</li>
+        <li>データは端末内に保存されます。定期的にバックアップをお願いします。</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <p>樹木点検・診断システム 利用マニュアル</p>
+  <p style="margin-top:4px;">国土交通省指針（案）準拠</p>
+</footer>
+
+</body>
+</html>
