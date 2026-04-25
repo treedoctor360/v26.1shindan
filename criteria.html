@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>詳細判定基準｜樹木点検システム</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* ── ベース ── */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Noto Sans JP', sans-serif; background: #f4f6f0; color: #1a1a1a; padding-bottom: 30px; }
+    .hdr { background: linear-gradient(145deg, #1e3a0e, #2d5016); color: white; padding: 16px 16px; border-radius: 0 0 28px 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+    .hdr h1 { font-size: 1.2rem; font-weight: 700; }
+
+    /* ── カード・セクション ── */
+    .card { background: white; border-radius: 20px; margin: 16px 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden; }
+    .card-hdr { padding: 14px 18px; font-weight: 700; background: #e8f3df; border-bottom: 2px solid rgba(0,0,0,0.05); display: flex; align-items: center; gap: 10px; }
+    .card-hdr.brown { background: #f3ede5; }
+    .card-hdr.blue { background: #e3f2fd; }
+    .sn { background: #2d5016; color: white; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 0.8rem; flex-shrink: 0; }
+    .card-body { padding: 16px; }
+
+    /* ── 評価バッジなど ── */
+    .badges { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+    .badge { display: flex; align-items: center; gap: 8px; border-radius: 30px; padding: 8px 16px; font-weight: 700; font-size: 0.9rem; }
+    .badge-A { background: #2e7d32; color: white; }
+    .badge-B { background: #f9a825; color: #222; }
+    .badge-C { background: #e65100; color: white; }
+    .badge-D { background: #b71c1c; color: white; }
+    table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.85rem; }
+    th { background: #2d5016; color: white; padding: 8px 10px; text-align: left; }
+    td { padding: 8px 10px; border-bottom: 1px solid #eee; vertical-align: top; }
+    tr:nth-child(even) td { background: #f9faf6; }
+
+    /* ── 活力度・健全度のグリッド ── */
+    .score-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 4px; margin: 8px 0 12px; }
+    .score-cell { border-radius: 8px; padding: 6px 4px; text-align: center; font-size: 0.75rem; }
+    .score-num { font-size: 1rem; font-weight: 800; display: block; }
+    .health-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 4px; margin: 8px 0 12px; }
+    .health-cell { border-radius: 8px; padding: 6px 4px; text-align: center; font-size: 0.75rem; }
+    .health-grade { font-size: 1rem; font-weight: 800; display: block; }
+
+    /* ── 注釈 ── */
+    .note { background: #fff8e1; border-left: 4px solid #f9a825; border-radius: 8px; padding: 10px 14px; font-size: 0.85rem; color: #5d4037; margin: 12px 0; }
+    .back-btn { display: inline-block; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; text-decoration: none; font-weight: 600; }
+    .section-title { font-size: 0.95rem; font-weight: 700; color: #2d5016; margin-bottom: 12px; border-bottom: 2px solid #e8f3df; padding-bottom: 6px; }
+
+    /* 配色 */
+    .s0{background:#e8f5e9;color:#1b5e20} .s1{background:#f9fbe7;color:#558b2f} .s2{background:#fff8e1;color:#e65100} .s3{background:#fce4ec;color:#c62828} .s4{background:#f3e5f5;color:#7b1fa2}
+    .hA{background:#e8f5e9;color:#2e7d32} .hB{background:#fff3e0;color:#e65100} .hC{background:#ffebee;color:#c62828} .hD{background:#f3e5f5;color:#7b1fa2}
+  </style>
+</head>
+<body>
+
+<header class="hdr">
+  <h1>📖 判定基準 詳細ガイド</h1>
+  <a href="./" class="back-btn">← アプリへ</a>
+</header>
+
+<div style="padding: 4px 16px; font-size: 0.72rem; color: #888; background: rgba(45,80,22,0.05);">
+  国土交通省「都市公園の樹木の点検・診断に関する指針（案）参考資料」に基づく解説
+</div>
+
+<!-- ===== 総合判定 ===== -->
+<div class="card">
+  <div class="card-hdr"><span class="sn">📊</span>総合判定の見かた</div>
+  <div class="card-body">
+    <table>
+      <tr><th>判定</th><th>活力度平均</th><th>健全度(最悪)</th><th>対応の目安</th></tr>
+      <tr><td><span class="badge" style="background:#2e7d32;color:white;">A 健全</span></td><td>0.8未満</td><td>A</td><td>現状維持、定期観察</td></tr>
+      <tr><td><span class="badge" style="background:#f9a825;color:#222;">B 健全に近い</span></td><td>0.8〜1.6</td><td>B</td><td>経過観察、軽度の管理</td></tr>
+      <tr><td><span class="badge" style="background:#e65100;color:white;">C 要注意</span></td><td>1.6〜2.4</td><td>C</td><td>早期に専門家へ相談・対処</td></tr>
+      <tr><td><span class="badge" style="background:#b71c1c;color:white;">D 危険木</span></td><td>2.4以上</td><td>D</td><td>緊急対応、立入制限を検討</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ===== Ⅰ-2 活力度 ===== -->
+<div class="card">
+  <div class="card-hdr brown"><span class="sn">Ⅰ-2</span>活力度（衰退度）— 17項目</div>
+  <div class="card-body">
+    <p style="font-size:0.85rem; color:#555; margin-bottom: 12px;">各項目を <strong>0（最良）〜4（最悪）</strong> の5段階で評価します。「同種の健全な木と比べてどうか」を基準に判断してください。</p>
+
+    <div class="section-title">① 樹勢</div>
+    <p style="font-size:0.85rem; color:#555; margin-bottom: 8px;">枝の伸び・葉の密度・葉色などから木全体の元気さを総合的に判断。最初に見たときの印象を大切に。</p>
+    <div class="score-grid">
+      <div class="score-cell s0"><span class="score-num">0</span>旺盛・被害なし</div>
+      <div class="score-cell s1"><span class="score-num">1</span>幾分影響があるが目立たない</div>
+      <div class="score-cell s2"><span class="score-num">2</span>異常が明らか</div>
+      <div class="score-cell s3"><span class="score-num">3</span>極めて劣悪</div>
+      <div class="score-cell s4"><span class="score-num">4</span>ほとんど枯死</div>
+    </div>
+
+    <div class="section-title">② 樹形</div>
+    <p style="font-size:0.85rem; color:#555; margin-bottom: 8px;">主幹・大枝の枯損や欠損、葉の密度と配置から評価。剪定で人工樹形にしている場合は留意。</p>
+    <div class="score-grid">
+      <div class="score-cell s0"><span class="score-num">0</span>自然樹形を保っている</div>
+      <div class="score-cell s1"><span class="score-num">1</span>若干の乱れがあるが自然樹形に近い</div>
+      <div class="score-cell s2"><span class="score-num">2</span>大きく変化している</div>
+      <div class="score-cell s3"><span class="score-num">3</span>樹形の乱れが著しい</div>
+      <div class="score-cell s4"><span class="score-num">4</span>完全に崩壊している</div>
+    </div>
+
+    <div class="note">
+      📌 残りの項目（枝葉密度、枝伸長量、葉の大きさ、葉色、梢端枯損、下枝枯損、大枝欠損、剪定痕、樹皮傷、新陳代謝、胴吹き、芽、紅黄葉、開花、結実）も同様に0〜4の基準で評価します。
+    </div>
+  </div>
+</div>
+
+<!-- ===== Ⅰ-3 健全度 ===== -->
+<div class="card">
+  <div class="card-hdr blue"><span class="sn">Ⅰ-3</span>健全度（危険度）— 14項目</div>
+  <div class="card-body">
+    <p style="font-size:0.85rem; color:#555; margin-bottom: 12px;">各項目を <strong>A（異常なし）〜D（非常に危険）</strong> の4段階で評価します。倒木・枝折れの危険性を総合的に判断します。</p>
+
+    <div class="section-title">① 揺らぎ</div>
+    <p style="font-size:0.85rem; color:#555; margin-bottom: 8px;">体重をかけて幹を押し、根元からの揺れを確認します。根元が動くか、土に割れ目がないかを観察。</p>
+    <div class="health-grid">
+      <div class="health-cell hA"><span class="health-grade">A</span>なし</div>
+      <div class="health-cell" style="background:#f5f5f5;color:#bbb;cursor:not-allowed;"><span class="health-grade">B</span>—（該当なし）</div>
+      <div class="health-cell hC"><span class="health-grade">C</span>あり（小）</div>
+      <div class="health-cell hD"><span class="health-grade">D</span>あり（大）<br>根元から揺らぐ</div>
+    </div>
+
+    <div class="section-title">② 不自然な傾斜</div>
+    <p style="font-size:0.85rem; color:#555; margin-bottom: 8px;">傾いている側の地面が盛り上がっていないか、反対側に亀裂がないかを確認。</p>
+    <div class="health-grid">
+      <div class="health-cell hA"><span class="health-grade">A</span>なし</div>
+      <div class="health-cell hB"><span class="health-grade">B</span>傾斜はあるが根付きは正常</div>
+      <div class="health-cell" style="background:#f5f5f5;color:#bbb;cursor:not-allowed;"><span class="health-grade">C</span>—（該当なし）</div>
+      <div class="health-cell hD"><span class="health-grade">D</span>傾斜＋地際に変状</div>
+    </div>
+
+    <div class="section-title">③ 開口空洞</div>
+    <p style="font-size:0.85rem; color:#555; margin-bottom: 8px;">空洞の深さ（芯まで達しているか）と、幹周に対する空洞の幅の割合を確認。</p>
+    <div class="health-grid">
+      <div class="health-cell hA"><span class="health-grade">A</span>なし</div>
+      <div class="health-cell hB"><span class="health-grade">B</span>芯に達しない</div>
+      <div class="health-cell hC"><span class="health-grade">C</span>芯に達し1/3未満</div>
+      <div class="health-cell hD"><span class="health-grade">D</span>芯に達し1/3以上</div>
+    </div>
+
+    <div class="note">
+      📌 残りの項目（亀裂、子実体(キノコ)、隆起、腐朽部露出、樹皮枯死･欠損、結合部の変状、穿孔害虫等、根張り、打診音異常、貫入異常、ぶら下がり枝）も同様にA〜Dの基準で評価します。
+    </div>
+  </div>
+</div>
+
+<!-- ===== 腐朽菌 ===== -->
+<div class="card">
+  <div class="card-hdr brown"><span class="sn">🍄</span>主な腐朽菌の種類と危険度</div>
+  <div class="card-body">
+    <table>
+      <tr><th>キノコ名</th><th>特徴</th><th>危険度</th></tr>
+      <tr><td><strong>ベッコウタケ</strong></td><td>広葉樹の根株の心材を腐朽させる。茶色い傘が特徴。</td><td style="color:#b71c1c;font-weight:700;">最高（D）</td></tr>
+      <tr><td><strong>コフキサルノコシカケ</strong></td><td>広葉樹の幹・枝・地際部の心材を腐朽。白い粉をふく。</td><td style="color:#b71c1c;font-weight:700;">最高（D）</td></tr>
+      <tr><td>カワラタケ</td><td>広葉樹・針葉樹の幹・枝の心材を腐朽。</td><td style="color:#e65100;font-weight:700;">高（C〜D）</td></tr>
+      <tr><td>カイメンタケ</td><td>針葉樹（特にカラマツ類）の根株の心材を腐朽。</td><td style="color:#e65100;font-weight:700;">中〜高（C）</td></tr>
+    </table>
+    <p style="font-size:0.75rem; color:#888; margin-top:8px;">
+      出典：国土交通省「都市公園の樹木の点検・診断に関する指針（案）参考資料」
+      <a href="https://www.mlit.go.jp/common/001203394.pdf" target="_blank" rel="noopener noreferrer" style="color:#1565c0;">（PDF）↗</a>
+    </p>
+  </div>
+</div>
+
+<!-- ===== 様式のダウンロード ===== -->
+<div class="card">
+  <div class="card-hdr green"><span class="sn">📋</span>関係資料</div>
+  <div class="card-body">
+    <p style="font-size:0.85rem; color:#555; margin-bottom: 8px;">
+      本システムは、以下の国土交通省の指針に準拠しています。詳細な評価基準や法的根拠、事故事例については、元の資料をご参照ください。
+    </p>
+    <a href="https://www.mlit.go.jp/toshi/park/toshi_parkgreen_tk_000109.html" target="_blank" rel="noopener noreferrer" class="back-btn" style="background:#2d5016; color:white; display:inline-block; text-align:center; width:100%;">
+      📄 国土交通省 樹木点検指針（案）ページへ
+    </a>
+  </div>
+</div>
+
+</body>
+</html>
