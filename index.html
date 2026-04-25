@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>樹木診断・点検システム（26.3）</title>
+  <title>樹木診断・点検システム（26.4）</title>
   <link rel="manifest" href="manifest.json">
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -36,14 +36,7 @@
     .rbtn { flex: 1 0 70px; padding: 8px 4px; background: #f2f2f2; border: 1.5px solid #ccc; border-radius: 30px; font-weight: 600; font-size: 0.9rem; cursor: pointer; text-align: center; line-height: 1.3; transition: all 0.1s; }
     .rbtn.sel { background: #4a7c2f; border-color: #2d5016; color: white; }
     .rbtn small { display: block; font-weight: 400; font-size: 0.65rem; opacity: 0.85; margin-top: 2px; }
-    .rbtn-inactive {
-      background: #e8e8e8;
-      color: #b0b0b0;
-      border-color: #ddd;
-      cursor: not-allowed;
-      opacity: 0.55;
-      pointer-events: none;
-    }
+    .rbtn-inactive { background: #e8e8e8; color: #b0b0b0; border-color: #ddd; cursor: not-allowed; opacity: 0.55; pointer-events: none; }
     .rbtn-inactive small { color: #b0b0b0; }
     .btn-pri { background: #2d5016; color: white; border: none; padding: 16px; border-radius: 50px; font-weight: 700; font-size: 1.2rem; width: 100%; cursor: pointer; }
     .btn-sec { background: #eee; border: 1px solid #bbb; padding: 12px; border-radius: 40px; font-weight: 600; cursor: pointer; }
@@ -94,105 +87,38 @@
 
     /* ヘルプアイコン */
     .help-icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: #e0e0e0;
-      color: #555;
-      font-size: 0.7rem;
-      font-weight: 700;
-      cursor: pointer;
-      margin-left: 4px;
-      text-decoration: none;
-      transition: all 0.15s;
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: #e0e0e0; color: #555; font-size: 0.7rem; font-weight: 700;
+      cursor: pointer; margin-left: 4px; text-decoration: none; transition: all 0.15s;
     }
     .help-icon:hover { background: #4a7c2f; color: white; }
 
     /* ヘルプポップアップ */
     .help-popup-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 9998;
-      display: none;
-      align-items: center;
-      justify-content: center;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); z-index: 9998;
+      display: none; align-items: center; justify-content: center;
     }
     .help-popup-overlay.open { display: flex; }
     .help-popup {
-      background: white;
-      border-radius: 20px;
-      width: 90vw;
-      max-width: 500px;
-      max-height: 80vh;
-      overflow-y: auto;
-      padding: 20px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-      position: relative;
+      background: white; border-radius: 20px; width: 90vw; max-width: 500px;
+      max-height: 80vh; overflow-y: auto; padding: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3); position: relative;
     }
-    .help-popup h3 {
-      font-size: 1.1rem;
-      color: #2d5016;
-      margin-bottom: 4px;
-    }
-    .help-popup .help-source {
-      font-size: 0.7rem;
-      color: #888;
-      margin-bottom: 14px;
-    }
-    .help-popup .help-summary {
-      font-size: 0.88rem;
-      margin-bottom: 14px;
-      line-height: 1.6;
-    }
-    .help-popup .help-criteria {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 14px;
-      font-size: 0.82rem;
-    }
-    .help-popup .help-criteria th {
-      background: #2d5016;
-      color: white;
-      padding: 6px 8px;
-      text-align: left;
-    }
-    .help-popup .help-criteria td {
-      padding: 6px 8px;
-      border-bottom: 1px solid #eee;
-    }
-    .help-popup .help-check {
-      background: #e8f5e9;
-      padding: 10px 12px;
-      border-radius: 8px;
-      font-size: 0.82rem;
-      margin-bottom: 8px;
-    }
-    .help-popup .help-danger {
-      background: #ffebee;
-      color: #b71c1c;
-      padding: 10px 12px;
-      border-radius: 8px;
-      font-size: 0.82rem;
-      font-weight: 600;
-    }
+    .help-popup h3 { font-size: 1.1rem; color: #2d5016; margin-bottom: 4px; }
+    .help-popup .help-source { font-size: 0.7rem; color: #888; margin-bottom: 14px; }
+    .help-popup .help-summary { font-size: 0.88rem; margin-bottom: 14px; line-height: 1.6; }
+    .help-popup .help-criteria { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 0.82rem; }
+    .help-popup .help-criteria th { background: #2d5016; color: white; padding: 6px 8px; text-align: left; }
+    .help-popup .help-criteria td { padding: 6px 8px; border-bottom: 1px solid #eee; }
+    .help-popup .help-check { background: #e8f5e9; padding: 10px 12px; border-radius: 8px; font-size: 0.82rem; margin-bottom: 8px; }
+    .help-popup .help-danger { background: #ffebee; color: #b71c1c; padding: 10px 12px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; }
     .help-popup .help-close {
-      position: absolute;
-      top: 12px;
-      right: 14px;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      border: none;
-      background: #eee;
-      font-size: 1rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      position: absolute; top: 12px; right: 14px;
+      width: 28px; height: 28px; border-radius: 50%;
+      border: none; background: #eee; font-size: 1rem;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
     }
 
     @media print { body { background: white; padding: 0; } .hdr, .tabs, .submit-area, .photo-del, .photo-save, .photo-edit, .btn-sec, .btn-pri, .btn-cancel, .search-bar, .record-actions, .tab-btn { display: none !important; } .card { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; } .content { padding: 0; } .tab-panel { display: block !important; } #map, #allMap { height: 350px !important; border: 1px solid #000; break-inside: avoid; } .card-body { padding: 8px; } }
@@ -203,7 +129,7 @@
 
 <header class="hdr">
   <h1>樹木点検・診断システム</h1>
-  <div style="font-size:0.9rem;">26.3</div>
+  <div style="font-size:0.9rem;">26.4（活力度❓追加・Excelレイアウト修正）</div>
   <div style="font-size:0.72rem; color:rgba(255,255,255,0.8); margin-top:4px; line-height:1.4;">
     ※診断結果は参考になります。専門家(樹木医等)の判断を併せてご検討ください。
   </div>
@@ -237,7 +163,7 @@
           <div class="fg"><label class="lbl">学名</label><input class="inp" id="scientificName"></div>
           <div class="fg"><label class="lbl">愛称</label><input class="inp" id="nickname"></div>
         </div>
-        <div class="fg"><label class="lbl">所在地</label><input class="inp" id="location" placeholder="例：○○市△△"></div>
+        <div class="fg"><label class="lbl">所在地</label><input class="inp" id="location" placeholder="例：○○市△△公園"></div>
         <div class="frow c2" style="margin-top:12px;">
           <div class="fg"><label class="lbl">樹高 (m)</label><input type="number" step="0.1" class="inp" id="treeHeight"></div>
           <div class="fg"><label class="lbl">幹周 (cm)</label><input type="number" class="inp" id="trunkGirth"></div>
@@ -509,7 +435,51 @@
       { id: 'hangingBranch', name: 'ぶら下がり枝', grades: ['A','B','C','D'], desc: ['なし','あり（小）','あり（大）','該当なし'], inactive: { D: true } }
     ];
 
-    // 健全度の詳細解説データ（国土交通省指針（案）参考資料に基づく）
+    // 活力度の詳細解説データ
+    const declineDetailGuide = {
+      'vigor': {
+        title: '樹勢',
+        summary: '枝の伸び・葉の密度・葉色などから木全体の元気さを総合的に判断します。最初に見たときの印象を大切にしてください。',
+        criteria: [
+          { grade: '0', desc: '旺盛な生育状態を示し被害が全くみられない' },
+          { grade: '1', desc: '幾分影響を受けているがあまり目立たない' },
+          { grade: '2', desc: '異常が明らかに認められる' },
+          { grade: '3', desc: '生育状態が極めて劣悪である' },
+          { grade: '4', desc: 'ほとんど枯死' }
+        ],
+        checkPoint: '同じ樹種の健全な木と比べて、葉の色つや、枝の伸び具合、全体のボリューム感を比較しましょう。',
+        dangerSign: '梢端が枯れている場合、根系や幹の障害のサインのことがあります。'
+      },
+      'shape': {
+        title: '樹形',
+        summary: '主幹・大枝の枯損や欠損、葉の密度と配置から評価します。剪定で人工樹形にしている場合は留意が必要です。',
+        criteria: [
+          { grade: '0', desc: '自然な樹形を保っている' },
+          { grade: '1', desc: '若干の乱れはあるが、自然樹形に近い' },
+          { grade: '2', desc: '自然樹形から大きく変化している' },
+          { grade: '3', desc: '樹形の乱れが著しい' },
+          { grade: '4', desc: 'ほとんど完全に崩壊' }
+        ],
+        checkPoint: 'その樹種本来の自然な樹形と比べて、枝の配置や全体のシルエットが崩れていないか確認します。',
+        dangerSign: '大枝が欠損して樹形が著しく乱れている場合は、腐朽や過去の折損が疑われます。'
+      },
+      'density': {
+        title: '枝葉密度',
+        summary: '樹冠全体の枝と葉の密度を評価します。落葉期は小枝や冬芽の量で判断します。',
+        criteria: [
+          { grade: '0', desc: '十分な量の枝葉を着けている' },
+          { grade: '1', desc: '0に比べてやや劣る' },
+          { grade: '2', desc: '枯枝がやや目立ち、枝葉量がやや少ない' },
+          { grade: '3', desc: '枯枝がかなり目立ち、枝葉量が著しく少ない' },
+          { grade: '4', desc: '枝の数が少なく葉もほとんどない' }
+        ],
+        checkPoint: '樹冠を見上げて、隙間が多くないか、枯れ枝が目立たないかを確認します。',
+        dangerSign: '枝葉密度が著しく低い場合、根系の障害や病害虫の深刻な被害が疑われます。'
+      }
+      // 他の活力度項目も同様に追加可能（ここでは代表3項目のみ。必要に応じて拡張してください）
+    };
+
+    // 健全度の詳細解説データ
     const healthDetailGuide = {
       'sway': {
         title: '揺らぎ',
@@ -608,7 +578,7 @@
           { grade: 'C', desc: '小さな変状がある' },
           { grade: 'D', desc: '強風等で被害が発生する危険性の高い大きな変状がある' }
         ],
-        checkPoint: '分岐角度が狭い枝や双幹木の又の部分を注意深く観察します。樹皮が挟まっている(入り皮)深さを確認します。',
+        checkPoint: '分岐角度が狭い枝や双幹木の又の部分を注意深く観察します。樹皮が挟まっている深さを確認します。',
         dangerSign: '入り皮が深く、強風で裂けそうなものは「D」評価です。'
       },
       'pestDamage': {
@@ -619,7 +589,7 @@
           { grade: 'B', desc: '小さな被害がある' },
           { grade: 'C', desc: '枯損の兆候が見られる' }
         ],
-        checkPoint: '幹や枝に小さな穴がないか、穴の周りにオガクズ状の虫糞が落ちていないか確認します。カリントウ状の木くずや大量な木くずがある場合はクビアカツヤカミキツの可能性が高いです。行政へ連絡してください。',
+        checkPoint: '幹や枝に小さな穴がないか、穴の周りにオガクズ状の虫糞が落ちていないか確認します。',
         dangerSign: '穿孔害虫による枯損の兆候（枝先の枯れ込みなど）が見られる場合は「C」評価です。'
       },
       'rootVisible': {
@@ -682,8 +652,8 @@
     };
 
     // ヘルプポップアップ
-    window.showHelpPopup = function(itemId) {
-      const guide = healthDetailGuide[itemId];
+    window.showHelpPopup = function(itemId, type) {
+      const guide = type === 'decline' ? declineDetailGuide[itemId] : healthDetailGuide[itemId];
       if (!guide) return;
       const content = document.getElementById('helpPopupContent');
       content.innerHTML = `
@@ -708,7 +678,11 @@
       const dCont = document.getElementById('decline-items');
       if (dCont) {
         dCont.innerHTML = declineItems.map(item => `
-          <div class="fg"><label class="lbl">${item.name}</label>
+          <div class="fg">
+            <label class="lbl">
+              ${item.name}
+              <span class="help-icon" onclick="event.stopPropagation(); showHelpPopup('${item.id}', 'decline')" title="クリックで詳しい解説を表示">?</span>
+            </label>
             <div class="rgroup">
               ${[0,1,2,3,4].map(v => `<button class="rbtn" data-type="decline" data-id="${item.id}" data-val="${v}" onclick="setScore(this)">${v}<small>${item.desc[v]}</small></button>`).join('')}
             </div>
@@ -721,7 +695,7 @@
           <div class="fg">
             <label class="lbl">
               ${item.name}
-              <span class="help-icon" onclick="event.stopPropagation(); showHelpPopup('${item.id}')" title="クリックで詳しい解説を表示">?</span>
+              <span class="help-icon" onclick="event.stopPropagation(); showHelpPopup('${item.id}', 'health')" title="クリックで詳しい解説を表示">?</span>
             </label>
             <div class="rgroup">
               ${item.grades.map((g, i) => {
@@ -856,7 +830,75 @@
     function setColWidths(ws, widths) { ws['!cols'] = widths.map(w => ({ wch: w })); }
     function sanitizeSheetName(name) { return name.replace(/[:\\\/\?\*\[\]]/g, '_').slice(0,31); }
     function dlBlob(blob, filename) { const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000); }
-    window.printRecord = function(id) { const r=records.find(r=>r.id===id); if(!r) return; const wb=XLSX.utils.book_new(); const ws1 = XLSX.utils.aoa_to_sheet([ ['様式Ⅰ-1　調査木位置図', '', '', '', '', '', '', ''], ['樹木No.', r.treeNo, '調査日', r.surveyDate, '天候', r.weather, '調査者', r.inspector], ['樹種名', r.species, '', '', '科名', r.family, '', ''], ['学名', r.scientificName, '', '', '樹木の名称(愛称)', r.nickname, '', ''], ['所在地', r.location, '', '', '', '', '', ''], ['樹高(m)', r.treeHeight, '幹周(cm)', r.trunkGirth, '', '', '', ''], ['緯度', r.latitude, '経度', r.longitude, '', '', '', ''], ['地図（1/25,000）', '', '', '', '', '', '', ''], ['※ Leaflet地図は印刷または画像保存', '', '', '', '', '', '', ''], ['写真枚数', (r.photos||[]).length, '写真はJSONバックアップに含まれます', '', '', '', '', ''] ]); setColWidths(ws1, [20,20,15,20,15,20,15,20]); XLSX.utils.book_append_sheet(wb, ws1, '様式Ⅰ-1_位置図'); const ws2 = XLSX.utils.aoa_to_sheet([ ['様式Ⅰ-2　地上部の衰退度判定票', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''], ['評価項目', '0', '', '1', '', '2', '', '3', '', '4', '', '評点'], ...declineItems.map(it => [it.name, ...it.desc, '', r.scores?.[it.id]??'']), ['衰退度(平均)', '', '', '', '', '', '', '', '', '', '', r.avg?.toFixed(2)??''], ['判定区分', '', '', '', '', '', '', '', '', '', '', (()=>{ const a=r.avg||0; return a<0.8?'Ⅰ（良）':a<1.6?'Ⅱ（やや不良）':a<2.4?'Ⅲ（不良）':a<3.2?'Ⅳ（著しく不良）':'Ⅴ（枯死寸前）'; })()] ]); setColWidths(ws2, [15,15,10,15,10,15,10,15,10,15,10,10]); XLSX.utils.book_append_sheet(wb, ws2, '様式Ⅰ-2_衰退度'); const ws3 = XLSX.utils.aoa_to_sheet([ ['様式Ⅰ-3　倒木、枝折れ等危険度判定票', '', '', '', '', '', ''], ['項目', '', 'A(0)', 'B(1)', 'C(2)', 'D(3)', '判定'], ...healthItems.map(it => [it.name, '', it.desc[0], it.desc[1], it.desc[2], it.desc[3], r.health?.[it.id]??'']), ['腐朽菌', '', '', '', '', '', [...(r.fungus||[]), r.fungusOther].filter(Boolean).join('、')], ['総合判定', '', '', '', '', '', r.overall], ['所見', '', '', '', '', '', r.comment], ['必要な措置', '', '', '', '', '', (r.measures||[]).join('、')] ]); setColWidths(ws3, [20,5,30,30,30,30,15]); XLSX.utils.book_append_sheet(wb, ws3, '様式Ⅰ-3_危険度'); dlBlob(new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:'application/octet-stream'}), `詳細_${r.treeNo}.xlsx`); };
+    
+    // ★ Excel出力修正：様式Ⅰ-2のPDFレイアウトに近づける
+    window.printRecord = function(id) {
+      const r=records.find(r=>r.id===id); if(!r) return;
+      const wb=XLSX.utils.book_new();
+      
+      // 様式Ⅰ-1
+      const ws1 = XLSX.utils.aoa_to_sheet([
+        ['様式Ⅰ-1　調査木位置図', '', '', '', '', '', '', ''],
+        ['樹木No.', r.treeNo, '調査日', r.surveyDate, '天候', r.weather, '調査者', r.inspector],
+        ['樹種名', r.species, '', '', '科名', r.family, '', ''],
+        ['学名', r.scientificName, '', '', '樹木の名称(愛称)', r.nickname, '', ''],
+        ['所在地', r.location, '', '', '', '', '', ''],
+        ['樹高(m)', r.treeHeight, '幹周(cm)', r.trunkGirth, '', '', '', ''],
+        ['緯度', r.latitude, '経度', r.longitude, '', '', '', ''],
+        ['写真枚数', (r.photos||[]).length, '', '', '', '', '', '']
+      ]);
+      setColWidths(ws1, [20,20,15,20,15,20,15,20]);
+      XLSX.utils.book_append_sheet(wb, ws1, '様式Ⅰ-1_位置図');
+      
+      // 様式Ⅰ-2：PDFのレイアウトに合わせた表形式
+      const ws2 = XLSX.utils.aoa_to_sheet([
+        ['様式Ⅰ-2　地上部の衰退度判定票', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+        ['評価項目', '0', '', '1', '', '2', '', '3', '', '4', '', '評点'],
+        ['樹勢', '旺盛な生育状態を示し被害が全くみられない', '', '幾分影響を受けているがあまり目立たない', '', '異常が明らかに認められる', '', '生育状態が極めて劣悪である', '', 'ほとんど枯死', '', r.scores?.vigor??''],
+        ['樹形', '自然な樹形を保っている', '', '若干の乱れはあるが、自然樹形に近い', '', '自然樹形から大きく変化している', '', '樹形の乱れが著しい', '', 'ほとんど完全に崩壊', '', r.scores?.shape??''],
+        ['枝葉の密度', '十分な量の枝葉を着けている', '', '0に比べてやや劣る', '', '枯枝がやや目立ち、枝葉量がやや少ない', '', '枯枝がかなり目立ち、枝葉量が著しく少ない', '', '枝の数が少なく葉もほとんどない', '', r.scores?.density??''],
+        ['枝の伸長量(節間の長さ)', '十分に伸長している', '', 'やや小さい', '', '枝は短くなり細い', '', '枝は極度に短小、しょうが状の節間がある', '', '下からの萌芽枝のみわずかに成長', '', r.scores?.shoot??''],
+        ['葉の大きさ', '葉がすべて十分な大きさ', '', '所々に小さい葉がある', '', '全体にやや小さい', '', '全体に著しく小さい', '', 'わずかな葉しかなく、それも小さい', '', r.scores?.leafSize??''],
+        ['葉色', '全体に濃い緑色を保っている', '', 'やや薄いが緑色を保っている', '', '黄色、赤褐色の葉が目立つ', '', '大部分が薄い緑色', '', '薄い緑色と黄色、赤褐色のみ', '', r.scores?.leafColor??''],
+        ['梢や上枝の先端の枯損', 'なし', '', '少しあるがあまり目立たない', '', '随所に見られる', '', 'かなり目立つ', '', '梢端・主枝がない', '', r.scores?.topDieback??''],
+        ['下枝の先端の枯損', 'なし', '', '少しあるがあまり目立たない', '', '随所にあり、切断が目立つ', '', 'かなり目立つ、大きな切断がある', '', 'ほとんど健全な枝端がない', '', r.scores?.lowerDieback??''],
+        ['大枝・幹の欠損', 'なし', '', '少しあるが回復している', '', '随所に目立つ', '', 'かなり目立つ、大きく切断されている', '', '大枝・幹の上部を失っている', '', r.scores?.largeBranch??''],
+        ['剪定痕の損傷被覆材形成', 'さかんに巻き込み成長している', '', '巻き込み成長している', '', '巻き込み成長はしているが、被覆材に活力なし', '', 'ほとんど巻き込み成長は見られない', '', 'まったく巻き込み成長していない', '', r.scores?.pruning??''],
+        ['樹皮の傷(剥皮・壊死)', '傷などほとんどなし', '', '穿孔・傷が少しあるが、あまり目立たない', '', '古傷が残る', '', '傷からの腐朽が著しい', '', '大きな空洞、剥がれがある', '', r.scores?.barkWound??''],
+        ['樹皮の新陳代謝', '樹皮は新鮮な色をしていて新陳代謝が活発である', '', '大部分は新鮮だが所々不活発な部分がある', '', '全体に樹皮に活力がない', '', '著しく活力が無く衰弱気味である', '', '樹皮の大部分が壊死', '', r.scores?.barkTurnover??''],
+        ['胴吹き・ひこばえ', '枝葉量が多く、胴吹きひこばえもない', '', '枝葉量は多いが胴吹きあるいはひこばえもある', '', '枝葉量が少なく胴吹き、ひこばえがある', '', '枝葉量が極めて少なく、胴吹き・ひこばえが多い', '', '枝葉量が極めて少なく、胴吹き、ひこばえも少ない', '', r.scores?.sprout??''],
+        ['芽の大きさと量', '大きく多数の芽が着いている', '', '0に比べてやや劣る', '', '芽が小さいまたは数が少ない', '', '芽の数が著しく少なく、貧弱', '', '芽がほとんど見られない', '', r.scores?.bud??''],
+        ['紅黄葉状況', '鮮やかな紅黄葉が見られる', '', '0に比べてやや劣る', '', '鮮やかな紅黄葉は一部にしか見られない', '', '鮮やかな紅黄葉が見られない', '', 'ほとんど正常な紅黄葉が見られない', '', r.scores?.autumnColor??''],
+        ['開花状況', '花つきがよい', '', '0に比べてやや劣る', '', '花が小さくやや疎', '', '小さい花が多く、著しく疎', '', 'ほとんど花がついていない', '', r.scores?.flower??''],
+        ['結実状況', '実つきがよい', '', '0に比べてやや劣る', '', '実が小さくやや疎', '', '小さい実が多く、しかも疎', '', 'ほとんど実がついていない', '', r.scores?.fruit??''],
+        ['', '', '', '', '', '', '', '', '', '', '', ''],
+        ['衰退度（平均評点）', '', '', '', '', '', '', '', '', '', '', r.avg?.toFixed(2)??''],
+        ['判定区分', '', '', '', '', '', '', '', '', '', '', (()=>{ const a=r.avg||0; return a<0.8?'Ⅰ（良）':a<1.6?'Ⅱ（やや不良）':a<2.4?'Ⅲ（不良）':a<3.2?'Ⅳ（著しく不良）':'Ⅴ（枯死寸前）'; })()],
+        ['', '', '', '', '', '', '', '', '', '', '', ''],
+        ['衰退度判定基準', '', '', '', '', '', '', '', '', '', '', ''],
+        ['Ⅰ', 'Ⅱ', 'Ⅲ', 'Ⅳ', 'Ⅴ', '', '', '', '', '', '', ''],
+        ['0.8未満', '0.8~1.6未満', '1.6~2.4未満', '2.4~3.2未満', '3.2以上', '', '', '', '', '', '', ''],
+        ['良', 'やや不良', '不良', '著しく不良', '枯死寸前', '', '', '', '', '', '', '']
+      ]);
+      setColWidths(ws2, [12, 30, 2, 30, 2, 30, 2, 30, 2, 30, 2, 8]);
+      XLSX.utils.book_append_sheet(wb, ws2, '様式Ⅰ-2_衰退度');
+      
+      // 様式Ⅰ-3
+      const ws3 = XLSX.utils.aoa_to_sheet([
+        ['様式Ⅰ-3　倒木、枝折れ等危険度判定票', '', '', '', '', '', ''],
+        ['項目', '', 'A(0)', 'B(1)', 'C(2)', 'D(3)', '判定'],
+        ...healthItems.map(it => [it.name, '', it.desc[0], it.desc[1], it.desc[2], it.desc[3], r.health?.[it.id]??'']),
+        ['腐朽菌', '', '', '', '', '', [...(r.fungus||[]), r.fungusOther].filter(Boolean).join('、')],
+        ['総合判定', '', '', '', '', '', r.overall],
+        ['所見', '', '', '', '', '', r.comment],
+        ['必要な措置', '', '', '', '', '', (r.measures||[]).join('、')]
+      ]);
+      setColWidths(ws3, [20,5,30,30,30,30,15]);
+      XLSX.utils.book_append_sheet(wb, ws3, '様式Ⅰ-3_危険度');
+      
+      dlBlob(new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:'application/octet-stream'}), `詳細_${r.treeNo}.xlsx`);
+    };
+    
     window.exportToExcel = () => { const d=collectData(); if(!d.treeNo){alert('樹木Noを入力');return;} printRecord(d.id); };
     window.exportSummaryToExcel = () => { if(!records.filter(r=>r?.id).length){alert('データなし');return;} const wb=XLSX.utils.book_new(); const rows=[['調査日','樹木No','樹種','場所','点検者','樹高','幹周','緯度','経度','判定','所見','必要な措置']]; records.filter(r=>r?.id).forEach(r=>rows.push([r.surveyDate,r.treeNo,r.species,r.location,r.inspector,r.treeHeight,r.trunkGirth,r.latitude,r.longitude,r.overall,r.comment,(r.measures||[]).join('、')])); const ws=XLSX.utils.aoa_to_sheet(rows); setColWidths(ws,[12,10,15,20,12,8,8,12,12,8,30,30]); XLSX.utils.book_append_sheet(wb,ws,'一覧表'); dlBlob(new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:'application/octet-stream'}),'樹木点検一覧.xlsx'); };
     window.exportAllToExcel = () => { const valid=records.filter(r=>r?.id); if(!valid.length){alert('データなし');return;} const wb=XLSX.utils.book_new(); valid.forEach(r=>{const ws=XLSX.utils.aoa_to_sheet([['樹木No',r.treeNo],['調査日',r.surveyDate],['天候',r.weather],['調査者',r.inspector],['樹種',r.species],['科名',r.family],['学名',r.scientificName],['愛称',r.nickname],['所在地',r.location],['樹高(m)',r.treeHeight],['幹周(cm)',r.trunkGirth],['緯度',r.latitude],['経度',r.longitude],['総合判定',r.overall],['所見',r.comment],['腐朽菌',[...(r.fungus||[]),r.fungusOther].filter(Boolean).join('、')],['必要な措置',(r.measures||[]).join('、')]]);setColWidths(ws,[20,40]);XLSX.utils.book_append_sheet(wb,ws,sanitizeSheetName(r.treeNo||r.id));}); const summary=[['調査日','樹木No','樹種','場所','点検者','樹高','幹周','緯度','経度','判定','所見','必要な措置']]; valid.forEach(r=>summary.push([r.surveyDate,r.treeNo,r.species,r.location,r.inspector,r.treeHeight,r.trunkGirth,r.latitude,r.longitude,r.overall,r.comment,(r.measures||[]).join('、')])); const wsSum=XLSX.utils.aoa_to_sheet(summary);setColWidths(wsSum,[12,10,15,20,12,8,8,12,12,8,30,30]);XLSX.utils.book_append_sheet(wb,wsSum,'一覧表'); dlBlob(new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:'application/octet-stream'}),'全件樹木診断.xlsx'); };
@@ -899,7 +941,7 @@
 </script>
 <script>
   if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('/26.3shindan/sw.js',{scope:'/26.3shindan/'}).then(reg=>{
+    navigator.serviceWorker.register('/v26.1shindan/sw.js',{scope:'/v26.1shindan/'}).then(reg=>{
       if(reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});
       reg.addEventListener('updatefound',()=>{ const nw=reg.installing; nw.addEventListener('statechange',()=>{ if(nw.state==='installed'&&navigator.serviceWorker.controller){ if(confirm('最新バージョンがあります。更新しますか？')){nw.postMessage({type:'SKIP_WAITING'});window.location.reload();} } }); });
     }).catch(()=>{});
@@ -907,3 +949,4 @@
   }
 </script>
 </body>
+</html>
