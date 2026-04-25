@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>樹木診断・点検システム（26.1）</title>
+  <title>樹木診断・点検システム（26.3）</title>
   <link rel="manifest" href="manifest.json">
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -36,7 +36,6 @@
     .rbtn { flex: 1 0 70px; padding: 8px 4px; background: #f2f2f2; border: 1.5px solid #ccc; border-radius: 30px; font-weight: 600; font-size: 0.9rem; cursor: pointer; text-align: center; line-height: 1.3; transition: all 0.1s; }
     .rbtn.sel { background: #4a7c2f; border-color: #2d5016; color: white; }
     .rbtn small { display: block; font-weight: 400; font-size: 0.65rem; opacity: 0.85; margin-top: 2px; }
-    /* 無効ボタン（該当なし） */
     .rbtn-inactive {
       background: #e8e8e8;
       color: #b0b0b0;
@@ -92,6 +91,110 @@
     .pe-footer { display: flex; gap: 8px; padding: 10px; background: #2a2a2a; justify-content: flex-end; flex-shrink: 0; }
     .pe-save-btn { background: #2d5016; color: white; padding: 8px 16px; border: none; border-radius: 20px; font-weight: 600; }
     .pe-close-btn { background: #555; color: white; padding: 8px 16px; border: none; border-radius: 20px; }
+
+    /* ヘルプアイコン */
+    .help-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      color: #555;
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-left: 4px;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .help-icon:hover { background: #4a7c2f; color: white; }
+
+    /* ヘルプポップアップ */
+    .help-popup-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 9998;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .help-popup-overlay.open { display: flex; }
+    .help-popup {
+      background: white;
+      border-radius: 20px;
+      width: 90vw;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      position: relative;
+    }
+    .help-popup h3 {
+      font-size: 1.1rem;
+      color: #2d5016;
+      margin-bottom: 4px;
+    }
+    .help-popup .help-source {
+      font-size: 0.7rem;
+      color: #888;
+      margin-bottom: 14px;
+    }
+    .help-popup .help-summary {
+      font-size: 0.88rem;
+      margin-bottom: 14px;
+      line-height: 1.6;
+    }
+    .help-popup .help-criteria {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 14px;
+      font-size: 0.82rem;
+    }
+    .help-popup .help-criteria th {
+      background: #2d5016;
+      color: white;
+      padding: 6px 8px;
+      text-align: left;
+    }
+    .help-popup .help-criteria td {
+      padding: 6px 8px;
+      border-bottom: 1px solid #eee;
+    }
+    .help-popup .help-check {
+      background: #e8f5e9;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      margin-bottom: 8px;
+    }
+    .help-popup .help-danger {
+      background: #ffebee;
+      color: #b71c1c;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+    .help-popup .help-close {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      background: #eee;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     @media print { body { background: white; padding: 0; } .hdr, .tabs, .submit-area, .photo-del, .photo-save, .photo-edit, .btn-sec, .btn-pri, .btn-cancel, .search-bar, .record-actions, .tab-btn { display: none !important; } .card { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; } .content { padding: 0; } .tab-panel { display: block !important; } #map, #allMap { height: 350px !important; border: 1px solid #000; break-inside: avoid; } .card-body { padding: 8px; } }
     .print-map-only body * { visibility: hidden !important; } .print-map-only #allMap, .print-map-only #allMap * { visibility: visible !important; } .print-map-only #allMap { position: absolute !important; top: 0; left: 0; width: 100vw !important; height: 100vh !important; margin: 0; border: none; border-radius: 0; }
   </style>
@@ -100,11 +203,14 @@
 
 <header class="hdr">
   <h1>樹木点検・診断システム</h1>
-  <div style="font-size:0.9rem;">26.1</div>
+  <div style="font-size:0.9rem;">26.3</div>
   <div style="font-size:0.72rem; color:rgba(255,255,255,0.8); margin-top:4px; line-height:1.4;">
     ※診断結果は参考になります。専門家(樹木医等)の判断を併せてご検討ください。
   </div>
-  <a href="manual.html" style="display:inline-block; margin-top:8px; padding:4px 14px; border:1px solid rgba(255,255,255,0.5); border-radius:20px; color:white; font-size:0.8rem; text-decoration:none;">📘 使い方ガイド</a> 
+  <div style="margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;">
+    <a href="manual.html" style="display:inline-block; padding:4px 14px; border:1px solid rgba(255,255,255,0.5); border-radius:20px; color:white; font-size:0.8rem; text-decoration:none;">📘 使い方ガイド</a>
+    <a href="criteria.html" style="display:inline-block; padding:4px 14px; border:1px solid rgba(255,255,255,0.5); border-radius:20px; color:white; font-size:0.8rem; text-decoration:none;">📖 判定基準詳細</a>
+  </div>
 </header>
 
 <div class="tabs">
@@ -131,7 +237,7 @@
           <div class="fg"><label class="lbl">学名</label><input class="inp" id="scientificName"></div>
           <div class="fg"><label class="lbl">愛称</label><input class="inp" id="nickname"></div>
         </div>
-        <div class="fg"><label class="lbl">所在地</label><input class="inp" id="location" placeholder="例：○○市△△公園"></div>
+        <div class="fg"><label class="lbl">所在地</label><input class="inp" id="location" placeholder="例：○○市△△"></div>
         <div class="frow c2" style="margin-top:12px;">
           <div class="fg"><label class="lbl">樹高 (m)</label><input type="number" step="0.1" class="inp" id="treeHeight"></div>
           <div class="fg"><label class="lbl">幹周 (cm)</label><input type="number" class="inp" id="trunkGirth"></div>
@@ -293,7 +399,18 @@
         <tr><td style="border:1px solid #ccc; padding:4px;">Ⅲ（1.6〜2.4）</td><td style="border:1px solid #ccc; padding:4px;">C</td><td style="border:1px solid #ccc; padding:4px;">C 要注意</td></tr>
         <tr><td style="border:1px solid #ccc; padding:4px;">Ⅳ・Ⅴ（2.4以上）</td><td style="border:1px solid #ccc; padding:4px;">D</td><td style="border:1px solid #ccc; padding:4px;">D 危険木</td></tr>
       </table>
+      <div style="margin-top: 16px; text-align: center;">
+        <a href="criteria.html" style="display: inline-block; background: #1565c0; color: white; padding: 10px 20px; border-radius: 30px; text-decoration: none; font-weight: 700; font-size: 0.9rem;">📖 詳細判定基準ページを開く →</a>
+      </div>
     </div></div>
+  </div>
+</div>
+
+<!-- ヘルプポップアップ -->
+<div class="help-popup-overlay" id="helpPopupOverlay" onclick="closeHelpPopup()">
+  <div class="help-popup" id="helpPopup" onclick="event.stopPropagation()">
+    <button class="help-close" onclick="closeHelpPopup()">✕</button>
+    <div id="helpPopupContent"></div>
   </div>
 </div>
 
@@ -386,11 +503,169 @@
       { id: 'barkDamage', name: '樹皮枯死･欠損', grades: ['A','B','C','D'], desc: ['なし','周囲長比1/3未満','周囲長比1/3以上','該当なし'], inactive: { D: true } },
       { id: 'jointAbnormality', name: '結合部の変状', grades: ['A','B','C','D'], desc: ['なし','該当なし','あり（小）','あり（大）'], inactive: { B: true } },
       { id: 'pestDamage', name: '穿孔害虫等', grades: ['A','B','C','D'], desc: ['なし','あり（小）','あり（大）','該当なし'], inactive: { D: true } },
-      { id: 'rootVisible', name: '根張り(ルートカラー)', grades: ['A','B','C','D'], desc: ['見える','該当なし','見えない','該当なし'], inactive: { B: true, D: true } },
+      { id: 'rootVisible', name: '根張り', grades: ['A','B','C','D'], desc: ['見える','該当なし','見えない','該当なし'], inactive: { B: true, D: true } },
       { id: 'tappingSound', name: '打診音異常', grades: ['A','B','C','D'], desc: ['なし','該当なし','あり（小）','あり（大）'], inactive: { B: true } },
       { id: 'penetrationAbnormality', name: '貫入異常', grades: ['A','B','C','D'], desc: ['なし','該当なし','あり（小）','あり（大）'], inactive: { B: true } },
       { id: 'hangingBranch', name: 'ぶら下がり枝', grades: ['A','B','C','D'], desc: ['なし','あり（小）','あり（大）','該当なし'], inactive: { D: true } }
     ];
+
+    // 健全度の詳細解説データ（国土交通省指針（案）参考資料に基づく）
+    const healthDetailGuide = {
+      'sway': {
+        title: '揺らぎ',
+        summary: '樹木を揺らしたときの根元の安定性を評価します。体重をかけて幹を押し、根元が動くかどうかを確認します。',
+        criteria: [
+          { grade: 'A', desc: '異常なし' },
+          { grade: 'C', desc: '小さな揺れはあるが、すぐに倒れる心配はない' },
+          { grade: 'D', desc: '根元から大きく揺れ、地面と根の間に隙間が見える。非常に危険' }
+        ],
+        checkPoint: '体重をかけて幹を押してみましょう。根元が動くか、根の周りの土に割れ目がないか確認します。',
+        dangerSign: '根元がグラグラと動いたり、根と地面の間に隙間がある場合は「D」評価です。すぐに専門家に相談してください。'
+      },
+      'lean': {
+        title: '不自然な傾斜',
+        summary: '周囲の建物や他の木による日陰で傾くこともあります。問題なのは根の支持力不足による傾きです。',
+        criteria: [
+          { grade: 'A', desc: 'まっすぐ、または自然な傾き' },
+          { grade: 'B', desc: '傾いているが、根はしっかりしている' },
+          { grade: 'D', desc: '傾きに加えて、根元の地面が盛り上がったり、亀裂が入っている' }
+        ],
+        checkPoint: '傾いている側の地面が盛り上がっていないか、反対側の地面に亀裂がないか観察します。',
+        dangerSign: '地際周辺の亀裂や異常な盛り上がりがある場合は非常に危険です。必要に応じて機器診断を行ってください。'
+      },
+      'crack': {
+        title: '亀裂',
+        summary: '樹幹に入った裂け目です。腐朽や落雷、衝突などが原因です。幹が裂ける途中段階で非常に危険な状態です。',
+        criteria: [
+          { grade: 'A', desc: '異常なし' },
+          { grade: 'C', desc: '小さな亀裂がある' },
+          { grade: 'D', desc: '樹体の存立に明らかに影響する大きな亀裂がある' }
+        ],
+        checkPoint: '亀裂の深さと長さを確認します。雨水が入り込んで内部で腐朽が進んでいないかも注意します。',
+        dangerSign: '大きく深い亀裂がある場合は、倒木や枝折れの危険が非常に高いため「D」評価です。'
+      },
+      'fungusBody': {
+        title: '子実体(キノコ)',
+        summary: '幹や根元に発生するキノコです。特にベッコウタケやコフキサルノコシカケは腐朽力が強く危険です。',
+        criteria: [
+          { grade: 'A', desc: '異常なし' },
+          { grade: 'C', desc: 'キノコの発生を認めた場合' },
+          { grade: 'D', desc: '腐朽力の強いキノコ（ベッコウタケ等）、または剪定等でも対処できないほど腐朽している場合' }
+        ],
+        checkPoint: 'キノコの種類を見分けます。ベッコウタケ（茶色い傘）、コフキサルノコシカケ（白い粉をふく）など腐朽力の強いものは特に要注意です。',
+        dangerSign: 'ベッコウタケやコフキサルノコシカケが発生している場合は、内部で腐朽がかなり進行している可能性があります。'
+      },
+      'cavity': {
+        title: '開口空洞',
+        summary: '樹幹に開いた穴（空洞）です。開口角度が120度以上（幹周の1/3以上）になると幹折れの危険が高まります。',
+        criteria: [
+          { grade: 'A', desc: '異常なし' },
+          { grade: 'B', desc: '空洞はあるが芯に達していない' },
+          { grade: 'C', desc: '芯に達し、周囲長の1/3未満' },
+          { grade: 'D', desc: '芯に達し、周囲長の1/3以上' }
+        ],
+        checkPoint: '空洞の深さ（芯まで達しているか）と、幹の周囲長に対する空洞の幅の割合を確認します。',
+        dangerSign: '空洞が大きく、幹の周囲の1/3以上に及ぶ場合は非常に危険です。'
+      },
+      'bulge': {
+        title: '隆起',
+        summary: '樹体内の大規模な腐朽や空洞に対して、樹木が力学的に補強しようとして盛り上がる現象です。',
+        criteria: [
+          { grade: 'A', desc: '異常なし' },
+          { grade: 'C', desc: '小さな隆起がある' },
+          { grade: 'D', desc: '幹周全体または根元に大きな隆起がある' }
+        ],
+        checkPoint: '隆起の範囲が幹の一部か全体かを確認します。根元に発生している場合も要注意です。',
+        dangerSign: '幹周全体に及ぶ隆起や、根元の大きな隆起は内部に深刻な腐朽がある可能性が高いです。'
+      },
+      'decayExposed': {
+        title: '腐朽部露出',
+        summary: '樹幹の傷口や枝から腐朽した部分が見えている状態です。材がスポンジ状になったり、白や茶色に変色します。',
+        criteria: [
+          { grade: 'A', desc: '異常なし' },
+          { grade: 'C', desc: '周囲長の1/3未満' },
+          { grade: 'D', desc: '周囲長の1/3以上' }
+        ],
+        checkPoint: '腐朽の範囲を幹の周囲長と比較し、どの程度広がっているかを確認します。',
+        dangerSign: '腐朽が幹周の1/3以上に及んでいる場合は非常に危険です。'
+      },
+      'barkDamage': {
+        title: '樹皮枯死･欠損',
+        summary: '衝突や病害虫などで樹皮が枯れたり剥がれたりしている状態です。傷口から腐朽菌が侵入することがあります。',
+        criteria: [
+          { grade: 'A', desc: '異常なし' },
+          { grade: 'B', desc: '周囲長の1/3未満' },
+          { grade: 'C', desc: '周囲長の1/3以上' }
+        ],
+        checkPoint: '枯死欠損部を剥がして内部の腐朽の有無を確認します。周囲長に対する割合が重要です。',
+        dangerSign: '周囲長の1/3以上に及ぶ樹皮枯死は、樹木の衰弱が進んでいる可能性があります。'
+      },
+      'jointAbnormality': {
+        title: '結合部の変状',
+        summary: '幹と枝の分かれ目（又）に樹皮が挟まった「入り皮」状態です。強風で裂ける危険があります。',
+        criteria: [
+          { grade: 'A', desc: '異常なし' },
+          { grade: 'C', desc: '小さな変状がある' },
+          { grade: 'D', desc: '強風等で被害が発生する危険性の高い大きな変状がある' }
+        ],
+        checkPoint: '分岐角度が狭い枝や双幹木の又の部分を注意深く観察します。樹皮が挟まっている(入り皮)深さを確認します。',
+        dangerSign: '入り皮が深く、強風で裂けそうなものは「D」評価です。'
+      },
+      'pestDamage': {
+        title: '穿孔害虫等',
+        summary: 'カミキリムシやコスカシバなど、幹や枝の中を食害する害虫です。侵入口からオガクズのような虫糞が出ます。',
+        criteria: [
+          { grade: 'A', desc: '異常なし' },
+          { grade: 'B', desc: '小さな被害がある' },
+          { grade: 'C', desc: '枯損の兆候が見られる' }
+        ],
+        checkPoint: '幹や枝に小さな穴がないか、穴の周りにオガクズ状の虫糞が落ちていないか確認します。カリントウ状の木くずや大量な木くずがある場合はクビアカツヤカミキツの可能性が高いです。行政へ連絡してください。',
+        dangerSign: '穿孔害虫による枯損の兆候（枝先の枯れ込みなど）が見られる場合は「C」評価です。'
+      },
+      'rootVisible': {
+        title: '根張り',
+        summary: '地際で幹が根に向けて広がる部分（ルートカラー）が見えるかどうかです。見えない場合は深植えや根の腐朽が疑われます。',
+        criteria: [
+          { grade: 'A', desc: '見える' },
+          { grade: 'C', desc: '見えない' }
+        ],
+        checkPoint: '地面と幹の境界がはっきり見えるか確認します。見えない場合は地際を掘削して確認する必要があります。',
+        dangerSign: '根張りが見えず、地際を掘削して腐朽が確認された場合は早急な対応が必要です。'
+      },
+      'tappingSound': {
+        title: '打診音異常',
+        summary: '木槌で幹を叩き、その音で内部の腐朽を推定します。響く音や音が吸収される場合は内部に腐朽があることが多いです。',
+        criteria: [
+          { grade: 'A', desc: '異常なし' },
+          { grade: 'C', desc: '一部で音の異常がある' },
+          { grade: 'D', desc: '広範囲で音の異常がある' }
+        ],
+        checkPoint: '木槌で軽く幹を叩き、健全な部分と音の違いを比較します。腐っていると「ポコポコ」という鈍い音がします。',
+        dangerSign: '広範囲で打診音の異常がある場合は、大規模な腐朽や空洞の可能性があります。'
+      },
+      'penetrationAbnormality': {
+        title: '貫入異常',
+        summary: '先端の尖った鋼棒を地際に刺し、抵抗感で根の腐朽を調べます。腐朽していると抵抗なく貫入します。',
+        criteria: [
+          { grade: 'A', desc: '異常なし' },
+          { grade: 'C', desc: '一部で貫入異常がある' },
+          { grade: 'D', desc: '芯に達する異常、または広範囲の腐朽が発見された場合' }
+        ],
+        checkPoint: '鋼棒を地際の周囲数カ所に刺してみて、手応えの違いを確認します。',
+        dangerSign: '抵抗なく深くまで貫入する場合は、根の腐朽が深刻です。根元周りを掘削して確認してください。'
+      },
+      'hangingBranch': {
+        title: 'ぶら下がり枝',
+        summary: '枝折れを起こして落下せずに木に引っかかっている枝です。わずかな風でも落下する危険があります。',
+        criteria: [
+          { grade: 'A', desc: '異常なし' },
+          { grade: 'B', desc: '小さなぶら下がり枝がある' },
+          { grade: 'C', desc: '大きなぶら下がり枝がある' }
+        ],
+        checkPoint: '樹冠を見上げて、折れて引っかかっている枝がないか確認します。',
+        dangerSign: '大きなぶら下がり枝は直ちに落下する危険があるため、速やかに除去が必要です。'
+      }
+    };
 
     function updateEditModeUI() {
       const cancelBtn = document.getElementById('cancelEditBtn');
@@ -404,6 +679,29 @@
         updateEditModeUI();
         showTab('records');
       }
+    };
+
+    // ヘルプポップアップ
+    window.showHelpPopup = function(itemId) {
+      const guide = healthDetailGuide[itemId];
+      if (!guide) return;
+      const content = document.getElementById('helpPopupContent');
+      content.innerHTML = `
+        <h3>${guide.title}</h3>
+        <div class="help-source">出典：国交省 樹木点検指針（案）参考資料</div>
+        <div class="help-summary">${guide.summary}</div>
+        <table class="help-criteria">
+          <thead><tr><th>評価</th><th>状態の目安</th></tr></thead>
+          <tbody>${guide.criteria.map(c => `<tr><td style="font-weight:700;text-align:center;">${c.grade}</td><td>${c.desc}</td></tr>`).join('')}</tbody>
+        </table>
+        <div class="help-check">🔍 <strong>現場での確認ポイント：</strong>${guide.checkPoint}</div>
+        ${guide.dangerSign ? `<div class="help-danger">⚠️ <strong>特に危険なサイン：</strong>${guide.dangerSign}</div>` : ''}
+      `;
+      document.getElementById('helpPopupOverlay').classList.add('open');
+    };
+
+    window.closeHelpPopup = function() {
+      document.getElementById('helpPopupOverlay').classList.remove('open');
     };
 
     function buildUI() {
@@ -420,7 +718,11 @@
       const hCont = document.getElementById('health-items');
       if (hCont) {
         hCont.innerHTML = healthItems.map(item => `
-          <div class="fg"><label class="lbl">${item.name}</label>
+          <div class="fg">
+            <label class="lbl">
+              ${item.name}
+              <span class="help-icon" onclick="event.stopPropagation(); showHelpPopup('${item.id}')" title="クリックで詳しい解説を表示">?</span>
+            </label>
             <div class="rgroup">
               ${item.grades.map((g, i) => {
                 const isInactive = item.inactive && item.inactive[g];
@@ -597,7 +899,7 @@
 </script>
 <script>
   if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('/26.1shindan/sw.js',{scope:'/26.1shindan/'}).then(reg=>{
+    navigator.serviceWorker.register('/26.3shindan/sw.js',{scope:'/26.3shindan/'}).then(reg=>{
       if(reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});
       reg.addEventListener('updatefound',()=>{ const nw=reg.installing; nw.addEventListener('statechange',()=>{ if(nw.state==='installed'&&navigator.serviceWorker.controller){ if(confirm('最新バージョンがあります。更新しますか？')){nw.postMessage({type:'SKIP_WAITING'});window.location.reload();} } }); });
     }).catch(()=>{});
@@ -605,4 +907,3 @@
   }
 </script>
 </body>
-</html>
