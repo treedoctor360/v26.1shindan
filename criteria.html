@@ -6,21 +6,16 @@
   <title>詳細判定基準｜樹木点検システム</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
-    /* ── ベース ── */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Noto Sans JP', sans-serif; background: #f4f6f0; color: #1a1a1a; padding-bottom: 30px; }
     .hdr { background: linear-gradient(145deg, #1e3a0e, #2d5016); color: white; padding: 16px 16px; border-radius: 0 0 28px 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; }
     .hdr h1 { font-size: 1.2rem; font-weight: 700; }
-
-    /* ── カード・セクション ── */
     .card { background: white; border-radius: 20px; margin: 16px 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden; }
     .card-hdr { padding: 14px 18px; font-weight: 700; background: #e8f3df; border-bottom: 2px solid rgba(0,0,0,0.05); display: flex; align-items: center; gap: 10px; }
     .card-hdr.brown { background: #f3ede5; }
     .card-hdr.blue { background: #e3f2fd; }
     .sn { background: #2d5016; color: white; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 0.8rem; flex-shrink: 0; }
     .card-body { padding: 16px; }
-
-    /* ── 評価バッジなど ── */
     .badges { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
     .badge { display: flex; align-items: center; gap: 8px; border-radius: 30px; padding: 8px 16px; font-weight: 700; font-size: 0.9rem; }
     .badge-A { background: #2e7d32; color: white; }
@@ -31,30 +26,28 @@
     th { background: #2d5016; color: white; padding: 8px 10px; text-align: left; }
     td { padding: 8px 10px; border-bottom: 1px solid #eee; vertical-align: top; }
     tr:nth-child(even) td { background: #f9faf6; }
-
-    /* ── 活力度・健全度のグリッド ── */
     .score-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 4px; margin: 8px 0 12px; }
     .score-cell { border-radius: 8px; padding: 6px 4px; text-align: center; font-size: 0.75rem; }
     .score-num { font-size: 1rem; font-weight: 800; display: block; }
     .health-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 4px; margin: 8px 0 12px; }
     .health-cell { border-radius: 8px; padding: 6px 4px; text-align: center; font-size: 0.75rem; }
     .health-grade { font-size: 1rem; font-weight: 800; display: block; }
-
-    /* ── 注釈 ── */
     .note { background: #fff8e1; border-left: 4px solid #f9a825; border-radius: 8px; padding: 10px 14px; font-size: 0.85rem; color: #5d4037; margin: 12px 0; }
     .back-btn { display: inline-block; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; text-decoration: none; font-weight: 600; }
     .section-title { font-size: 0.95rem; font-weight: 700; color: #2d5016; margin-bottom: 12px; border-bottom: 2px solid #e8f3df; padding-bottom: 6px; }
-
-    /* 配色 */
+    .item-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; font-size: 0.8rem; }
+    @media (max-width: 400px) { .item-list { grid-template-columns: 1fr; } }
+    .item-badge { background: #f0f0f0; padding: 6px 10px; border-radius: 8px; text-align: center; font-weight: 600; color: #555; }
     .s0{background:#e8f5e9;color:#1b5e20} .s1{background:#f9fbe7;color:#558b2f} .s2{background:#fff8e1;color:#e65100} .s3{background:#fce4ec;color:#c62828} .s4{background:#f3e5f5;color:#7b1fa2}
     .hA{background:#e8f5e9;color:#2e7d32} .hB{background:#fff3e0;color:#e65100} .hC{background:#ffebee;color:#c62828} .hD{background:#f3e5f5;color:#7b1fa2}
+    @media print { body { background: white; } .back-btn { display: none; } }
   </style>
 </head>
 <body>
 
 <header class="hdr">
   <h1>📖 判定基準 詳細ガイド</h1>
-  <a href="./" class="back-btn">← アプリへ</a>
+  <a href="index.html" class="back-btn">← アプリへ</a>
 </header>
 
 <div style="padding: 4px 16px; font-size: 0.72rem; color: #888; background: rgba(45,80,22,0.05);">
@@ -101,9 +94,26 @@
       <div class="score-cell s4"><span class="score-num">4</span>完全に崩壊している</div>
     </div>
 
-    <div class="note">
-      📌 残りの項目（枝葉密度、枝伸長量、葉の大きさ、葉色、梢端枯損、下枝枯損、大枝欠損、剪定痕、樹皮傷、新陳代謝、胴吹き、芽、紅黄葉、開花、結実）も同様に0〜4の基準で評価します。
+    <!-- 残り15項目の簡略表示 -->
+    <div class="section-title">③〜⑰ その他の活力度項目</div>
+    <div class="item-list">
+      <div class="item-badge">③ 枝葉密度</div>
+      <div class="item-badge">④ 枝伸長量</div>
+      <div class="item-badge">⑤ 葉の大きさ</div>
+      <div class="item-badge">⑥ 葉色</div>
+      <div class="item-badge">⑦ 梢端枯損</div>
+      <div class="item-badge">⑧ 下枝枯損</div>
+      <div class="item-badge">⑨ 大枝欠損</div>
+      <div class="item-badge">⑩ 剪定痕</div>
+      <div class="item-badge">⑪ 樹皮傷</div>
+      <div class="item-badge">⑫ 新陳代謝</div>
+      <div class="item-badge">⑬ 胴吹き</div>
+      <div class="item-badge">⑭ 芽</div>
+      <div class="item-badge">⑮ 紅黄葉</div>
+      <div class="item-badge">⑯ 開花</div>
+      <div class="item-badge">⑰ 結実</div>
     </div>
+    <p style="font-size:0.8rem; color:#888; margin-top: 8px;">※ 各項目の詳細は、実際の点検時にアプリ内の ❓ヘルプアイコンからも確認できます。</p>
   </div>
 </div>
 
@@ -140,9 +150,22 @@
       <div class="health-cell hD"><span class="health-grade">D</span>芯に達し1/3以上</div>
     </div>
 
-    <div class="note">
-      📌 残りの項目（亀裂、子実体(キノコ)、隆起、腐朽部露出、樹皮枯死･欠損、結合部の変状、穿孔害虫等、根張り、打診音異常、貫入異常、ぶら下がり枝）も同様にA〜Dの基準で評価します。
+    <!-- 残り11項目の簡略表示 -->
+    <div class="section-title">④〜⑭ その他の健全度項目</div>
+    <div class="item-list">
+      <div class="item-badge">④ 亀裂</div>
+      <div class="item-badge">⑤ 子実体(キノコ)</div>
+      <div class="item-badge">⑥ 隆起</div>
+      <div class="item-badge">⑦ 腐朽部露出</div>
+      <div class="item-badge">⑧ 樹皮枯死･欠損</div>
+      <div class="item-badge">⑨ 結合部の変状</div>
+      <div class="item-badge">⑩ 穿孔害虫等</div>
+      <div class="item-badge">⑪ 根張り</div>
+      <div class="item-badge">⑫ 打診音異常</div>
+      <div class="item-badge">⑬ 貫入異常</div>
+      <div class="item-badge">⑭ ぶら下がり枝</div>
     </div>
+    <p style="font-size:0.8rem; color:#888; margin-top: 8px;">※ 各項目の詳細は、実際の点検時にアプリ内の ❓ヘルプアイコンからも確認できます。</p>
   </div>
 </div>
 
@@ -154,31 +177,32 @@
       <tr><th>キノコ名</th><th>特徴</th><th>危険度</th></tr>
       <tr><td><strong>ベッコウタケ</strong></td><td>広葉樹の根株の心材を腐朽させる。茶色い傘が特徴。</td><td style="color:#b71c1c;font-weight:700;">最高（D）</td></tr>
       <tr><td><strong>コフキサルノコシカケ</strong></td><td>広葉樹の幹・枝・地際部の心材を腐朽。白い粉をふく。</td><td style="color:#b71c1c;font-weight:700;">最高（D）</td></tr>
-      <tr><td>カワラタケ</td><td>広葉樹・針葉樹の幹・枝の心材を腐朽。</td><td style="color:#e65100;font-weight:700;">高（C〜D）</td></tr>
+      <tr><td>カワラタケ</td><td>広葉樹・針葉樹の枯れた幹・枝の心材を腐朽。</td><td style="color:#e65100;font-weight:700;">高（C〜D）</td></tr>
       <tr><td>カイメンタケ</td><td>針葉樹（特にカラマツ類）の根株の心材を腐朽。</td><td style="color:#e65100;font-weight:700;">中〜高（C）</td></tr>
     </table>
     <p style="font-size:0.75rem; color:#888; margin-top:8px;">
-      出典：国土交通省「都市公園の樹木の点検・診断に関する指針（案）参考資料」
-      <a href="https://www.mlit.go.jp/common/001203394.pdf" target="_blank" rel="noopener noreferrer" style="color:#1565c0;">（PDF）↗</a>
+      出典：国交省指針(案)参考資料・日本緑化センター資料
+      <a href="https://www.mlit.go.jp/common/001203394.pdf" target="_blank" rel="noopener noreferrer" style="color:#1565c0;">（国交省PDF）↗</a>
     </p>
   </div>
 </div>
 
-<!-- ===== 様式のダウンロード ===== -->
+<!-- ===== 関係資料 ===== -->
 <div class="card">
   <div class="card-hdr green"><span class="sn">📋</span>関係資料</div>
   <div class="card-body">
-    <p style="font-size:0.85rem; color:#555; margin-bottom: 8px;">
-      本システムは、以下の評価方法及び指針に準拠しています。詳細な評価基準や事故事例については、元の資料をご参照ください。
+    <p style="font-size:0.85rem; color:#555; margin-bottom: 12px;">
+      本システムは、以下の資料に準拠しています。詳細な評価基準や法的根拠、事故事例については、元の資料をご参照ください。
     </p>
     <div style="display: flex; flex-direction: column; gap: 8px;">
-  <a href="https://www.mlit.go.jp/toshi/park/toshi_parkgreen_tk_000109.html" target="_blank" rel="noopener noreferrer" class="back-btn" style="background:#2d5016; color:white; display:inline-block; text-align:center; width:100%;">
-    📄 国土交通省 樹木点検指針（案）ページへ
-  </a>
-  <a href="https://www.jpgreen.or.jp/kyoukyu_jyouhou/gijyutsu/j_shindan/shindan03.html" target="_blank" rel="noopener noreferrer" class="back-btn" style="background:#2d5016; color:white; display:inline-block; text-align:center; width:100%;">
-    🌱 日本緑化センター 樹木診断技術情報へ
-  </a>
-</div>
+      <a href="https://www.mlit.go.jp/toshi/park/toshi_parkgreen_tk_000109.html" target="_blank" rel="noopener noreferrer" class="back-btn" style="background:#2d5016; color:white; display:inline-block; text-align:center; width:100%;">
+        📄 国土交通省 樹木点検指針（案）ページへ
+      </a>
+      <a href="https://www.jpgreen.or.jp/kyoukyu_jyouhou/gijyutsu/j_shindan/shindan03.html" target="_blank" rel="noopener noreferrer" class="back-btn" style="background:#2d5016; color:white; display:inline-block; text-align:center; width:100%;">
+        🌱 日本緑化センター 樹木診断技術情報へ
+      </a>
+    </div>
+  </div>
 </div>
 
 </body>
