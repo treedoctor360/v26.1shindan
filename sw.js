@@ -1,8 +1,8 @@
 // ============================================================
 // 樹木点検システム - Service Worker
 // ============================================================
-const CACHE_NAME = 'tree-inspect-v24';
-const TILE_CACHE = 'tree-inspect-tiles-v24';
+const CACHE_NAME = 'tree-inspect-v24.3';
+const TILE_CACHE = 'tree-inspect-tiles-v24.3';
 
 // オフラインで動作するために必要なファイル
 const APP_SHELL = [
