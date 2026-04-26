@@ -2,208 +2,1372 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>詳細判定基準｜樹木点検システム</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>詳細判定基準ガイド｜樹木点検システム</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --green-dark: #2d5016;
+      --green-mid: #4a7c2f;
+      --green-light: #e8f3df;
+      --green-bg: #f0f4eb;
+      --brown: #795548;
+      --brown-light: #f3ede5;
+      --blue: #1565c0;
+      --blue-light: #e3f2fd;
+      --warn: #fff8e1;
+      --warn-border: #f9a825;
+      --danger: #ffebee;
+      --danger-border: #c62828;
+      --info: #e1f5fe;
+      --info-border: #0277bd;
+      --ok: #f1f8e9;
+      --ok-border: #689f38;
+      --text: #1a1a1a;
+      --muted: #5a5a5a;
+      --border: #e0e0e0;
+      --card-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Noto Sans JP', sans-serif; background: #f4f6f0; color: #1a1a1a; padding-bottom: 30px; }
-    .hdr { background: linear-gradient(145deg, #1e3a0e, #2d5016); color: white; padding: 16px 16px; border-radius: 0 0 28px 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; }
-    .hdr h1 { font-size: 1.2rem; font-weight: 700; }
-    .card { background: white; border-radius: 20px; margin: 16px 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden; }
-    .card-hdr { padding: 14px 18px; font-weight: 700; background: #e8f3df; border-bottom: 2px solid rgba(0,0,0,0.05); display: flex; align-items: center; gap: 10px; }
-    .card-hdr.brown { background: #f3ede5; }
-    .card-hdr.blue { background: #e3f2fd; }
-    .sn { background: #2d5016; color: white; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 0.8rem; flex-shrink: 0; }
-    .card-body { padding: 16px; }
-    .badges { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
-    .badge { display: flex; align-items: center; gap: 8px; border-radius: 30px; padding: 8px 16px; font-weight: 700; font-size: 0.9rem; }
-    .badge-A { background: #2e7d32; color: white; }
-    .badge-B { background: #f9a825; color: #222; }
-    .badge-C { background: #e65100; color: white; }
-    .badge-D { background: #b71c1c; color: white; }
-    table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.85rem; }
-    th { background: #2d5016; color: white; padding: 8px 10px; text-align: left; }
-    td { padding: 8px 10px; border-bottom: 1px solid #eee; vertical-align: top; }
-    tr:nth-child(even) td { background: #f9faf6; }
-    .score-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 4px; margin: 8px 0 12px; }
-    .score-cell { border-radius: 8px; padding: 6px 4px; text-align: center; font-size: 0.75rem; }
-    .score-num { font-size: 1rem; font-weight: 800; display: block; }
-    .health-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 4px; margin: 8px 0 12px; }
-    .health-cell { border-radius: 8px; padding: 6px 4px; text-align: center; font-size: 0.75rem; }
-    .health-grade { font-size: 1rem; font-weight: 800; display: block; }
-    .note { background: #fff8e1; border-left: 4px solid #f9a825; border-radius: 8px; padding: 10px 14px; font-size: 0.85rem; color: #5d4037; margin: 12px 0; }
-    .back-btn { display: inline-block; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; text-decoration: none; font-weight: 600; }
-    .section-title { font-size: 0.95rem; font-weight: 700; color: #2d5016; margin-bottom: 12px; border-bottom: 2px solid #e8f3df; padding-bottom: 6px; }
-    .item-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; font-size: 0.8rem; }
-    @media (max-width: 400px) { .item-list { grid-template-columns: 1fr; } }
-    .item-badge { background: #f0f0f0; padding: 6px 10px; border-radius: 8px; text-align: center; font-weight: 600; color: #555; }
-    .s0{background:#e8f5e9;color:#1b5e20} .s1{background:#f9fbe7;color:#558b2f} .s2{background:#fff8e1;color:#e65100} .s3{background:#fce4ec;color:#c62828} .s4{background:#f3e5f5;color:#7b1fa2}
-    .hA{background:#e8f5e9;color:#2e7d32} .hB{background:#fff3e0;color:#e65100} .hC{background:#ffebee;color:#c62828} .hD{background:#f3e5f5;color:#7b1fa2}
-    @media print { body { background: white; } .back-btn { display: none; } }
+    body {
+      font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+      background: var(--green-bg);
+      color: var(--text);
+      line-height: 1.8;
+      font-size: 15px;
+      padding-bottom: 60px;
+    }
+    a { color: var(--green-mid); }
+
+    /* ── ヘッダー ── */
+    .site-header {
+      background: linear-gradient(160deg, #1b3a0a 0%, #2d5016 60%, #3a6b1e 100%);
+      color: white;
+      padding: 28px 20px 24px;
+      text-align: center;
+      border-radius: 0 0 28px 28px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    }
+    .site-header h1 { font-size: 1.35rem; font-weight: 700; letter-spacing: 0.04em; margin-bottom: 6px; }
+    .site-header .subtitle { font-size: 0.82rem; opacity: 0.82; margin-bottom: 14px; }
+    .header-links { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+    .header-link {
+      display: inline-block;
+      padding: 7px 18px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 30px;
+      color: white;
+      text-decoration: none;
+      font-size: 0.82rem;
+      transition: background 0.2s;
+    }
+    .header-link:hover { background: rgba(255,255,255,0.28); }
+
+    /* ── 警告バナー ── */
+    .alert-banner {
+      background: var(--warn);
+      border: 2px solid var(--warn-border);
+      border-radius: 14px;
+      padding: 13px 16px;
+      margin: 16px 14px;
+      font-size: 0.85rem;
+      color: #5d4037;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+    .alert-banner .icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
+    .alert-banner strong { color: #b71c1c; }
+
+    /* ── 全体展開/折りたたみボタン ── */
+    .toggle-all-bar {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin: 0 14px 4px;
+    }
+    .toggle-all-btn {
+      background: white;
+      border: 1.5px solid var(--green-mid);
+      color: var(--green-mid);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .toggle-all-btn:hover { background: var(--green-light); }
+
+    /* ── 目次 ── */
+    .toc {
+      background: white;
+      border-radius: 18px;
+      margin: 10px 14px 16px;
+      padding: 18px;
+      box-shadow: var(--card-shadow);
+    }
+    .toc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+    }
+    .toc-header h2 { font-size: 1rem; color: var(--green-dark); display: flex; align-items: center; gap: 8px; }
+    .toc-toggle { color: var(--green-mid); font-size: 0.85rem; }
+    .toc-body { margin-top: 14px; }
+    .toc-section { margin-bottom: 14px; }
+    .toc-section:last-child { margin-bottom: 0; }
+    .toc-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--green-dark);
+      margin-bottom: 7px;
+      padding-left: 8px;
+      border-left: 3px solid var(--green-mid);
+    }
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 3px;
+      list-style: none;
+    }
+    .toc-grid a {
+      display: block;
+      padding: 5px 8px;
+      font-size: 0.83rem;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: background 0.15s;
+    }
+    .toc-grid a:hover { background: var(--green-light); }
+
+    /* ── セクション ── */
+    .section { margin: 22px 14px 0; }
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--green-dark);
+      padding: 13px 16px;
+      background: var(--green-light);
+      border-radius: 14px 14px 0 0;
+      border-left: 5px solid var(--green-mid);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title.brown { background: var(--brown-light); border-left-color: var(--brown); color: var(--brown); }
+    .section-title.blue  { background: var(--blue-light);  border-left-color: var(--blue);  color: var(--blue); }
+    .section-body {
+      background: white;
+      border-radius: 0 0 14px 14px;
+      padding: 16px 18px;
+      box-shadow: var(--card-shadow);
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    /* ── アコーディオンカード ── */
+    .acc-card {
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      margin: 10px 14px 0;
+      overflow: hidden;
+      scroll-margin-top: 10px;
+      background: white;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+      transition: box-shadow 0.2s;
+    }
+    .acc-card:hover { box-shadow: 0 3px 14px rgba(0,0,0,0.1); }
+
+    /* アコーディオンのヘッダー（クリックで開閉） */
+    .acc-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 14px;
+      cursor: pointer;
+      user-select: none;
+      list-style: none;
+      background: white;
+      transition: background 0.15s;
+    }
+    .acc-head::-webkit-details-marker { display: none; }
+    .acc-card[open] .acc-head { background: var(--green-light); }
+    .acc-card.brown[open] .acc-head { background: var(--brown-light); }
+    .acc-card.blue[open] .acc-head  { background: var(--blue-light); }
+
+    .acc-num {
+      background: var(--green-dark);
+      color: white;
+      min-width: 30px;
+      height: 30px;
+      padding: 0 8px;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .acc-card.brown .acc-num { background: var(--brown); }
+    .acc-card.blue  .acc-num { background: var(--blue); }
+
+    .acc-title-text { font-weight: 700; font-size: 1rem; flex: 1; }
+    .acc-subtitle { font-size: 0.78rem; color: var(--muted); font-weight: 400; margin-left: 4px; }
+
+    /* 最悪スコアバッジ */
+    .worst-badge {
+      font-size: 0.72rem;
+      padding: 2px 9px;
+      border-radius: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .wb-safe { background: #c8e6c9; color: #1b5e20; }
+    .wb-warn { background: #ffe0b2; color: #bf360c; }
+    .wb-danger { background: #ffcdd2; color: #b71c1c; }
+
+    /* 開閉矢印 */
+    .acc-arrow {
+      color: var(--muted);
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      transition: transform 0.25s;
+    }
+    details.acc-card[open] .acc-arrow { transform: rotate(180deg); }
+
+    /* アコーディオン中身 */
+    .acc-body { padding: 14px 16px 16px; }
+
+    /* 概要テキスト */
+    .item-summary {
+      background: #fafafa;
+      padding: 10px 13px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-bottom: 14px;
+      border-left: 3px solid var(--border);
+    }
+    .item-summary strong { color: var(--text); }
+
+    /* ── 評価表 ── */
+    .grade-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0 14px;
+      font-size: 0.85rem;
+    }
+    .grade-table thead th {
+      background: var(--green-dark);
+      color: white;
+      padding: 8px 10px;
+      text-align: left;
+      font-weight: 600;
+    }
+    .acc-card.brown .grade-table thead th { background: var(--brown); }
+    .acc-card.blue  .grade-table thead th { background: var(--blue); }
+    .grade-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #f0f0f0;
+      vertical-align: middle;
+    }
+    .grade-table tr:last-child td { border-bottom: none; }
+    .g-cell {
+      width: 48px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.98rem;
+      border-radius: 6px;
+    }
+    .s0 { background: #c8e6c9; color: #1b5e20; }
+    .s1 { background: #f0f4c3; color: #558b2f; }
+    .s2 { background: #ffe0b2; color: #e65100; }
+    .s3 { background: #ffccbc; color: #bf360c; }
+    .s4 { background: #ffcdd2; color: #b71c1c; }
+    .gA { background: #c8e6c9; color: #1b5e20; }
+    .gB { background: #fff9c4; color: #5d4037; }
+    .gC { background: #ffe0b2; color: #bf360c; }
+    .gD { background: #ffcdd2; color: #b71c1c; }
+
+    /* ── ボックス類 ── */
+    .box {
+      border-radius: 10px;
+      padding: 10px 13px;
+      margin: 8px 0;
+      font-size: 0.84rem;
+      line-height: 1.7;
+    }
+    .box-check   { background: var(--info);   border-left: 4px solid var(--info-border);   color: #01579b; }
+    .box-danger  { background: var(--danger);  border-left: 4px solid var(--danger-border); color: #b71c1c; }
+    .box-person  { background: var(--ok);      border-left: 4px solid var(--ok-border);     color: #33691e; }
+    .box strong  { display: block; margin-bottom: 3px; font-size: 0.88rem; }
+
+    /* ── 総合判定マトリクス ── */
+    .matrix {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 0.85rem;
+    }
+    .matrix th, .matrix td {
+      border: 1px solid #ccc;
+      padding: 9px 8px;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .matrix th { background: var(--green-dark); color: white; font-weight: 700; }
+    .matrix .lbl { background: #f5f5f5; font-weight: 600; text-align: left; padding-left: 10px; }
+    .badge { display: inline-block; padding: 3px 12px; border-radius: 20px; font-weight: 700; font-size: 0.83rem; }
+    .b-A { background: #2e7d32; color: white; }
+    .b-B { background: #f9a825; color: #222; }
+    .b-C { background: #e65100; color: white; }
+    .b-D { background: #b71c1c; color: white; }
+
+    /* ── 腐朽菌カード ── */
+    .fungus-card {
+      border-radius: 12px;
+      padding: 13px 15px;
+      margin: 10px 0;
+      font-size: 0.88rem;
+      border: 1.5px solid;
+    }
+    .f-red    { background: #fff5f5; border-color: #ef9a9a; }
+    .f-orange { background: #fff8f0; border-color: #ffcc80; }
+    .f-yellow { background: #fffde7; border-color: #ffe082; }
+    .fungus-head { font-weight: 700; font-size: 0.95rem; margin-bottom: 6px; }
+
+    /* ── 用語集 ── */
+    .glossary-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    .glossary-item {
+      background: #fafafa;
+      border-left: 3px solid var(--green-mid);
+      border-radius: 8px;
+      padding: 10px 13px;
+    }
+    .glossary-term { font-weight: 700; color: var(--green-dark); font-size: 0.9rem; margin-bottom: 3px; }
+    .glossary-def  { font-size: 0.84rem; color: var(--muted); }
+
+    /* ── TOPへ戻るリンク ── */
+    .top-link {
+      display: block;
+      text-align: right;
+      margin: 14px 14px 0;
+      font-size: 0.78rem;
+      color: var(--green-mid);
+      text-decoration: none;
+    }
+
+    /* ── レスポンシブ ── */
+    @media (min-width: 680px) {
+      .section, .toc, .alert-banner, .toggle-all-bar, .acc-card, .top-link {
+        max-width: 760px; margin-left: auto; margin-right: auto;
+      }
+      .toc-grid { grid-template-columns: repeat(3, 1fr); }
+      .glossary-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media print {
+      body { background: white; }
+      .site-header { border-radius: 0; }
+      details.acc-card { open: true; }
+      .acc-arrow { display: none; }
+      .toggle-all-bar { display: none; }
+      .back-link, .top-link { display: none; }
+    }
   </style>
 </head>
-<body>
+<body id="top">
 
-<header class="hdr">
-  <h1>📖 判定基準 詳細ガイド</h1>
-  <a href="index.html" class="back-btn">← アプリへ</a>
+<!-- ヘッダー -->
+<header class="site-header">
+  <h1>📖 詳細判定基準ガイド</h1>
+  <p class="subtitle">樹木点検の評価項目を、専門知識がない方にもわかるよう解説します</p>
+  <div class="header-links">
+    <a href="index.html" class="header-link">← 点検システム</a>
+    <a href="manual.html" class="header-link">📘 使い方ガイド</a>
+  </div>
 </header>
 
-<div style="padding: 4px 16px; font-size: 0.72rem; color: #888; background: rgba(45,80,22,0.05);">
-  国土交通省「都市公園の樹木の点検・診断に関する指針（案）参考資料」および<br>日本緑化センター「緑化樹木の樹勢回復技術（診断編）」等に基づく解説
+<!-- 警告 -->
+<div class="alert-banner">
+  <span class="icon">⚠️</span>
+  <span>本ガイドは目安です。判定が「C（要注意）」または「D（危険）」になった場合は、必ず<strong>樹木医等の専門家</strong>にご相談ください。倒木・枝折れの危険がある場合は速やかに立入禁止措置を行ってください。</span>
 </div>
 
-<!-- ===== 総合判定 ===== -->
-<div class="card">
-  <div class="card-hdr"><span class="sn">📊</span>総合判定の見かた</div>
-  <div class="card-body">
-    <table>
-      <tr><th>判定</th><th>活力度平均</th><th>健全度(最悪)</th><th>対応の目安</th></tr>
-      <tr><td><span class="badge" style="background:#2e7d32;color:white;">A 健全</span></td><td>0.8未満</td><td>A</td><td>現状維持、定期観察</td></tr>
-      <tr><td><span class="badge" style="background:#f9a825;color:#222;">B 健全に近い</span></td><td>0.8〜1.6</td><td>B</td><td>経過観察、軽度の管理</td></tr>
-      <tr><td><span class="badge" style="background:#e65100;color:white;">C 要注意</span></td><td>1.6〜2.4</td><td>C</td><td>早期に専門家へ相談・対処</td></tr>
-      <tr><td><span class="badge" style="background:#b71c1c;color:white;">D 危険木</span></td><td>2.4以上</td><td>D</td><td>緊急対応、立入制限を検討</td></tr>
+<!-- 展開/折りたたみボタン -->
+<div class="toggle-all-bar">
+  <button class="toggle-all-btn" onclick="toggleAll(true)">▼ すべて展開</button>
+  <button class="toggle-all-btn" onclick="toggleAll(false)">▲ すべて折りたたむ</button>
+</div>
+
+<!-- 目次 -->
+<div class="toc">
+  <div class="toc-header" onclick="toggleToc()">
+    <h2>📑 目次</h2>
+    <span class="toc-toggle" id="tocToggle">▲ 閉じる</span>
+  </div>
+  <div class="toc-body" id="tocBody">
+    <div class="toc-section">
+      <div class="toc-title">基本のしくみ</div>
+      <ul class="toc-grid">
+        <li><a href="#overview">判定のしくみ</a></li>
+        <li><a href="#how-to-read">見かた</a></li>
+      </ul>
+    </div>
+    <div class="toc-section">
+      <div class="toc-title">🌿 Ⅰ-2 活力度（17項目）</div>
+      <ul class="toc-grid">
+        <li><a href="#vigor">①樹勢</a></li>
+        <li><a href="#shape">②樹形</a></li>
+        <li><a href="#density">③枝葉密度</a></li>
+        <li><a href="#shoot">④枝伸長量</a></li>
+        <li><a href="#leafSize">⑤葉の大きさ</a></li>
+        <li><a href="#leafColor">⑥葉色</a></li>
+        <li><a href="#topDieback">⑦梢端枯損</a></li>
+        <li><a href="#lowerDieback">⑧下枝枯損</a></li>
+        <li><a href="#largeBranch">⑨大枝欠損</a></li>
+        <li><a href="#pruning">⑩剪定痕</a></li>
+        <li><a href="#barkWound">⑪樹皮傷</a></li>
+        <li><a href="#barkTurnover">⑫新陳代謝</a></li>
+        <li><a href="#sprout">⑬胴吹き</a></li>
+        <li><a href="#bud">⑭芽</a></li>
+        <li><a href="#autumnColor">⑮紅黄葉</a></li>
+        <li><a href="#flower">⑯開花</a></li>
+        <li><a href="#fruit">⑰結実</a></li>
+      </ul>
+    </div>
+    <div class="toc-section">
+      <div class="toc-title">⚠️ Ⅰ-3 健全度（14項目）</div>
+      <ul class="toc-grid">
+        <li><a href="#sway">①揺らぎ</a></li>
+        <li><a href="#lean">②不自然な傾斜</a></li>
+        <li><a href="#crack">③亀裂</a></li>
+        <li><a href="#fungusBody">④子実体(キノコ)</a></li>
+        <li><a href="#cavity">⑤開口空洞</a></li>
+        <li><a href="#bulge">⑥隆起</a></li>
+        <li><a href="#decayExposed">⑦腐朽部露出</a></li>
+        <li><a href="#barkDamage">⑧樹皮枯死･欠損</a></li>
+        <li><a href="#jointAbnormality">⑨結合部の変状</a></li>
+        <li><a href="#pestDamage">⑩穿孔害虫等</a></li>
+        <li><a href="#rootVisible">⑪根張り</a></li>
+        <li><a href="#tappingSound">⑫打診音異常</a></li>
+        <li><a href="#penetrationAbnormality">⑬貫入異常</a></li>
+        <li><a href="#hangingBranch">⑭ぶら下がり枝</a></li>
+      </ul>
+    </div>
+    <div class="toc-section">
+      <div class="toc-title">参考資料</div>
+      <ul class="toc-grid">
+        <li><a href="#fungus-list">主な腐朽菌</a></li>
+        <li><a href="#glossary">用語集</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ 概要 ════════════════ -->
+<section class="section" id="overview">
+  <div class="section-title">🌳 判定のしくみ</div>
+  <div class="section-body">
+    <p>樹木点検システムでは、2つの観点から樹木の状態を評価します。</p>
+
+    <p style="margin-top:14px; font-weight:700; color:var(--brown);">① 活力度（Ⅰ-2）— 元気さ</p>
+    <p style="font-size:0.88rem; color:var(--muted); margin-bottom:10px;">葉の量や色など「樹木がどれだけ元気か」を17項目、<strong>0〜4の5段階</strong>で評価します。</p>
+    <table class="grade-table">
+      <thead><tr><th style="width:56px;">評点</th><th>状態</th><th>衰退度の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell s0">0</td><td>正常・健全</td><td rowspan="5" style="font-size:0.83rem; line-height:1.9;">
+          平均値で算出<br>
+          <strong>Ⅰ</strong>（0.8未満）良<br>
+          <strong>Ⅱ</strong>（0.8〜1.6）やや不良<br>
+          <strong>Ⅲ</strong>（1.6〜2.4）不良<br>
+          <strong>Ⅳ</strong>（2.4〜3.2）著しく不良<br>
+          <strong>Ⅴ</strong>（3.2以上）枯死寸前
+        </td></tr>
+        <tr><td class="g-cell s1">1</td><td>わずかに異常</td></tr>
+        <tr><td class="g-cell s2">2</td><td>明らかに異常</td></tr>
+        <tr><td class="g-cell s3">3</td><td>著しく不良</td></tr>
+        <tr><td class="g-cell s4">4</td><td>枯死寸前</td></tr>
+      </tbody>
+    </table>
+
+    <p style="margin-top:16px; font-weight:700; color:var(--blue);">② 健全度（Ⅰ-3）— 危険度</p>
+    <p style="font-size:0.88rem; color:var(--muted); margin-bottom:10px;">傾きや空洞など「倒木・枝折れの危険性」を14項目、<strong>A〜Dの4段階</strong>で評価します。</p>
+    <table class="grade-table">
+      <thead><tr><th style="width:56px;">評価</th><th>意味</th><th>対応の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell gA">A</td><td>異常なし</td><td>現状維持</td></tr>
+        <tr><td class="g-cell gB">B</td><td>軽微な異常</td><td>経過観察</td></tr>
+        <tr><td class="g-cell gC">C</td><td>危険性あり</td><td>早期に専門家へ相談</td></tr>
+        <tr><td class="g-cell gD">D</td><td>非常に危険</td><td>緊急対応・立入制限</td></tr>
+      </tbody>
+    </table>
+
+    <p style="margin-top:16px; font-weight:700; color:var(--green-dark);">③ 総合判定</p>
+    <p style="font-size:0.88rem; color:var(--muted); margin-bottom:10px;">活力度と健全度のうち<strong>悪いほうの評価</strong>が総合判定になります。</p>
+    <table class="matrix">
+      <thead><tr><th>活力度</th><th>健全度</th><th>総合判定</th></tr></thead>
+      <tbody>
+        <tr><td class="lbl">Ⅰ（0.8未満）</td><td>A</td><td><span class="badge b-A">A 健全</span></td></tr>
+        <tr><td class="lbl">Ⅱ（0.8〜1.6）</td><td>B</td><td><span class="badge b-B">B 健全に近い</span></td></tr>
+        <tr><td class="lbl">Ⅲ（1.6〜2.4）</td><td>C</td><td><span class="badge b-C">C 要注意</span></td></tr>
+        <tr><td class="lbl">Ⅳ・Ⅴ（2.4以上）</td><td>D</td><td><span class="badge b-D">D 危険木</span></td></tr>
+      </tbody>
     </table>
   </div>
-</div>
+</section>
 
-<!-- ===== Ⅰ-2 活力度 ===== -->
-<div class="card">
-  <div class="card-hdr brown"><span class="sn">Ⅰ-2</span>活力度（衰退度）— 17項目</div>
-  <div class="card-body">
-    <p style="font-size:0.85rem; color:#555; margin-bottom: 12px;">各項目を <strong>0（最良）〜4（最悪）</strong> の5段階で評価します。「同種の健全な木と比べてどうか」を基準に判断してください。</p>
-
-    <div class="section-title">① 樹勢</div>
-    <p style="font-size:0.85rem; color:#555; margin-bottom: 8px;">枝の伸び・葉の密度・葉色などから木全体の元気さを総合的に判断。最初に見たときの印象を大切に。</p>
-    <div class="score-grid">
-      <div class="score-cell s0"><span class="score-num">0</span>旺盛・被害なし</div>
-      <div class="score-cell s1"><span class="score-num">1</span>幾分影響があるが目立たない</div>
-      <div class="score-cell s2"><span class="score-num">2</span>異常が明らか</div>
-      <div class="score-cell s3"><span class="score-num">3</span>極めて劣悪</div>
-      <div class="score-cell s4"><span class="score-num">4</span>ほとんど枯死</div>
+<section class="section" id="how-to-read">
+  <div class="section-title">📘 本ガイドの見かた</div>
+  <div class="section-body">
+    <p>各項目をタップ/クリックすると詳細が展開されます。3つの視点で解説しています。</p>
+    <div style="display:grid; gap:8px; margin-top:12px;">
+      <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>点検時にどこをどう確認すればよいか、具体的な手順を示します。</div>
+      <div class="box box-danger"><strong>⚠️ 特に危険なサイン</strong>この症状が見られたら早急に対応が必要、という重要な見分けかたです。</div>
+      <div class="box box-person"><strong>👤 一般の方向けひとこと</strong>専門知識がない方でも判断しやすいよう、身近な例えで説明します。</div>
     </div>
-
-    <div class="section-title">② 樹形</div>
-    <p style="font-size:0.85rem; color:#555; margin-bottom: 8px;">主幹・大枝の枯損や欠損、葉の密度と配置から評価。剪定で人工樹形にしている場合は留意。</p>
-    <div class="score-grid">
-      <div class="score-cell s0"><span class="score-num">0</span>自然樹形を保っている</div>
-      <div class="score-cell s1"><span class="score-num">1</span>若干の乱れがあるが自然樹形に近い</div>
-      <div class="score-cell s2"><span class="score-num">2</span>大きく変化している</div>
-      <div class="score-cell s3"><span class="score-num">3</span>樹形の乱れが著しい</div>
-      <div class="score-cell s4"><span class="score-num">4</span>完全に崩壊している</div>
-    </div>
-
-    <!-- 残り15項目の簡略表示 -->
-    <div class="section-title">③〜⑰ その他の活力度項目</div>
-    <div class="item-list">
-      <div class="item-badge">③ 枝葉密度</div>
-      <div class="item-badge">④ 枝伸長量</div>
-      <div class="item-badge">⑤ 葉の大きさ</div>
-      <div class="item-badge">⑥ 葉色</div>
-      <div class="item-badge">⑦ 梢端枯損</div>
-      <div class="item-badge">⑧ 下枝枯損</div>
-      <div class="item-badge">⑨ 大枝欠損</div>
-      <div class="item-badge">⑩ 剪定痕</div>
-      <div class="item-badge">⑪ 樹皮傷</div>
-      <div class="item-badge">⑫ 新陳代謝</div>
-      <div class="item-badge">⑬ 胴吹き</div>
-      <div class="item-badge">⑭ 芽</div>
-      <div class="item-badge">⑮ 紅黄葉</div>
-      <div class="item-badge">⑯ 開花</div>
-      <div class="item-badge">⑰ 結実</div>
-    </div>
-    <p style="font-size:0.8rem; color:#888; margin-top: 8px;">※ 各項目の詳細は、実際の点検時にアプリ内の ❓ヘルプアイコンからも確認できます。</p>
   </div>
-</div>
+</section>
 
-<!-- ===== Ⅰ-3 健全度 ===== -->
-<div class="card">
-  <div class="card-hdr blue"><span class="sn">Ⅰ-3</span>健全度（危険度）— 14項目</div>
-  <div class="card-body">
-    <p style="font-size:0.85rem; color:#555; margin-bottom: 12px;">各項目を <strong>A（異常なし）〜D（非常に危険）</strong> の4段階で評価します。倒木・枝折れの危険性を総合的に判断します。</p>
+<!-- ════════════════ 活力度セクション見出し ════════════════ -->
+<section class="section" style="margin-bottom:0;">
+  <div class="section-title brown">🌿 Ⅰ-2 活力度（17項目） — 0〜4の5段階評価</div>
+  <div class="section-body">樹木の「元気さ」を17項目で総合評価します。各項目を <strong>0（正常）〜4（枯死寸前）</strong> の5段階で評価してください。すべての平均点が衰退度の判定に使われます。</div>
+</section>
 
-    <div class="section-title">① 揺らぎ</div>
-    <p style="font-size:0.85rem; color:#555; margin-bottom: 8px;">体重をかけて幹を押し、根元からの揺れを確認します。根元が動くか、土に割れ目がないかを観察。</p>
-    <div class="health-grid">
-      <div class="health-cell hA"><span class="health-grade">A</span>なし</div>
-      <div class="health-cell" style="background:#f5f5f5;color:#bbb;cursor:not-allowed;"><span class="health-grade">B</span>—（該当なし）</div>
-      <div class="health-cell hC"><span class="health-grade">C</span>あり（小）</div>
-      <div class="health-cell hD"><span class="health-grade">D</span>あり（大）<br>根元から揺らぐ</div>
-    </div>
+<!-- ── 活力度 17項目 ── -->
 
-    <div class="section-title">② 不自然な傾斜</div>
-    <p style="font-size:0.85rem; color:#555; margin-bottom: 8px;">傾いている側の地面が盛り上がっていないか、反対側に亀裂がないかを確認。</p>
-    <div class="health-grid">
-      <div class="health-cell hA"><span class="health-grade">A</span>なし</div>
-      <div class="health-cell hB"><span class="health-grade">B</span>傾斜はあるが根付きは正常</div>
-      <div class="health-cell" style="background:#f5f5f5;color:#bbb;cursor:not-allowed;"><span class="health-grade">C</span>—（該当なし）</div>
-      <div class="health-cell hD"><span class="health-grade">D</span>傾斜＋地際に変状</div>
-    </div>
-
-    <div class="section-title">③ 開口空洞</div>
-    <p style="font-size:0.85rem; color:#555; margin-bottom: 8px;">空洞の深さ（芯まで達しているか）と、幹周に対する空洞の幅の割合を確認。</p>
-    <div class="health-grid">
-      <div class="health-cell hA"><span class="health-grade">A</span>なし</div>
-      <div class="health-cell hB"><span class="health-grade">B</span>芯に達しない</div>
-      <div class="health-cell hC"><span class="health-grade">C</span>芯に達し1/3未満</div>
-      <div class="health-cell hD"><span class="health-grade">D</span>芯に達し1/3以上</div>
-    </div>
-
-    <!-- 残り11項目の簡略表示 -->
-    <div class="section-title">④〜⑭ その他の健全度項目</div>
-    <div class="item-list">
-      <div class="item-badge">④ 亀裂</div>
-      <div class="item-badge">⑤ 子実体(キノコ)</div>
-      <div class="item-badge">⑥ 隆起</div>
-      <div class="item-badge">⑦ 腐朽部露出</div>
-      <div class="item-badge">⑧ 樹皮枯死･欠損</div>
-      <div class="item-badge">⑨ 結合部の変状</div>
-      <div class="item-badge">⑩ 穿孔害虫等</div>
-      <div class="item-badge">⑪ 根張り</div>
-      <div class="item-badge">⑫ 打診音異常</div>
-      <div class="item-badge">⑬ 貫入異常</div>
-      <div class="item-badge">⑭ ぶら下がり枝</div>
-    </div>
-    <p style="font-size:0.8rem; color:#888; margin-top: 8px;">※ 各項目の詳細は、実際の点検時にアプリ内の ❓ヘルプアイコンからも確認できます。</p>
-  </div>
-</div>
-
-<!-- ===== 腐朽菌 ===== -->
-<div class="card">
-  <div class="card-hdr brown"><span class="sn">🍄</span>主な腐朽菌の種類と危険度</div>
-  <div class="card-body">
-    <table>
-      <tr><th>キノコ名</th><th>特徴</th><th>危険度</th></tr>
-      <tr><td><strong>ベッコウタケ</strong></td><td>広葉樹の根株の心材を腐朽させる。淡黄褐色～赤褐色の傘が特徴。</td><td style="color:#b71c1c;font-weight:700;">最高（D）</td></tr>
-      <tr><td><strong>コフキサルノコシカケ</strong></td><td>広葉樹の幹・枝・地際部の心材を腐朽。白い粉をふく。</td><td style="color:#b71c1c;font-weight:700;">最高（D）</td></tr>
-      <tr><td>カワラタケ</td><td>広葉樹・針葉樹の枯れた幹・枝の心材を腐朽。</td><td style="color:#e65100;font-weight:700;">高（C〜D）</td></tr>
-      <tr><td>カイメンタケ</td><td>針葉樹（特にカラマツ類）の根株の心材を腐朽。</td><td style="color:#e65100;font-weight:700;">中〜高（C）</td></tr>
+<details class="acc-card brown" id="vigor">
+  <summary class="acc-head">
+    <span class="acc-num">①</span>
+    <span class="acc-title-text">樹勢<span class="acc-subtitle">— 木全体の元気さ</span></span>
+    <span class="worst-badge wb-warn">最悪 4</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">樹木全体の<strong>勢いや見栄え</strong>を直感的に評価します。健康な同種の木と比べて、生き生きしているかどうかが目安です。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評点</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell s0">0</td><td>旺盛で被害なし。葉も枝も生き生きしている</td></tr>
+        <tr><td class="g-cell s1">1</td><td>幾分影響はあるが、ほとんど目立たない</td></tr>
+        <tr><td class="g-cell s2">2</td><td>異常が明らかに見える（葉が少ない・色が悪いなど）</td></tr>
+        <tr><td class="g-cell s3">3</td><td>極めて劣悪。明らかに弱っている</td></tr>
+        <tr><td class="g-cell s4">4</td><td>ほとんど枯死状態</td></tr>
+      </tbody>
     </table>
-    <p style="font-size:0.75rem; color:#888; margin-top:8px;">
-      出典：国交省指針(案)参考資料・日本緑化センター資料
-      <a href="https://www.mlit.go.jp/common/001203394.pdf" target="_blank" rel="noopener noreferrer" style="color:#1565c0;">（国交省PDF）↗</a>
-    </p>
+    <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>少し離れた場所から木全体を眺め、近くの同種の元気な木と比べてみましょう。「葉の量」「枝の張り具合」「全体のバランス」を見ます。</div>
+    <div class="box box-person"><strong>👤 一般の方向けひとこと</strong>第一印象でかまいません。「元気そう」「ちょっと弱ってそう」「明らかに枯れかけ」を直感で判断してOKです。</div>
   </div>
-</div>
+</details>
 
-<!-- ===== 関係資料 ===== -->
-<div class="card">
-  <div class="card-hdr green"><span class="sn">📋</span>関係資料</div>
-  <div class="card-body">
-    <p style="font-size:0.85rem; color:#555; margin-bottom: 12px;">
-      本システムは、以下の資料に準拠しています。詳細な評価基準や法的根拠、事故事例については、元の資料をご参照ください。
-    </p>
-    <div style="display: flex; flex-direction: column; gap: 8px;">
-      <a href="https://www.mlit.go.jp/toshi/park/toshi_parkgreen_tk_000109.html" target="_blank" rel="noopener noreferrer" class="back-btn" style="background:#2d5016; color:white; display:inline-block; text-align:center; width:100%;">
-        📄 国土交通省 樹木点検指針（案）ページへ
-      </a>
-      <a href="https://www.jpgreen.or.jp/kyoukyu_jyouhou/gijyutsu/j_shindan/shindan03.html" target="_blank" rel="noopener noreferrer" class="back-btn" style="background:#2d5016; color:white; display:inline-block; text-align:center; width:100%;">
-        🌱 日本緑化センター 樹木診断技術情報へ
-      </a>
+<details class="acc-card brown" id="shape">
+  <summary class="acc-head">
+    <span class="acc-num">②</span>
+    <span class="acc-title-text">樹形<span class="acc-subtitle">— 自然な形かどうか</span></span>
+    <span class="worst-badge wb-warn">最悪 4</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">その樹種本来の<strong>自然な形</strong>を保っているかを見ます。サクラやケヤキなど樹種ごとに「典型的な形」があります。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評点</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell s0">0</td><td>自然な樹形を保っている</td></tr>
+        <tr><td class="g-cell s1">1</td><td>若干の乱れがある</td></tr>
+        <tr><td class="g-cell s2">2</td><td>大きく形が変化している</td></tr>
+        <tr><td class="g-cell s3">3</td><td>乱れが著しい</td></tr>
+        <tr><td class="g-cell s4">4</td><td>樹形が完全に崩壊している</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>樹種図鑑やネット画像で「健康なその樹種」の形と比べます。強剪定で頭を切られた木は形が崩れていることが多いです。</div>
+    <div class="box box-person"><strong>👤 一般の方向けひとこと</strong>サクラなら「傘のような広がった形」、ケヤキなら「ほうきを逆さにしたような形」が自然です。これと大きく違っていたら評点を上げます。</div>
+  </div>
+</details>
+
+<details class="acc-card brown" id="density">
+  <summary class="acc-head">
+    <span class="acc-num">③</span>
+    <span class="acc-title-text">枝葉密度<span class="acc-subtitle">— 葉の量・詰まり具合</span></span>
+    <span class="worst-badge wb-warn">最悪 4</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">樹冠（枝葉が広がる範囲）にどれだけ<strong>葉が詰まっているか</strong>です。葉の量は樹木の健康のバロメーターです。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評点</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell s0">0</td><td>十分な量の葉がついている</td></tr>
+        <tr><td class="g-cell s1">1</td><td>やや葉が少ない</td></tr>
+        <tr><td class="g-cell s2">2</td><td>枯枝が目立ち、葉がやや少ない</td></tr>
+        <tr><td class="g-cell s3">3</td><td>著しく葉が少ない</td></tr>
+        <tr><td class="g-cell s4">4</td><td>ほとんど葉がない</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>樹冠を下から見上げ、空の見え具合をチェックします。健康な木は葉で空がほとんど見えませんが、衰弱した木は枝の隙間から空がたくさん見えます。</div>
+    <div class="box box-person"><strong>👤 一般の方向けひとこと</strong>「下から見上げて青空がたくさん見える」=葉が少ない、と判断できます。落葉期（冬）は評価が難しいので、葉のある時期に行いましょう。</div>
+  </div>
+</details>
+
+<details class="acc-card brown" id="shoot">
+  <summary class="acc-head">
+    <span class="acc-num">④</span>
+    <span class="acc-title-text">枝伸長量<span class="acc-subtitle">— 今年の枝の伸び</span></span>
+    <span class="worst-badge wb-warn">最悪 4</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">前年に伸びた新しい枝の<strong>長さ・太さ</strong>を見ます。元気な木は毎年しっかりと枝が伸びますが、衰弱すると伸びが止まります。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評点</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell s0">0</td><td>新枝が十分に伸長している</td></tr>
+        <tr><td class="g-cell s1">1</td><td>新枝がやや小さい</td></tr>
+        <tr><td class="g-cell s2">2</td><td>新枝が短く細い</td></tr>
+        <tr><td class="g-cell s3">3</td><td>極度に短小</td></tr>
+        <tr><td class="g-cell s4">4</td><td>萌芽（新芽の伸び）のみで枝にならない</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>枝の先端を観察すると、その年に伸びた部分は色や質感が違います。鉛筆くらいの太さ・20〜30cm以上伸びていれば健全です。</div>
+    <div class="box box-person"><strong>👤 一般の方向けひとこと</strong>枝先が「ちょこんと小さい芽だけしかない」「指で触ると細くて頼りない」状態は要注意です。</div>
+  </div>
+</details>
+
+<details class="acc-card brown" id="leafSize">
+  <summary class="acc-head">
+    <span class="acc-num">⑤</span>
+    <span class="acc-title-text">葉の大きさ<span class="acc-subtitle">— 健全な同種と比較</span></span>
+    <span class="worst-badge wb-warn">最悪 4</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">葉の<strong>サイズ</strong>を健康な同種と比較します。栄養不足や根の障害があると葉が小さくなります。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評点</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell s0">0</td><td>十分な大きさ</td></tr>
+        <tr><td class="g-cell s1">1</td><td>所々に小さい葉がある</td></tr>
+        <tr><td class="g-cell s2">2</td><td>全体にやや小さい</td></tr>
+        <tr><td class="g-cell s3">3</td><td>著しく小さい</td></tr>
+        <tr><td class="g-cell s4">4</td><td>葉がわずかで、しかも小さい</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>同じ場所にある同種の元気な木と葉を見比べます。小さくなっている範囲（一部か全体か）も評価のポイントです。</div>
+    <div class="box box-person"><strong>👤 一般の方向けひとこと</strong>葉を1枚拾って、その樹種の「普通の葉」とサイズを見比べてみましょう。明らかに小さければ栄養不足のサインです。</div>
+  </div>
+</details>
+
+<details class="acc-card brown" id="leafColor">
+  <summary class="acc-head">
+    <span class="acc-num">⑥</span>
+    <span class="acc-title-text">葉色<span class="acc-subtitle">— 色と艶</span></span>
+    <span class="worst-badge wb-warn">最悪 4</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">葉の<strong>色つや</strong>を確認します。健康な葉は濃く鮮やかな緑色ですが、弱ると薄くなったり黄ばんだりします。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評点</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell s0">0</td><td>濃い緑色で鮮やか</td></tr>
+        <tr><td class="g-cell s1">1</td><td>やや薄い緑色</td></tr>
+        <tr><td class="g-cell s2">2</td><td>黄変が目立つ</td></tr>
+        <tr><td class="g-cell s3">3</td><td>大部分が薄緑色</td></tr>
+        <tr><td class="g-cell s4">4</td><td>薄緑・黄変のみ</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>季節の影響を考慮します（秋の紅葉は別評価）。夏でも黄ばんでいる、葉脈の間だけ黄色い（マグネシウム欠乏など）といった病的な変色を見ます。</div>
+    <div class="box box-danger"><strong>⚠️ 特に危険なサイン</strong>夏なのに葉全体が黄色〜茶色に変色しているのは、根の障害や深刻な水ストレスのサインです。</div>
+  </div>
+</details>
+
+<details class="acc-card brown" id="topDieback">
+  <summary class="acc-head">
+    <span class="acc-num">⑦</span>
+    <span class="acc-title-text">梢端枯損<span class="acc-subtitle">— てっぺんの枯れ</span></span>
+    <span class="worst-badge wb-danger">最悪 4</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">「梢端（しょうたん）」は<strong>樹木のてっぺん部分</strong>のこと。ここが枯れる現象は樹木全体の衰弱を示す重要なサインです。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評点</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell s0">0</td><td>梢端の枯れなし</td></tr>
+        <tr><td class="g-cell s1">1</td><td>少しだけ枯れている</td></tr>
+        <tr><td class="g-cell s2">2</td><td>随所に枯れがある</td></tr>
+        <tr><td class="g-cell s3">3</td><td>かなり目立つ</td></tr>
+        <tr><td class="g-cell s4">4</td><td>梢端や主要な枝が完全に枯れている</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>樹冠の最上部を見上げ、葉のない枯れた小枝が突き出していないか観察します。「枯下がり」と呼ばれる症状です。</div>
+    <div class="box box-person"><strong>👤 一般の方向けひとこと</strong>木の頭のてっぺんが「カサカサに枯れた箒（ほうき）のような枝」になっている状態。これが目立つ木は弱っています。</div>
+  </div>
+</details>
+
+<details class="acc-card brown" id="lowerDieback">
+  <summary class="acc-head">
+    <span class="acc-num">⑧</span>
+    <span class="acc-title-text">下枝枯損<span class="acc-subtitle">— 下のほうの枝の枯れ</span></span>
+    <span class="worst-badge wb-danger">最悪 4</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">幹の<strong>下のほうの枝</strong>が枯れる現象です。日陰で自然に枯れる場合と、衰弱で枯れる場合があります。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評点</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell s0">0</td><td>下枝の枯れなし</td></tr>
+        <tr><td class="g-cell s1">1</td><td>少し枯れている</td></tr>
+        <tr><td class="g-cell s2">2</td><td>随所に枯れ枝、または剪定跡が目立つ</td></tr>
+        <tr><td class="g-cell s3">3</td><td>かなり目立つ</td></tr>
+        <tr><td class="g-cell s4">4</td><td>健全な枝先がほとんどない</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-danger"><strong>⚠️ 特に危険なサイン</strong>枯れた枝は突然落下する危険があります。下枝の枯れが多い木の真下では作業や歩行に注意が必要です。</div>
+  </div>
+</details>
+
+<details class="acc-card brown" id="largeBranch">
+  <summary class="acc-head">
+    <span class="acc-num">⑨</span>
+    <span class="acc-title-text">大枝欠損<span class="acc-subtitle">— 太い枝の折れ・欠け</span></span>
+    <span class="worst-badge wb-danger">最悪 4</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">直径10cm以上の<strong>太い枝</strong>が折れたり欠けたりしている状態です。大枝欠損は樹形を大きく崩します。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評点</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell s0">0</td><td>大枝の欠損なし</td></tr>
+        <tr><td class="g-cell s1">1</td><td>少し欠けたが回復しつつある</td></tr>
+        <tr><td class="g-cell s2">2</td><td>随所に欠損が目立つ</td></tr>
+        <tr><td class="g-cell s3">3</td><td>かなり目立つ</td></tr>
+        <tr><td class="g-cell s4">4</td><td>幹の上部が失われている</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>大枝が折れた箇所から雨水が侵入し、内部腐朽が進んでいないかも合わせて確認しましょう。</div>
+  </div>
+</details>
+
+<details class="acc-card brown" id="pruning">
+  <summary class="acc-head">
+    <span class="acc-num">⑩</span>
+    <span class="acc-title-text">剪定痕<span class="acc-subtitle">— 切り口の回復具合</span></span>
+    <span class="worst-badge wb-warn">最悪 4</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">過去に枝を切った<strong>切り口</strong>が、樹皮で覆われつつあるか（巻込み）を見ます。元気な木は切り口を自分で塞いでいきます。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評点</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell s0">0</td><td>旺盛に巻込んでいる（切り口がほぼ覆われた）</td></tr>
+        <tr><td class="g-cell s1">1</td><td>巻込み成長中</td></tr>
+        <tr><td class="g-cell s2">2</td><td>巻込みに活力がない</td></tr>
+        <tr><td class="g-cell s3">3</td><td>ほとんど巻込んでいない</td></tr>
+        <tr><td class="g-cell s4">4</td><td>全く巻込んでいない（切り口がそのまま）</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>切り口の周囲にドーナツ状に盛り上がる樹皮（カルス）が形成されているかを確認します。</div>
+    <div class="box box-person"><strong>👤 一般の方向けひとこと</strong>人間の傷口がだんだんふさがるのと同じです。切り口がしっかり「かさぶた」のようになっていれば元気、ぱっくり開いたままなら衰弱のサインです。</div>
+  </div>
+</details>
+
+<details class="acc-card brown" id="barkWound">
+  <summary class="acc-head">
+    <span class="acc-num">⑪</span>
+    <span class="acc-title-text">樹皮傷<span class="acc-subtitle">— 幹のキズ・空洞</span></span>
+    <span class="worst-badge wb-danger">最悪 4</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">幹についた<strong>キズや空洞</strong>です。傷口から腐朽菌が侵入することがあります。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評点</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell s0">0</td><td>傷はほとんどない</td></tr>
+        <tr><td class="g-cell s1">1</td><td>少し傷がある</td></tr>
+        <tr><td class="g-cell s2">2</td><td>古傷が残っている</td></tr>
+        <tr><td class="g-cell s3">3</td><td>腐朽が著しい</td></tr>
+        <tr><td class="g-cell s4">4</td><td>大きな空洞・樹皮の剥がれがある</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-danger"><strong>⚠️ 特に危険なサイン</strong>大きな空洞は内部腐朽を示します。Ⅰ-3「開口空洞」「腐朽部露出」も合わせて評価してください。</div>
+  </div>
+</details>
+
+<details class="acc-card brown" id="barkTurnover">
+  <summary class="acc-head">
+    <span class="acc-num">⑫</span>
+    <span class="acc-title-text">新陳代謝<span class="acc-subtitle">— 樹皮の更新活発さ</span></span>
+    <span class="worst-badge wb-danger">最悪 4</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">樹皮の<strong>新陳代謝</strong>（古い皮が剥がれて新しい皮が出てくる動き）を見ます。健康な木は樹皮が活発に更新されます。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評点</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell s0">0</td><td>活発に新陳代謝している</td></tr>
+        <tr><td class="g-cell s1">1</td><td>一部不活発</td></tr>
+        <tr><td class="g-cell s2">2</td><td>全体に活力がない</td></tr>
+        <tr><td class="g-cell s3">3</td><td>著しく衰弱している</td></tr>
+        <tr><td class="g-cell s4">4</td><td>大部分が壊死している</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>樹皮の表面を観察します。健康な樹皮はその樹種固有のパターン（ケヤキの斑模様、サクラの皮目など）が鮮明です。死んだ樹皮はパサパサで色が抜けます。</div>
+  </div>
+</details>
+
+<details class="acc-card brown" id="sprout">
+  <summary class="acc-head">
+    <span class="acc-num">⑬</span>
+    <span class="acc-title-text">胴吹き<span class="acc-subtitle">— SOSの不定芽</span></span>
+    <span class="worst-badge wb-danger">最悪 4</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">幹や根元から出る<strong>不定芽（ふていが）</strong>のことです。普通そこに芽はないはずなのに出てくる芽で、樹木のSOSサインです。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評点</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell s0">0</td><td>胴吹きなし</td></tr>
+        <tr><td class="g-cell s1">1</td><td>枝葉は多いが胴吹きあり</td></tr>
+        <tr><td class="g-cell s2">2</td><td>枝葉少なめ＋胴吹きあり</td></tr>
+        <tr><td class="g-cell s3">3</td><td>枝葉極少＋胴吹き多数</td></tr>
+        <tr><td class="g-cell s4">4</td><td>枝葉極少＋胴吹き少（最後の力）</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-person"><strong>👤 一般の方向けひとこと</strong>幹の途中や根元から、本来出ないはずの場所に小さな枝・葉が出ている状態。「樹冠の枝が弱って緊急で芽を出した」というSOS。多いほど樹木は弱っています。</div>
+  </div>
+</details>
+
+<details class="acc-card brown" id="bud">
+  <summary class="acc-head">
+    <span class="acc-num">⑭</span>
+    <span class="acc-title-text">芽<span class="acc-subtitle">— 冬芽の大きさ・数</span></span>
+    <span class="worst-badge wb-warn">最悪 4</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">枝先の<strong>冬芽（とうが）</strong>の大きさと数を見ます。元気な木は冬芽が大きく充実しています。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評点</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell s0">0</td><td>大きな芽が多数</td></tr>
+        <tr><td class="g-cell s1">1</td><td>やや劣る</td></tr>
+        <tr><td class="g-cell s2">2</td><td>小さい・少ない</td></tr>
+        <tr><td class="g-cell s3">3</td><td>著しく少なく貧弱</td></tr>
+        <tr><td class="g-cell s4">4</td><td>ほとんど見られない</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>冬〜早春が観察に適した時期です。枝先の芽が「ふっくらと膨らんで大きい」=元気、「小さくしぼんでいる」=衰弱と判断します。</div>
+  </div>
+</details>
+
+<details class="acc-card brown" id="autumnColor">
+  <summary class="acc-head">
+    <span class="acc-num">⑮</span>
+    <span class="acc-title-text">紅黄葉<span class="acc-subtitle">— 秋の紅葉の鮮やかさ</span></span>
+    <span class="worst-badge wb-safe">最悪 4</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">秋の<strong>紅葉・黄葉</strong>の鮮やかさです。健康な木はきれいに紅葉しますが、衰弱すると色がさえません。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評点</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell s0">0</td><td>鮮やかに紅黄葉する</td></tr>
+        <tr><td class="g-cell s1">1</td><td>やや劣る</td></tr>
+        <tr><td class="g-cell s2">2</td><td>一部のみ紅葉</td></tr>
+        <tr><td class="g-cell s3">3</td><td>正常な紅黄葉が見られない</td></tr>
+        <tr><td class="g-cell s4">4</td><td>紅葉前に葉が枯れ落ちる</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>紅葉する樹種（カエデ、サクラ、イチョウなど）でのみ評価します。常緑樹は対象外です。</div>
+  </div>
+</details>
+
+<details class="acc-card brown" id="flower">
+  <summary class="acc-head">
+    <span class="acc-num">⑯</span>
+    <span class="acc-title-text">開花<span class="acc-subtitle">— 花のつき具合</span></span>
+    <span class="worst-badge wb-safe">最悪 4</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">花の<strong>つき具合・大きさ</strong>を見ます。樹木のエネルギーが余っている健全な木はたくさん花をつけます。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評点</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell s0">0</td><td>花つきが良好</td></tr>
+        <tr><td class="g-cell s1">1</td><td>やや劣る</td></tr>
+        <tr><td class="g-cell s2">2</td><td>花が小さく疎ら</td></tr>
+        <tr><td class="g-cell s3">3</td><td>小さい花が多くまばら</td></tr>
+        <tr><td class="g-cell s4">4</td><td>ほとんど開花しない</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-person"><strong>👤 一般の方向けひとこと</strong>※「衰弱した木が最後の力を振り絞って大量の花をつける」（最後の咲き）というケースもあります。判断に迷ったら他の項目も合わせて見てください。</div>
+  </div>
+</details>
+
+<details class="acc-card brown" id="fruit">
+  <summary class="acc-head">
+    <span class="acc-num">⑰</span>
+    <span class="acc-title-text">結実<span class="acc-subtitle">— 実のつき具合</span></span>
+    <span class="worst-badge wb-safe">最悪 4</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary"><strong>実のつき具合・大きさ</strong>です。開花と同様、樹木の余力を反映します。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評点</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell s0">0</td><td>実つきが良好</td></tr>
+        <tr><td class="g-cell s1">1</td><td>やや劣る</td></tr>
+        <tr><td class="g-cell s2">2</td><td>実が小さく疎ら</td></tr>
+        <tr><td class="g-cell s3">3</td><td>小さい実が多くまばら</td></tr>
+        <tr><td class="g-cell s4">4</td><td>ほとんど結実しない</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>その樹種の結実期に観察します。地面に落ちている実から逆算的に結実量を推測することもできます。</div>
+  </div>
+</details>
+
+<a href="#top" class="top-link">▲ 目次に戻る</a>
+
+<!-- ════════════════ 健全度セクション見出し ════════════════ -->
+<section class="section" style="margin-bottom:0; margin-top:28px;">
+  <div class="section-title blue">⚠️ Ⅰ-3 健全度（14項目） — A〜Dの4段階評価</div>
+  <div class="section-body">「倒木・枝折れ」など<strong>事故につながる危険性</strong>を14項目で評価します。各項目を A（異常なし）〜 D（非常に危険）の4段階で評価してください。<strong>最も悪い評価が全体の健全度</strong>になります。</div>
+</section>
+
+<!-- ── 健全度 14項目 ── -->
+
+<details class="acc-card blue" id="sway">
+  <summary class="acc-head">
+    <span class="acc-num">①</span>
+    <span class="acc-title-text">揺らぎ<span class="acc-subtitle">— 根元の安定性</span></span>
+    <span class="worst-badge wb-danger">最悪 D</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">樹木を揺らしたときの<strong>根元の安定性</strong>を評価します。風で揺れるのは正常ですが、根元自体がぐらつくのは異常です。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評価</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell gA">A</td><td>異常なし</td></tr>
+        <tr><td class="g-cell gC">C</td><td>小さな揺れがあるが、すぐに倒れる心配はない</td></tr>
+        <tr><td class="g-cell gD">D</td><td>根元から大きく揺れ、地面と根の間に隙間が見える</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>体重をかけて幹を押してみましょう。根元が動くか、根の周りの土に割れ目がないか確認します。</div>
+    <div class="box box-danger"><strong>⚠️ 特に危険なサイン</strong>根元がグラグラと動いたり、根と地面の間に隙間がある場合は「D」評価です。すぐに専門家に相談してください。</div>
+    <div class="box box-person"><strong>👤 一般の方向けひとこと</strong>無理に強く押す必要はありません。風の強い日に観察すると根元の動きがわかりやすいです。</div>
+  </div>
+</details>
+
+<details class="acc-card blue" id="lean">
+  <summary class="acc-head">
+    <span class="acc-num">②</span>
+    <span class="acc-title-text">不自然な傾斜<span class="acc-subtitle">— 危険な傾きか</span></span>
+    <span class="worst-badge wb-danger">最悪 D</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">幹の<strong>傾き</strong>を見ます。日陰側へ伸びる自然な傾斜は問題ありませんが、根の支持力不足による傾きは危険です。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評価</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell gA">A</td><td>まっすぐ、または自然な傾き</td></tr>
+        <tr><td class="g-cell gB">B</td><td>傾いているが、根はしっかりしている</td></tr>
+        <tr><td class="g-cell gD">D</td><td>傾きに加え、根元の地面が盛り上がる・亀裂がある</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>傾いている側の地面が盛り上がっていないか、反対側の地面に亀裂がないか観察します。</div>
+    <div class="box box-danger"><strong>⚠️ 特に危険なサイン</strong>地際周辺の亀裂や異常な盛り上がりがある場合は非常に危険です。必要に応じて機器診断を行ってください。</div>
+  </div>
+</details>
+
+<details class="acc-card blue" id="crack">
+  <summary class="acc-head">
+    <span class="acc-num">③</span>
+    <span class="acc-title-text">亀裂<span class="acc-subtitle">— 幹の裂け目</span></span>
+    <span class="worst-badge wb-danger">最悪 D</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">幹に入った<strong>裂け目</strong>です。腐朽や落雷、衝突などが原因で生じ、幹折れにつながる重大なサインです。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評価</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell gA">A</td><td>異常なし</td></tr>
+        <tr><td class="g-cell gC">C</td><td>小さな亀裂がある</td></tr>
+        <tr><td class="g-cell gD">D</td><td>樹体の存立に明らかに影響する大きな亀裂</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>亀裂の深さと長さを確認します。雨水が入り込んで内部で腐朽が進んでいないかも注意。</div>
+    <div class="box box-danger"><strong>⚠️ 特に危険なサイン</strong>大きく深い亀裂がある場合は、倒木や枝折れの危険が非常に高いため「D」評価です。</div>
+  </div>
+</details>
+
+<details class="acc-card blue" id="fungusBody">
+  <summary class="acc-head">
+    <span class="acc-num">④</span>
+    <span class="acc-title-text">子実体（キノコ）<span class="acc-subtitle">— 腐朽のサイン</span></span>
+    <span class="worst-badge wb-danger">最悪 D</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">幹や根元に発生する<strong>キノコ</strong>です。キノコは内部で進行している腐朽の「氷山の一角」です。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評価</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell gA">A</td><td>異常なし</td></tr>
+        <tr><td class="g-cell gC">C</td><td>キノコの発生を認めた場合</td></tr>
+        <tr><td class="g-cell gD">D</td><td>腐朽力の強いキノコ（ベッコウタケ等）、または剪定でも対処不能</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>キノコの種類を見分けます。<a href="#fungus-list">主な腐朽菌の見分けかた</a>を参照してください。</div>
+    <div class="box box-danger"><strong>⚠️ 特に危険なサイン</strong>ベッコウタケやコフキサルノコシカケは「強毒」レベル。これらが発生している木は内部で腐朽が深刻です。</div>
+    <div class="box box-person"><strong>👤 一般の方向けひとこと</strong>キノコは雨上がりや夏〜秋によく見られます。一度見つけたら、その後消えても「過去に発生した木」として記録に残しておきましょう。</div>
+  </div>
+</details>
+
+<details class="acc-card blue" id="cavity">
+  <summary class="acc-head">
+    <span class="acc-num">⑤</span>
+    <span class="acc-title-text">開口空洞<span class="acc-subtitle">— 幹の穴・空洞</span></span>
+    <span class="worst-badge wb-danger">最悪 D</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">幹に開いた<strong>穴・空洞</strong>です。空洞が幹周の1/3以上に及ぶと幹折れの危険が急激に高まります。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評価</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell gA">A</td><td>異常なし</td></tr>
+        <tr><td class="g-cell gB">B</td><td>空洞はあるが芯（中心）に達していない</td></tr>
+        <tr><td class="g-cell gC">C</td><td>芯に達し、周囲長の1/3未満</td></tr>
+        <tr><td class="g-cell gD">D</td><td>芯に達し、周囲長の1/3以上</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>空洞の入口の幅を測り、その位置の幹周（円周）と比較します。「空洞の幅÷幹周」が1/3以上なら「D」評価です。</div>
+    <div class="box box-person"><strong>👤 一般の方向けひとこと</strong>幹を時計の文字盤と考えると、空洞が「12時から4時まで」（約120度）開いていれば1/3です。これを目安にしましょう。</div>
+  </div>
+</details>
+
+<details class="acc-card blue" id="bulge">
+  <summary class="acc-head">
+    <span class="acc-num">⑥</span>
+    <span class="acc-title-text">隆起<span class="acc-subtitle">— 幹のこぶ状の膨れ</span></span>
+    <span class="worst-badge wb-danger">最悪 D</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">樹体内の腐朽や空洞に対して、樹木が<strong>力学的に補強しようと盛り上がる</strong>現象です。内部の深刻な変状を示すことがあります。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評価</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell gA">A</td><td>異常なし</td></tr>
+        <tr><td class="g-cell gC">C</td><td>小さな隆起がある</td></tr>
+        <tr><td class="g-cell gD">D</td><td>幹周全体または根元に大きな隆起がある</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-danger"><strong>⚠️ 特に危険なサイン</strong>幹周全体に及ぶ隆起や、根元の大きな隆起は内部に深刻な腐朽がある可能性が高いです。</div>
+    <div class="box box-person"><strong>👤 一般の方向けひとこと</strong>幹に「こぶ」のように盛り上がっている部分があるかどうかです。見た目は怖くないですが、樹木の中では大規模な異常が起きているサインです。</div>
+  </div>
+</details>
+
+<details class="acc-card blue" id="decayExposed">
+  <summary class="acc-head">
+    <span class="acc-num">⑦</span>
+    <span class="acc-title-text">腐朽部露出<span class="acc-subtitle">— 腐った部分が見える</span></span>
+    <span class="worst-badge wb-danger">最悪 D</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">樹幹の傷口や枝の付け根から<strong>腐った部分</strong>が見えている状態です。スポンジ状になったり、白・茶色に変色します。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評価</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell gA">A</td><td>異常なし</td></tr>
+        <tr><td class="g-cell gC">C</td><td>周囲長の1/3未満</td></tr>
+        <tr><td class="g-cell gD">D</td><td>周囲長の1/3以上</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>腐朽の範囲を幹の周囲長と比較し、どの程度広がっているかを確認します。</div>
+    <div class="box box-person"><strong>👤 一般の方向けひとこと</strong>触ると指が沈むように軟らかく、ボロボロと崩れる材は腐朽が進んでいます。逆に固くて健全な木質は手で押してもびくともしません。</div>
+  </div>
+</details>
+
+<details class="acc-card blue" id="barkDamage">
+  <summary class="acc-head">
+    <span class="acc-num">⑧</span>
+    <span class="acc-title-text">樹皮枯死・欠損<span class="acc-subtitle">— 樹皮の枯れ・剥がれ</span></span>
+    <span class="worst-badge wb-warn">最悪 C</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">衝突や病害虫などで<strong>樹皮が枯れたり剥がれたり</strong>している状態です。傷口は腐朽菌の侵入経路になります。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評価</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell gA">A</td><td>異常なし</td></tr>
+        <tr><td class="g-cell gB">B</td><td>周囲長の1/3未満</td></tr>
+        <tr><td class="g-cell gC">C</td><td>周囲長の1/3以上</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>枯死部を軽く剥がして内部の腐朽の有無を確認します。樹皮が幹を一周してしまう「環状剥皮（かんじょうはくひ）」になると樹木は枯死します。</div>
+  </div>
+</details>
+
+<details class="acc-card blue" id="jointAbnormality">
+  <summary class="acc-head">
+    <span class="acc-num">⑨</span>
+    <span class="acc-title-text">結合部の変状<span class="acc-subtitle">— 枝の又の状態</span></span>
+    <span class="worst-badge wb-danger">最悪 D</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">幹と枝の<strong>分かれ目（又）</strong>に樹皮が挟まった「入り皮」状態です。強風で裂ける危険があります。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評価</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell gA">A</td><td>異常なし</td></tr>
+        <tr><td class="g-cell gC">C</td><td>小さな変状がある</td></tr>
+        <tr><td class="g-cell gD">D</td><td>強風等で被害が発生する危険性の高い大きな変状</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>分岐角度が狭い枝（V字に近い又）や双幹木の又の部分を注意深く観察します。樹皮が挟まっている深さを確認します。</div>
+    <div class="box box-person"><strong>👤 一般の方向けひとこと</strong>「U字に開いた又」=丈夫、「V字に閉じた又」=裂けやすい、と覚えると判別しやすいです。</div>
+  </div>
+</details>
+
+<details class="acc-card blue" id="pestDamage">
+  <summary class="acc-head">
+    <span class="acc-num">⑩</span>
+    <span class="acc-title-text">穿孔害虫等<span class="acc-subtitle">— 幹の内部を食害する虫</span></span>
+    <span class="worst-badge wb-warn">最悪 C</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">カミキリムシ、コスカシバなど<strong>幹や枝の中を食害する害虫</strong>です。侵入口からオガクズのような虫糞が出ます。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評価</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell gA">A</td><td>異常なし</td></tr>
+        <tr><td class="g-cell gB">B</td><td>小さな被害がある</td></tr>
+        <tr><td class="g-cell gC">C</td><td>枯損の兆候が見られる</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>幹や枝に小さな穴がないか、穴の周りにオガクズ状の虫糞（フラス）が落ちていないか確認します。</div>
+    <div class="box box-danger"><strong>⚠️ 特に危険なサイン</strong>近年、サクラ・モモなどに被害をもたらす<strong>クビアカツヤカミキリ</strong>（特定外来生物）が拡大中です。麺状のフラスを大量に出すのが特徴で、発見した場合はただちに行政の担当窓口へ通報してください。</div>
+  </div>
+</details>
+
+<details class="acc-card blue" id="rootVisible">
+  <summary class="acc-head">
+    <span class="acc-num">⑪</span>
+    <span class="acc-title-text">根張り<span class="acc-subtitle">— ルートカラーが見えるか</span></span>
+    <span class="worst-badge wb-warn">最悪 C</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">地際（地面と幹の境）で幹が根に向けて広がる部分=<strong>ルートカラー</strong>が見えるかどうかです。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評価</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell gA">A</td><td>根張りがはっきり見える</td></tr>
+        <tr><td class="g-cell gC">C</td><td>根張りが見えない</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>地面と幹の境界がワイングラスのように広がって見えるか確認します。土に埋もれて幹がまっすぐ「電柱のように」突き出している場合は要注意です。</div>
+    <div class="box box-person"><strong>👤 一般の方向けひとこと</strong>健全な木は地際でゾウの足のように広がっています。見えない原因として「深植え」「土の埋め過ぎ」「根の腐朽」が考えられ、いずれも問題があります。</div>
+  </div>
+</details>
+
+<details class="acc-card blue" id="tappingSound">
+  <summary class="acc-head">
+    <span class="acc-num">⑫</span>
+    <span class="acc-title-text">打診音異常<span class="acc-subtitle">— 幹を叩いた音</span></span>
+    <span class="worst-badge wb-danger">最悪 D</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">木槌で幹を叩き、その<strong>音の違い</strong>で内部の腐朽を推定する方法です。健全部と腐朽部で音が変わります。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評価</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell gA">A</td><td>異常なし</td></tr>
+        <tr><td class="g-cell gC">C</td><td>一部で音の異常がある</td></tr>
+        <tr><td class="g-cell gD">D</td><td>広範囲で音の異常がある</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>木槌で軽く幹を叩き、健全な部分と音の違いを比較します。腐っていると「ポコポコ」という鈍い音がします。</div>
+    <div class="box box-person"><strong>👤 一般の方向けひとこと</strong>「コンコン」と「ポコポコ」の違いはスイカを叩いた音と同じ要領です。市民の方でも聞き分けられます。</div>
+  </div>
+</details>
+
+<details class="acc-card blue" id="penetrationAbnormality">
+  <summary class="acc-head">
+    <span class="acc-num">⑬</span>
+    <span class="acc-title-text">貫入異常<span class="acc-subtitle">— 根元の腐朽検査</span></span>
+    <span class="worst-badge wb-danger">最悪 D</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">先端の尖った<strong>鋼棒</strong>を地際に刺し、抵抗感で根の腐朽を調べます。腐朽していると抵抗なく貫入します。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評価</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell gA">A</td><td>異常なし</td></tr>
+        <tr><td class="g-cell gC">C</td><td>一部で貫入異常がある</td></tr>
+        <tr><td class="g-cell gD">D</td><td>芯に達する異常、または広範囲の腐朽</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>鋼棒を地際の周囲数カ所に刺してみて、手応えの違いを確認します。これは樹木医や専門業者が行う検査です。</div>
+    <div class="box box-person"><strong>👤 一般の方向けひとこと</strong>専門装備が必要なので、一般の方は「外見で根張りに異常を感じたら専門家に貫入検査を依頼する」と覚えておけば十分です。</div>
+  </div>
+</details>
+
+<details class="acc-card blue" id="hangingBranch">
+  <summary class="acc-head">
+    <span class="acc-num">⑭</span>
+    <span class="acc-title-text">ぶら下がり枝<span class="acc-subtitle">— 引っかかった折れ枝</span></span>
+    <span class="worst-badge wb-warn">最悪 C</span>
+    <span class="acc-arrow">▼</span>
+  </summary>
+  <div class="acc-body">
+    <div class="item-summary">折れて落下せずに<strong>木に引っかかったままの枝</strong>です。わずかな風でも落下する危険があります。</div>
+    <table class="grade-table">
+      <thead><tr><th style="width:52px;">評価</th><th>状態の目安</th></tr></thead>
+      <tbody>
+        <tr><td class="g-cell gA">A</td><td>異常なし</td></tr>
+        <tr><td class="g-cell gB">B</td><td>小さなぶら下がり枝がある</td></tr>
+        <tr><td class="g-cell gC">C</td><td>大きなぶら下がり枝がある</td></tr>
+      </tbody>
+    </table>
+    <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>樹冠を見上げて、折れて引っかかっている枝がないか確認します。逆光で見えにくい場合は時間帯を変えて再度確認しましょう。</div>
+    <div class="box box-danger"><strong>⚠️ 特に危険なサイン</strong>大きなぶら下がり枝は直ちに落下する危険があります。通行人・車両が通る場所では立入制限を検討してください。</div>
+  </div>
+</details>
+
+<a href="#top" class="top-link">▲ 目次に戻る</a>
+
+<!-- ════════════════ 腐朽菌 ════════════════ -->
+<section class="section" id="fungus-list" style="margin-top:28px;">
+  <div class="section-title">🍄 主な腐朽菌の見分けかた</div>
+  <div class="section-body">
+    <p style="font-size:0.88rem; color:var(--muted); margin-bottom:14px;">樹木に発生する代表的な腐朽菌を紹介します。<strong>赤色のものほど危険性が高い</strong>と覚えてください。</p>
+
+    <div class="fungus-card f-red">
+      <div class="fungus-head">🔴 ベッコウタケ（腐朽力大）</div>
+      <p style="font-size:0.87rem;">茶色〜黒褐色で「べっ甲飴」のような光沢のある半円形のキノコ。サクラ・ケヤキ・カシなど幅広い樹種で発生。<strong>樹木の根や根元に発生し、白色腐朽を引き起こす最強クラスの危険菌</strong>です。発見されたらほぼ確実に内部腐朽が進んでいます。</p>
+      <div class="box box-danger" style="margin-top:8px;"><strong>⚠️ 対応</strong>原則として伐採対象。発見したら速やかに専門家へ。</div>
+    </div>
+
+    <div class="fungus-card f-red" style="margin-top:10px;">
+      <div class="fungus-head">🔴 コフキサルノコシカケ（腐朽力大）</div>
+      <p style="font-size:0.87rem;">白い粉（胞子）を傘の上に振ったように見える、半円形の硬いキノコ。クスノキ、ケヤキ、サクラなどに発生。<strong>樹幹の中心部の腐朽（心材腐朽）を進行させ、空洞化を招きます。</strong></p>
+      <div class="box box-danger" style="margin-top:8px;"><strong>⚠️ 対応</strong>発見後数年で危険木になる可能性が高い。要精密診断。</div>
+    </div>
+
+    <div class="fungus-card f-orange" style="margin-top:10px;">
+      <div class="fungus-head">🟠 カイメンタケ（腐朽力中）</div>
+      <p style="font-size:0.87rem;">海綿（スポンジ）状で表面がオレンジ〜黄褐色のキノコ。マツ類などの針葉樹に多く発生し、<strong>褐色腐朽</strong>（材質を煉瓦状に崩す）を引き起こします。</p>
+    </div>
+
+    <div class="fungus-card f-yellow" style="margin-top:10px;">
+      <div class="fungus-head">🟡 カワラタケ（腐朽力弱）</div>
+      <p style="font-size:0.87rem;">小さな半円形で、表面に灰色〜茶色の縞模様。非常に一般的なキノコ。多くは枯死木や倒木に発生しますが、生木の傷口にも見られます。<strong>毒性は比較的弱い</strong>とされていますが、発生していること自体が「腐朽部位がある」というサインです。</p>
+    </div>
+
+    <div class="alert-banner" style="margin: 14px 0 0;">
+      <span class="icon">💡</span>
+      <span><strong>キノコは氷山の一角。</strong>外に見えるキノコ1つに対して、樹木内部では何百倍もの菌糸が広がっています。「小さなキノコだから大丈夫」ではなく、「キノコがある＝内部に腐朽がある」と考えてください。</span>
     </div>
   </div>
-</div>
+</section>
 
+<!-- ════════════════ 用語集 ════════════════ -->
+<section class="section" id="glossary" style="margin-top:22px;">
+  <div class="section-title">📚 用語集</div>
+  <div class="section-body">
+    <div class="glossary-grid">
+      <div class="glossary-item"><div class="glossary-term">樹冠（じゅかん）</div><div class="glossary-def">枝葉が広がっている部分の全体。木の「葉っぱの茂っている部分」のこと。</div></div>
+      <div class="glossary-item"><div class="glossary-term">梢端（しょうたん）</div><div class="glossary-def">樹木のてっぺん部分。樹冠の最上部。</div></div>
+      <div class="glossary-item"><div class="glossary-term">地際（じぎわ）</div><div class="glossary-def">幹と地面が接する境界部分。健全度評価で重要なポイント。</div></div>
+      <div class="glossary-item"><div class="glossary-term">根張り・ルートカラー</div><div class="glossary-def">地際で幹が根に向かって広がる部分。健全な木はゾウの足のように広がっている。</div></div>
+      <div class="glossary-item"><div class="glossary-term">幹周（かんしゅう）</div><div class="glossary-def">地面から1.2mの高さで幹を一周した長さ（cm）。胸高周囲ともいう。</div></div>
+      <div class="glossary-item"><div class="glossary-term">樹勢（じゅせい）</div><div class="glossary-def">樹木の元気さ・勢いを総合的に表す言葉。</div></div>
+      <div class="glossary-item"><div class="glossary-term">胴吹き</div><div class="glossary-def">幹の途中から出る不定芽。樹冠が弱ったときに緊急で出る芽。</div></div>
+      <div class="glossary-item"><div class="glossary-term">ひこばえ</div><div class="glossary-def">根元や根から出てくる芽。樹勢低下のサインのことが多い。</div></div>
+      <div class="glossary-item"><div class="glossary-term">巻込み（カルス）</div><div class="glossary-def">傷口や剪定跡を覆おうとして盛り上がる新しい組織。「樹木のかさぶた」。</div></div>
+      <div class="glossary-item"><div class="glossary-term">腐朽（ふきゅう）</div><div class="glossary-def">腐朽菌により木材が分解される現象。白色腐朽と褐色腐朽がある。</div></div>
+      <div class="glossary-item"><div class="glossary-term">子実体（しじったい）</div><div class="glossary-def">きのこの本体。胞子を作る器官で、菌糸の集合体。</div></div>
+      <div class="glossary-item"><div class="glossary-term">入り皮（いりかわ）</div><div class="glossary-def">幹と枝の又に樹皮が挟まった状態。強風で裂けやすい。</div></div>
+      <div class="glossary-item"><div class="glossary-term">穿孔害虫（せんこうがいちゅう）</div><div class="glossary-def">幹や枝の内部に穴を開けて食害する昆虫類。カミキリムシなど。</div></div>
+      <div class="glossary-item"><div class="glossary-term">フラス</div><div class="glossary-def">穿孔害虫が排出する木屑＋糞の混合物。オガクズ状のものが多い。</div></div>
+      <div class="glossary-item"><div class="glossary-term">樹木医</div><div class="glossary-def">樹木の診断・治療を行う専門家。（一財）日本緑化センターが認定する資格。</div></div>
+      <div class="glossary-item"><div class="glossary-term">機器診断</div><div class="glossary-def">レジストグラフ、貫入抵抗計、超音波装置などで樹木の内部を非破壊で調べる検査。</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 出典 -->
+<section class="section" style="margin-top:22px;">
+  <div class="section-title" style="font-size:1rem;">📖 参考・出典</div>
+  <div class="section-body" style="font-size:0.87rem; line-height:1.9; color:var(--muted);">
+    本ガイドの判定基準は <strong>国土交通省「樹木点検要領（案）」（参考資料）</strong> に基づいています。一般市民向け解説部分は、樹木医の知見・現場経験に基づいてやさしい表現に書き換えたものです。<br>
+    最終的な診断・治療判断は <strong>樹木医等の有資格者</strong> が行ってください。本ガイドの利用により生じた損害について、開発者は一切の責任を負いません。
+    <a href="#top" class="top-link" style="margin-top:12px;">▲ 目次に戻る</a>
+  </div>
+</section>
+
+<footer style="text-align:center; padding:24px 14px 10px; color:#999; font-size:0.75rem;">
+  詳細判定基準ガイド ／ 樹木点検システム
+</footer>
+
+<script>
+  // 全展開 / 全折りたたみ
+  function toggleAll(open) {
+    document.querySelectorAll('details.acc-card').forEach(d => d.open = open);
+  }
+
+  // 目次の開閉
+  function toggleToc() {
+    const body = document.getElementById('tocBody');
+    const toggle = document.getElementById('tocToggle');
+    if (body.style.display === 'none') {
+      body.style.display = '';
+      toggle.textContent = '▲ 閉じる';
+    } else {
+      body.style.display = 'none';
+      toggle.textContent = '▼ 開く';
+    }
+  }
+
+  // URLハッシュでページ内リンク先を自動展開
+  function openFromHash() {
+    const hash = location.hash.slice(1);
+    if (!hash) return;
+    const el = document.getElementById(hash);
+    if (el && el.tagName === 'DETAILS') el.open = true;
+  }
+  window.addEventListener('DOMContentLoaded', openFromHash);
+  window.addEventListener('hashchange', openFromHash);
+</script>
 </body>
 </html>
