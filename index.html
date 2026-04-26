@@ -3,660 +3,1533 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>樹木診断・点検システム（26.4）</title>
+  <title>樹木診断・点検システム（26.5）</title>
   <link rel="manifest" href="manifest.json">
-  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js">
+  </script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js">
+  </script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Noto Sans JP', sans-serif; background: #f4f6f0; color: #1a1a1a; padding-bottom: 30px; }
-    .hdr { background: linear-gradient(145deg, #1e3a0e, #2d5016); color: white; padding: 18px 16px; border-radius: 0 0 28px 28px; }
-    .tabs { display: flex; gap: 6px; margin: 16px 12px; background: white; padding: 6px; border-radius: 50px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); flex-wrap: wrap; }
-    .tab-btn { flex:1; padding: 10px 4px; border: none; background: transparent; border-radius: 40px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
-    .tab-btn.active { background: #4a7c2f; color: white; }
-    .content { padding: 0 12px; }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
-    .card { background: white; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden; }
-    .card-hdr { padding: 14px 18px; font-weight: 700; background: #e8f3df; border-bottom: 2px solid rgba(0,0,0,0.05); display: flex; align-items: center; gap: 10px; }
-    .card-hdr.brown { background: #f3ede5; }
-    .card-hdr.blue { background: #e3f2fd; }
-    .sn { background: #2d5016; color: white; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
-    .card-body { padding: 16px; }
-    .frow { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
-    .c2 > * { flex: 1 1 calc(50% - 6px); min-width: 140px; }
-    .fg { display: flex; flex-direction: column; }
-    .lbl { font-weight: 600; font-size: 0.9rem; margin-bottom: 5px; color: #555; display: flex; align-items: center; gap: 4px; }
-    .req { color: #c62828; margin-left: 3px; }
-    .inp { padding: 12px 14px; border: 1.5px solid #ddd; border-radius: 14px; font-size: 1rem; background: #fdfdfd; }
-    .rgroup { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 5px; }
-    .rbtn { flex: 1 0 70px; padding: 8px 4px; background: #f2f2f2; border: 1.5px solid #ccc; border-radius: 30px; font-weight: 600; font-size: 0.9rem; cursor: pointer; text-align: center; line-height: 1.3; transition: all 0.1s; }
-    .rbtn.sel { background: #4a7c2f; border-color: #2d5016; color: white; }
-    .rbtn small { display: block; font-weight: 400; font-size: 0.65rem; opacity: 0.85; margin-top: 2px; }
-    .rbtn-inactive { background: #e8e8e8; color: #b0b0b0; border-color: #ddd; cursor: not-allowed; opacity: 0.55; pointer-events: none; }
-    .rbtn-inactive small { color: #b0b0b0; }
-    .btn-pri { background: #2d5016; color: white; border: none; padding: 16px; border-radius: 50px; font-weight: 700; font-size: 1.2rem; width: 100%; cursor: pointer; }
-    .btn-sec { background: #eee; border: 1px solid #bbb; padding: 12px; border-radius: 40px; font-weight: 600; cursor: pointer; }
-    .btn-cancel { background: #ffcdd2; border: 1px solid #c62828; color: #b71c1c; }
-    .submit-area { display: flex; gap: 12px; margin: 20px 0; flex-wrap: wrap; }
-    .photo-area { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
-    .photo-item { position: relative; width: 90px; height: 90px; }
-    .photo-thumb { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; border: 2px solid #ccc; background: #eee; }
-    .photo-del { position: absolute; top: -5px; right: -5px; background: #c62828; color: white; border: none; width: 26px; height: 26px; border-radius: 50%; font-weight: bold; cursor: pointer; z-index: 10; }
-    .photo-save { position: absolute; bottom: -5px; right: -5px; background: #2d5016; color: white; border: none; width: 26px; height: 26px; border-radius: 50%; font-weight: bold; cursor: pointer; font-size: 14px; z-index: 10; }
-    .photo-edit { position: absolute; bottom: -5px; left: -5px; background: #1565c0; color: white; border: none; width: 26px; height: 26px; border-radius: 50%; font-weight: bold; cursor: pointer; font-size: 14px; z-index: 10; }
-    .grade-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: 700; }
-    .grade-A { background: #2e7d32; color: white; }
-    .grade-B { background: #f9a825; color: black; }
-    .grade-C { background: #e65100; color: white; }
-    .grade-D { background: #b71c1c; color: white; }
-    .record-item { background: white; border-radius: 20px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .search-bar { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; }
-    .search-bar .inp { flex: 1; }
-    .search-bar select.inp { max-width: 130px; font-size: 0.85rem; padding: 12px 8px; }
-    .record-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
-    .btn-small { padding: 6px 14px; border-radius: 30px; border: none; background: #e0e0e0; font-weight: 500; cursor: pointer; }
-    #map, #allMap { height: 220px; width: 100%; border-radius: 14px; margin-top: 12px; border: 1px solid #ccc; z-index: 1; }
-    #allMap { height: 400px; }
-    .loc-photo-preview { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; border: 1px solid #ccc; margin-top: 8px; }
-    #memoCanvas { border: 1px solid #ccc; border-radius: 12px; margin-top: 8px; touch-action: none; }
-    #photoEditModal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; display: none; align-items: center; justify-content: center; }
-    #photoEditModal.open { display: flex; }
-    .pe-container { background: #1e1e1e; border-radius: 20px; width: 95vw; max-width: 600px; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-    .pe-toolbar { display: flex; gap: 4px; padding: 10px; background: #2a2a2a; flex-wrap: wrap; align-items: center; }
-    .pe-btn { padding: 6px 10px; border-radius: 6px; border: none; background: #3a3a3a; color: #ccc; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
-    .pe-btn.active { background: #4a7c2f; color: white; }
-    .pe-colors { display: flex; gap: 4px; align-items: center; margin-left: 8px; flex-wrap: wrap; }
-    .pe-swatch { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
-    .pe-swatch.active { border-color: white; }
-    .pe-size-wrap { display: flex; align-items: center; gap: 6px; margin-left: 8px; }
-    .pe-size-lbl { color: #aaa; font-size: 0.75rem; }
-    #peSizeSlider { width: 80px; }
-    #peTextRow { display: none; gap: 6px; align-items: center; padding: 6px 10px; background: #2a2a2a; }
-    #peTextRow.vis { display: flex; }
-    #peTextInput { flex: 1; padding: 6px 10px; background: #444; border: 1px solid #555; color: white; border-radius: 6px; }
-    #peFontSize { width: 50px; text-align: center; background: #444; border: 1px solid #555; color: white; border-radius: 6px; }
-    .pe-canvas-wrap { flex: 1 1 auto; overflow: auto; background: #111; padding: 10px; display: flex; align-items: center; justify-content: center; min-height: 0; }
-    #editCanvas { max-width: 100%; max-height: 100%; border-radius: 8px; display: block; }
-    .pe-footer { display: flex; gap: 8px; padding: 10px; background: #2a2a2a; justify-content: flex-end; flex-shrink: 0; }
-    .pe-save-btn { background: #2d5016; color: white; padding: 8px 16px; border: none; border-radius: 20px; font-weight: 600; }
-    .pe-close-btn { background: #555; color: white; padding: 8px 16px; border: none; border-radius: 20px; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: #f4f6f0;
+      color: #1a1a1a;
+      padding-bottom: 30px;
+    }
+    .hdr {
+      background: linear-gradient(145deg, #1e3a0e, #2d5016);
+      color: white;
+      padding: 18px 16px;
+      border-radius: 0 0 28px 28px;
+    }
+    .tabs {
+      display: flex;
+      gap: 6px;
+      margin: 16px 12px;
+      background: white;
+      padding: 6px;
+      border-radius: 50px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 10px 4px;
+      border: none;
+      background: transparent;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .tab-btn.active {
+      background: #4a7c2f;
+      color: white;
+    }
+    .content {
+      padding: 0 12px;
+    }
+    .tab-panel {
+      display: none;
+    }
+    .tab-panel.active {
+      display: block;
+    }
+    .card {
+      background: white;
+      border-radius: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    .card-hdr {
+      padding: 14px 18px;
+      font-weight: 700;
+      background: #e8f3df;
+      border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card-hdr.brown {
+      background: #f3ede5;
+    }
+    .card-hdr.blue {
+      background: #e3f2fd;
+    }
+    .sn {
+      background: #2d5016;
+      color: white;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+    }
+    .card-body {
+      padding: 16px;
+    }
+    .frow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .c2>* {
+      flex: 1 1 calc(50% - 6px);
+      min-width: 140px;
+    }
+    .fg {
+      display: flex;
+      flex-direction: column;
+    }
+    .lbl {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 5px;
+      color: #555;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .req {
+      color: #c62828;
+      margin-left: 3px;
+    }
+    .inp {
+      padding: 12px 14px;
+      border: 1.5px solid #ddd;
+      border-radius: 14px;
+      font-size: 1rem;
+      background: #fdfdfd;
+    }
+    .rgroup {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 5px;
+    }
+    .rbtn {
+      flex: 1 0 70px;
+      padding: 8px 4px;
+      background: #f2f2f2;
+      border: 1.5px solid #ccc;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-align: center;
+      line-height: 1.3;
+      transition: all 0.1s;
+    }
+    .rbtn.sel {
+      background: #4a7c2f;
+      border-color: #2d5016;
+      color: white;
+    }
+    .rbtn small {
+      display: block;
+      font-weight: 400;
+      font-size: 0.65rem;
+      opacity: 0.85;
+      margin-top: 2px;
+    }
+    .rbtn-inactive {
+      background: #e8e8e8;
+      color: #b0b0b0;
+      border-color: #ddd;
+      cursor: not-allowed;
+      opacity: 0.55;
+      pointer-events: none;
+    }
+    .rbtn-inactive small {
+      color: #b0b0b0;
+    }
+    .btn-pri {
+      background: #2d5016;
+      color: white;
+      border: none;
+      padding: 16px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 1.2rem;
+      width: 100%;
+      cursor: pointer;
+    }
+    .btn-sec {
+      background: #eee;
+      border: 1px solid #bbb;
+      padding: 12px;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-cancel {
+      background: #ffcdd2;
+      border: 1px solid #c62828;
+      color: #b71c1c;
+    }
+    .submit-area {
+      display: flex;
+      gap: 12px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+    .photo-area {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .photo-item {
+      position: relative;
+      width: 90px;
+      height: 90px;
+    }
+    .photo-thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 16px;
+      border: 2px solid #ccc;
+      background: #eee;
+    }
+    .photo-del {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #c62828;
+      color: white;
+      border: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 10;
+    }
+    .photo-save {
+      position: absolute;
+      bottom: -5px;
+      right: -5px;
+      background: #2d5016;
+      color: white;
+      border: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+      z-index: 10;
+    }
+    .photo-edit {
+      position: absolute;
+      bottom: -5px;
+      left: -5px;
+      background: #1565c0;
+      color: white;
+      border: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+      z-index: 10;
+    }
+    .grade-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+    }
+    .grade-A {
+      background: #2e7d32;
+      color: white;
+    }
+    .grade-B {
+      background: #f9a825;
+      color: black;
+    }
+    .grade-C {
+      background: #e65100;
+      color: white;
+    }
+    .grade-D {
+      background: #b71c1c;
+      color: white;
+    }
+    .record-item {
+      background: white;
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .search-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      align-items: center;
+    }
+    .search-bar .inp {
+      flex: 1;
+    }
+    .search-bar select.inp {
+      max-width: 130px;
+      font-size: 0.85rem;
+      padding: 12px 8px;
+    }
+    .record-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+    .btn-small {
+      padding: 6px 14px;
+      border-radius: 30px;
+      border: none;
+      background: #e0e0e0;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    #map,
+    #allMap {
+      height: 220px;
+      width: 100%;
+      border-radius: 14px;
+      margin-top: 12px;
+      border: 1px solid #ccc;
+      z-index: 1;
+    }
+    #allMap {
+      height: 400px;
+    }
+    .loc-photo-preview {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      margin-top: 8px;
+    }
+    #memoCanvas {
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      margin-top: 8px;
+      touch-action: none;
+    }
+    #photoEditModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    #photoEditModal.open {
+      display: flex;
+    }
+    .pe-container {
+      background: #1e1e1e;
+      border-radius: 20px;
+      width: 95vw;
+      max-width: 600px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+    .pe-toolbar {
+      display: flex;
+      gap: 4px;
+      padding: 10px;
+      background: #2a2a2a;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .pe-btn {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: none;
+      background: #3a3a3a;
+      color: #ccc;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+    .pe-btn.active {
+      background: #4a7c2f;
+      color: white;
+    }
+    .pe-colors {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      margin-left: 8px;
+      flex-wrap: wrap;
+    }
+    .pe-swatch {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
+    .pe-swatch.active {
+      border-color: white;
+    }
+    .pe-size-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 8px;
+    }
+    .pe-size-lbl {
+      color: #aaa;
+      font-size: 0.75rem;
+    }
+    #peSizeSlider {
+      width: 80px;
+    }
+    #peTextRow {
+      display: none;
+      gap: 6px;
+      align-items: center;
+      padding: 6px 10px;
+      background: #2a2a2a;
+    }
+    #peTextRow.vis {
+      display: flex;
+    }
+    #peTextInput {
+      flex: 1;
+      padding: 6px 10px;
+      background: #444;
+      border: 1px solid #555;
+      color: white;
+      border-radius: 6px;
+    }
+    #peFontSize {
+      width: 50px;
+      text-align: center;
+      background: #444;
+      border: 1px solid #555;
+      color: white;
+      border-radius: 6px;
+    }
+    .pe-canvas-wrap {
+      flex: 1 1 auto;
+      overflow: auto;
+      background: #111;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 0;
+    }
+    #editCanvas {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 8px;
+      display: block;
+    }
+    .pe-footer {
+      display: flex;
+      gap: 8px;
+      padding: 10px;
+      background: #2a2a2a;
+      justify-content: flex-end;
+      flex-shrink: 0;
+    }
+    .pe-save-btn {
+      background: #2d5016;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+    .pe-close-btn {
+      background: #555;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 20px;
+    }
 
     /* ヘルプアイコン */
     .help-icon {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 20px; height: 20px; border-radius: 50%;
-      background: #e0e0e0; color: #555; font-size: 0.7rem; font-weight: 700;
-      cursor: pointer; margin-left: 4px; text-decoration: none; transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      color: #555;
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-left: 4px;
+      text-decoration: none;
+      transition: all 0.15s;
     }
-    .help-icon:hover { background: #4a7c2f; color: white; }
+    .help-icon:hover {
+      background: #4a7c2f;
+      color: white;
+    }
 
     /* ヘルプポップアップ */
     .help-popup-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5); z-index: 9998;
-      display: none; align-items: center; justify-content: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 9998;
+      display: none;
+      align-items: center;
+      justify-content: center;
     }
-    .help-popup-overlay.open { display: flex; }
+    .help-popup-overlay.open {
+      display: flex;
+    }
     .help-popup {
-      background: white; border-radius: 20px; width: 90vw; max-width: 500px;
-      max-height: 80vh; overflow-y: auto; padding: 20px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.3); position: relative;
+      background: white;
+      border-radius: 20px;
+      width: 90vw;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      position: relative;
     }
-    .help-popup h3 { font-size: 1.1rem; color: #2d5016; margin-bottom: 4px; }
-    .help-popup .help-source { font-size: 0.7rem; color: #888; margin-bottom: 14px; }
-    .help-popup .help-summary { font-size: 0.88rem; margin-bottom: 14px; line-height: 1.6; }
-    .help-popup .help-criteria { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 0.82rem; }
-    .help-popup .help-criteria th { background: #2d5016; color: white; padding: 6px 8px; text-align: left; }
-    .help-popup .help-criteria td { padding: 6px 8px; border-bottom: 1px solid #eee; }
-    .help-popup .help-check { background: #e8f5e9; padding: 10px 12px; border-radius: 8px; font-size: 0.82rem; margin-bottom: 8px; }
-    .help-popup .help-danger { background: #ffebee; color: #b71c1c; padding: 10px 12px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; }
+    .help-popup h3 {
+      font-size: 1.1rem;
+      color: #2d5016;
+      margin-bottom: 4px;
+    }
+    .help-popup .help-source {
+      font-size: 0.7rem;
+      color: #888;
+      margin-bottom: 14px;
+    }
+    .help-popup .help-summary {
+      font-size: 0.88rem;
+      margin-bottom: 14px;
+      line-height: 1.6;
+    }
+    .help-popup .help-criteria {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 14px;
+      font-size: 0.82rem;
+    }
+    .help-popup .help-criteria th {
+      background: #2d5016;
+      color: white;
+      padding: 6px 8px;
+      text-align: left;
+    }
+    .help-popup .help-criteria td {
+      padding: 6px 8px;
+      border-bottom: 1px solid #eee;
+    }
+    .help-popup .help-check {
+      background: #e8f5e9;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      margin-bottom: 8px;
+    }
+    .help-popup .help-danger {
+      background: #ffebee;
+      color: #b71c1c;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
     .help-popup .help-close {
-      position: absolute; top: 12px; right: 14px;
-      width: 28px; height: 28px; border-radius: 50%;
-      border: none; background: #eee; font-size: 1rem;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      background: #eee;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    @media print { body { background: white; padding: 0; } .hdr, .tabs, .submit-area, .photo-del, .photo-save, .photo-edit, .btn-sec, .btn-pri, .btn-cancel, .search-bar, .record-actions, .tab-btn { display: none !important; } .card { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; } .content { padding: 0; } .tab-panel { display: block !important; } #map, #allMap { height: 350px !important; border: 1px solid #000; break-inside: avoid; } .card-body { padding: 8px; } }
-    .print-map-only body * { visibility: hidden !important; } .print-map-only #allMap, .print-map-only #allMap * { visibility: visible !important; } .print-map-only #allMap { position: absolute !important; top: 0; left: 0; width: 100vw !important; height: 100vh !important; margin: 0; border: none; border-radius: 0; }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      .hdr,
+      .tabs,
+      .submit-area,
+      .photo-del,
+      .photo-save,
+      .photo-edit,
+      .btn-sec,
+      .btn-pri,
+      .btn-cancel,
+      .search-bar,
+      .record-actions,
+      .tab-btn {
+        display: none !important;
+      }
+      .card {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        break-inside: avoid;
+      }
+      .content {
+        padding: 0;
+      }
+      .tab-panel {
+        display: block !important;
+      }
+      #map,
+      #allMap {
+        height: 350px !important;
+        border: 1px solid #000;
+        break-inside: avoid;
+      }
+      .card-body {
+        padding: 8px;
+      }
+      /* ★修正：印刷用クラスは@media printの中に移動 */
+      .print-map-only body * {
+        visibility: hidden !important;
+      }
+      .print-map-only #allMap,
+      .print-map-only #allMap * {
+        visibility: visible !important;
+      }
+      .print-map-only #allMap {
+        position: absolute !important;
+        top: 0;
+        left: 0;
+        width: 100vw !important;
+        height: 100vh !important;
+        margin: 0;
+        border: none;
+        border-radius: 0;
+      }
+    }
+
+    /* 通常画面ではprint-map-onlyのスタイルが効かないようにする */
+    /* （@media print内に移動済みのためここには何も記述しない） */
   </style>
 </head>
 <body>
 
-<header class="hdr">
-  <h1>樹木点検・診断システム</h1>
-  <div style="font-size:0.9rem;">26.4（活力度❓追加・Excelレイアウト修正）</div>
-  <div style="font-size:0.72rem; color:rgba(255,255,255,0.8); margin-top:4px; line-height:1.4;">
-    ※診断結果は参考になります。専門家(樹木医等)の判断を併せてご検討ください。
-  </div>
-  <div style="margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;">
-    <a href="manual.html" style="display:inline-block; padding:4px 14px; border:1px solid rgba(255,255,255,0.5); border-radius:20px; color:white; font-size:0.8rem; text-decoration:none;">📘 使い方ガイド</a>
-    <a href="criteria.html" style="display:inline-block; padding:4px 14px; border:1px solid rgba(255,255,255,0.5); border-radius:20px; color:white; font-size:0.8rem; text-decoration:none;">📖 判定基準詳細</a>
-  </div>
-</header>
+  <header class="hdr">
+    <h1>樹木点検・診断システム</h1>
+    <div style="font-size:0.9rem;">26.5</div>
+    <div style="font-size:0.72rem; color:rgba(255,255,255,0.8); margin-top:4px; line-height:1.4;">
+      ※診断結果は参考になります。専門家(樹木医等)の判断を併せてご検討ください。
+    </div>
+    <div style="margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;">
+      <a href="manual.html" style="display:inline-block; padding:4px 14px; border:1px solid rgba(255,255,255,0.5); border-radius:20px; color:white; font-size:0.8rem; text-decoration:none;">📘 使い方ガイド</a>
+      <a href="criteria.html" style="display:inline-block; padding:4px 14px; border:1px solid rgba(255,255,255,0.5); border-radius:20px; color:white; font-size:0.8rem; text-decoration:none;">📖 判定基準詳細</a>
+    </div>
+  </header>
 
-<div class="tabs">
-  <button class="tab-btn active" data-tab="inspect">📋 点検入力</button>
-  <button class="tab-btn" data-tab="records">📚 記録一覧</button>
-  <button class="tab-btn" data-tab="allmap">🗺️ 全体マップ</button>
-  <button class="tab-btn" data-tab="guide">📖 判定基準</button>
-</div>
+  <!-- ⚠️ データ保存警告バナー -->
+  <div id="saveBanner" style="background:#fff8e1; border-bottom:2px solid #f9a825; padding:8px 14px; font-size:0.82rem; color:#5d4037; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+    <span style="font-size:1rem;">⚠️</span>
+    <span><strong>データ保存のご注意：</strong>このアプリのデータはお使いの端末内にのみ保存されます。ブラウザのデータ削除・機種変更・アプリ再インストールで<strong>消えます</strong>。定期的に「📦 JSONバックアップ」を行ってください。</span>
+    <button onclick="document.getElementById('saveBanner').style.display='none'" style="margin-left:auto; background:none; border:none; font-size:1rem; cursor:pointer; color:#795548;">✕</button>
+  </div>
 
-<div class="content">
-  <div class="tab-panel active" id="tab-inspect">
-    <div class="card">
-      <div class="card-hdr green"><span class="sn">Ⅰ-1</span>調査木位置図・基本情報</div>
-      <div class="card-body">
-        <div class="frow c2">
-          <div class="fg"><label class="lbl">樹木No.<span class="req">*</span></label><input class="inp" id="treeNo" placeholder="例：S-001"></div>
-          <div class="fg"><label class="lbl">調査日<span class="req">*</span></label><input type="date" class="inp" id="surveyDate"></div>
-          <div class="fg"><label class="lbl">天候</label><select class="inp" id="weather"><option>晴れ</option><option>曇り</option><option>雨</option></select></div>
-          <div class="fg"><label class="lbl">調査者<span class="req">*</span></label><input class="inp" id="inspector"></div>
-        </div>
-        <div class="frow c2">
-          <div class="fg"><label class="lbl">樹種名<span class="req">*</span></label><input class="inp" id="species"></div>
-          <div class="fg"><label class="lbl">科名</label><input class="inp" id="family"></div>
-          <div class="fg"><label class="lbl">学名</label><input class="inp" id="scientificName"></div>
-          <div class="fg"><label class="lbl">愛称</label><input class="inp" id="nickname"></div>
-        </div>
-        <div class="fg"><label class="lbl">所在地</label><input class="inp" id="location" placeholder="例：○○市△△公園"></div>
-        <div class="frow c2" style="margin-top:12px;">
-          <div class="fg"><label class="lbl">樹高 (m)</label><input type="number" step="0.1" class="inp" id="treeHeight"></div>
-          <div class="fg"><label class="lbl">幹周 (cm)</label><input type="number" class="inp" id="trunkGirth"></div>
-        </div>
-        <div class="frow c2">
-          <div class="fg"><label class="lbl">緯度</label><input class="inp" id="latitude" placeholder="例：35.123456" step="any"></div>
-          <div class="fg"><label class="lbl">経度</label><input class="inp" id="longitude" placeholder="例：139.123456" step="any"></div>
-        </div>
-        <button id="gpsButton" onclick="getGPS()" style="margin-top:8px;padding:10px 16px;background:#4a7c2f;color:#fff;border:none;border-radius:40px;font-weight:600;cursor:pointer;">📍 現在位置を取得</button>
-        <div id="map"></div>
-        <div style="margin-top: 16px;">
-          <label class="lbl">📸 位置写真</label>
-          <input type="file" id="locPhotoInput" accept="image/*" capture="environment" style="display:none;">
-          <div style="display:flex; gap:8px; align-items:center;">
-            <button class="btn-sec" onclick="takeLocationPhoto()">📷 撮影</button>
-            <button class="btn-sec" onclick="selectLocationPhoto()">🖼️ アルバム</button>
-            <button class="btn-sec" onclick="clearLocationPhoto()" style="background:#ffcdd2;">🗑️ クリア</button>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="inspect">📋 点検入力</button>
+    <button class="tab-btn" data-tab="records">📚 記録一覧</button>
+    <button class="tab-btn" data-tab="allmap">🗺️ 全体マップ</button>
+    <button class="tab-btn" data-tab="guide">📖 判定基準</button>
+  </div>
+
+  <div class="content">
+    <div class="tab-panel active" id="tab-inspect">
+      <div class="card">
+        <div class="card-hdr green"><span class="sn">Ⅰ-1</span>調査木位置図・基本情報</div>
+        <div class="card-body">
+          <div class="frow c2">
+            <div class="fg"><label class="lbl">樹木No.<span class="req">*</span></label><input class="inp" id="treeNo" placeholder="例：S-001"></div>
+            <div class="fg"><label class="lbl">調査日<span class="req">*</span></label><input type="date" class="inp" id="surveyDate"></div>
+            <div class="fg"><label class="lbl">天候</label><select class="inp" id="weather"><option>晴れ</option><option>曇り</option><option>雨</option></select></div>
+            <div class="fg"><label class="lbl">調査者<span class="req">*</span></label><input class="inp" id="inspector"></div>
           </div>
-          <img id="locPhotoPreview" class="loc-photo-preview" style="display:none;">
-        </div>
-        <div style="margin-top: 16px;">
-          <label class="lbl">🖊️ 手書きメモ</label>
-          <canvas id="memoCanvas" width="300" height="150" style="width:100%; height:auto;"></canvas>
-          <div style="display:flex; gap:8px; margin-top:4px;">
-            <button class="btn-sec" onclick="clearMemo()">🗑️ クリア</button>
-            <button class="btn-sec" onclick="saveMemo()">💾 メモ保存</button>
+          <div class="frow c2">
+            <div class="fg"><label class="lbl">樹種名<span class="req">*</span></label><input class="inp" id="species"></div>
+            <div class="fg"><label class="lbl">科名</label><input class="inp" id="family"></div>
+            <div class="fg"><label class="lbl">学名</label><input class="inp" id="scientificName"></div>
+            <div class="fg"><label class="lbl">愛称</label><input class="inp" id="nickname"></div>
           </div>
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-hdr brown"><span class="sn">Ⅰ-2</span>地上部の衰退度判定（活力度）</div>
-      <div class="card-body" id="decline-items"></div>
-      <div style="padding: 0 16px 16px;">
-        <div style="background:#f9f5e9; padding:12px; border-radius:12px;">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <strong>衰退度（平均評点）</strong>
-            <span style="font-size:1.5rem; font-weight:800;" id="declineAvgDisplay">-</span>
+          <div class="fg"><label class="lbl">所在地</label><input class="inp" id="location" placeholder="例：○○市△△公園"></div>
+          <div class="frow c2" style="margin-top:12px;">
+            <div class="fg"><label class="lbl">樹高 (m)</label><input type="number" step="0.1" class="inp" id="treeHeight"></div>
+            <div class="fg"><label class="lbl">幹周 (cm)</label><input type="number" class="inp" id="trunkGirth"></div>
           </div>
-          <div style="display:flex; justify-content:space-between; margin-top:8px;">
-            <span>判定区分</span>
-            <span style="font-weight:700;" id="declineLevelDisplay">-</span>
+          <div class="frow c2">
+            <div class="fg"><label class="lbl">緯度</label><input class="inp" id="latitude" placeholder="例：35.123456" step="any"></div>
+            <div class="fg"><label class="lbl">経度</label><input class="inp" id="longitude" placeholder="例：139.123456" step="any"></div>
+          </div>
+          <button id="gpsButton" onclick="getGPS()" style="margin-top:8px;padding:10px 16px;background:#4a7c2f;color:#fff;border:none;border-radius:40px;font-weight:600;cursor:pointer;">📍 現在位置を取得</button>
+          <div id="map"></div>
+          <div style="margin-top: 16px;">
+            <label class="lbl">📸 位置写真</label>
+            <input type="file" id="locPhotoInput" accept="image/*" capture="environment" style="display:none;">
+            <div style="display:flex; gap:8px; align-items:center;">
+              <button class="btn-sec" onclick="takeLocationPhoto()">📷 撮影</button>
+              <button class="btn-sec" onclick="selectLocationPhoto()">🖼️ アルバム</button>
+              <button class="btn-sec" onclick="clearLocationPhoto()" style="background:#ffcdd2;">🗑️ クリア</button>
+            </div>
+            <img id="locPhotoPreview" class="loc-photo-preview" style="display:none;">
+          </div>
+          <div style="margin-top: 16px;">
+            <label class="lbl">🖊️ 手書きメモ</label>
+            <canvas id="memoCanvas" width="300" height="150" style="width:100%; height:auto;"></canvas>
+            <div style="display:flex; gap:8px; margin-top:4px;">
+              <button class="btn-sec" onclick="clearMemo()">🗑️ クリア</button>
+              <button class="btn-sec" onclick="saveMemo()">💾 メモ保存</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="card">
-      <div class="card-hdr blue"><span class="sn">Ⅰ-3</span>倒木、枝折れ等危険度判定（健全度）</div>
-      <div class="card-body" id="health-items"></div>
-    </div>
-    <div class="card">
-      <div class="card-hdr brown"><span class="sn">🍄</span>腐朽菌・子実体</div>
-      <div class="card-body">
-        <div style="display:flex;flex-wrap:wrap;gap:8px;">
-          <label><input type="checkbox" value="ベッコウタケ" class="fungus-check"> ベッコウタケ</label>
-          <label><input type="checkbox" value="コフキサルノコシカケ" class="fungus-check"> コフキサルノコシカケ</label>
-          <label><input type="checkbox" value="カワラタケ" class="fungus-check"> カワラタケ</label>
-          <label><input type="checkbox" value="カイメンタケ" class="fungus-check"> カイメンタケ</label>
-          <label><input type="checkbox" value="その他" class="fungus-check"> その他</label>
-        </div>
-        <input class="inp" id="fungusOther" placeholder="その他のキノコ名" style="margin-top:8px;">
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-hdr green">📸 写真記録（編集可能）</div>
-      <div class="card-body">
-        <input type="file" id="photoInput" accept="image/*" multiple style="display:none;">
-        <div style="display:flex;gap:8px;">
-          <button class="btn-sec" onclick="takePhoto()">📷 カメラ</button>
-          <button class="btn-sec" onclick="selectFromAlbum()">🖼️ アルバム</button>
-        </div>
-        <div id="photoContainer" class="photo-area"></div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-hdr green">📊 総合判定・診断</div>
-      <div class="card-body">
-        <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px; background:#f0f7ea; padding:12px; border-radius:12px;">
-          <span style="font-size:2.5rem;font-weight:800;" id="overallGradeDisplay">-</span>
-          <div>
-            <div><strong>総合判定</strong></div>
-            <div id="overallLevelDisplay" style="font-weight:600;"></div>
+      <div class="card">
+        <div class="card-hdr brown"><span class="sn">Ⅰ-2</span>地上部の衰退度判定（活力度）</div>
+        <div class="card-body" id="decline-items"></div>
+        <div style="padding: 0 16px 16px;">
+          <div style="background:#f9f5e9; padding:12px; border-radius:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <strong>衰退度（平均評点）</strong>
+              <span style="font-size:1.5rem; font-weight:800;" id="declineAvgDisplay">-</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:8px;">
+              <span>判定区分</span>
+              <span style="font-weight:700;" id="declineLevelDisplay">-</span>
+            </div>
           </div>
         </div>
-        <div style="margin:12px 0 0 0; padding:10px 12px; background:#fff8e1; border-left:4px solid #f9a825; border-radius:8px; font-size:0.78rem; color:#5d4037;">
-          ⚠️ 本システムの診断は<span style="font-weight:700;">目安</span>です。倒木など重大な危険が疑われる場合は、必ず<span style="font-weight:700;">専門家(樹木医等) にご相談</span>ください。本システムの利用により生じた損害について、開発者は一切の責任を負いません。
-        </div>
-        <textarea class="inp" id="overallComment" rows="3" placeholder="総合所見（診断結果・具体的な状態等）" style="margin-top:14px;"></textarea>
-        <div style="margin-top:12px;">
-          <label class="lbl">必要な措置</label>
+      </div>
+      <div class="card">
+        <div class="card-hdr blue"><span class="sn">Ⅰ-3</span>倒木、枝折れ等危険度判定（健全度）</div>
+        <div class="card-body" id="health-items"></div>
+      </div>
+      <div class="card">
+        <div class="card-hdr brown"><span class="sn">🍄</span>腐朽菌・子実体</div>
+        <div class="card-body">
           <div style="display:flex;flex-wrap:wrap;gap:8px;">
-            <label><input type="checkbox" value="伐採" class="measure-check"> 伐採</label><label><input type="checkbox" value="剪定" class="measure-check"> 剪定</label>
-            <label><input type="checkbox" value="支柱補修" class="measure-check"> 支柱補修</label><label><input type="checkbox" value="土壌改良" class="measure-check"> 土壌改良</label>
-            <label><input type="checkbox" value="施肥" class="measure-check"> 施肥</label><label><input type="checkbox" value="薬剤処理" class="measure-check"> 薬剤処理</label>
-            <label><input type="checkbox" value="経過観察" class="measure-check"> 経過観察</label>
+            <label><input type="checkbox" value="ベッコウタケ" class="fungus-check"> ベッコウタケ</label>
+            <label><input type="checkbox" value="コフキサルノコシカケ" class="fungus-check"> コフキサルノコシカケ</label>
+            <label><input type="checkbox" value="カワラタケ" class="fungus-check"> カワラタケ</label>
+            <label><input type="checkbox" value="カイメンタケ" class="fungus-check"> カイメンタケ</label>
+            <label><input type="checkbox" value="その他" class="fungus-check"> その他</label>
+          </div>
+          <input class="inp" id="fungusOther" placeholder="その他のキノコ名" style="margin-top:8px;">
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hdr green">📸 写真記録（編集可能）</div>
+        <div class="card-body">
+          <input type="file" id="photoInput" accept="image/*" multiple style="display:none;">
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button class="btn-sec" onclick="takePhoto()">📷 カメラ</button>
+            <button class="btn-sec" onclick="selectFromAlbum()">🖼️ アルバム</button>
+            <span id="photoCounter" style="font-size:0.8rem;color:#555;margin-left:4px;">📸 0枚</span>
+          </div>
+          <div id="photoContainer" class="photo-area"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hdr green">📊 総合判定・診断</div>
+        <div class="card-body">
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px; background:#f0f7ea; padding:12px; border-radius:12px;">
+            <span style="font-size:2.5rem;font-weight:800;" id="overallGradeDisplay">-</span>
+            <div>
+              <div><strong>総合判定</strong></div>
+              <div id="overallLevelDisplay" style="font-weight:600;"></div>
+            </div>
+          </div>
+          <div style="margin:12px 0 0 0; padding:10px 12px; background:#fff8e1; border-left:4px solid #f9a825; border-radius:8px; font-size:0.78rem; color:#5d4037;">
+            ⚠️ 本システムの診断は<span style="font-weight:700;">目安</span>です。倒木など重大な危険が疑われる場合は、必ず<span style="font-weight:700;">専門家(樹木医等) にご相談</span>ください。本システムの利用により生じた損害について、開発者は一切の責任を負いません。
+          </div>
+          <textarea class="inp" id="overallComment" rows="3" placeholder="総合所見（診断結果・具体的な状態等）" style="margin-top:14px;"></textarea>
+          <div style="margin-top:12px;">
+            <label class="lbl">必要な措置</label>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;">
+              <label><input type="checkbox" value="伐採" class="measure-check"> 伐採</label><label><input type="checkbox" value="剪定" class="measure-check"> 剪定</label>
+              <label><input type="checkbox" value="支柱補修" class="measure-check"> 支柱補修</label><label><input type="checkbox" value="土壌改良" class="measure-check"> 土壌改良</label>
+              <label><input type="checkbox" value="施肥" class="measure-check"> 施肥</label><label><input type="checkbox" value="薬剤処理" class="measure-check"> 薬剤処理</label>
+              <label><input type="checkbox" value="経過観察" class="measure-check"> 経過観察</label>
+            </div>
+          </div>
+          <div class="submit-area">
+            <button class="btn-pri" onclick="saveRecord()">💾 保存</button>
+            <button class="btn-sec" onclick="resetForm()">🔄 リセット</button>
+            <button class="btn-sec" onclick="exportToExcel()">📊 詳細Excel</button>
+            <button class="btn-sec" onclick="copyFormData()">📋 コピー</button>
+            <button class="btn-sec" onclick="pasteFormData()">📌 貼り付け</button>
+            <button class="btn-sec btn-cancel" id="cancelEditBtn" style="display:none;" onclick="cancelEdit()">❌ キャンセル</button>
           </div>
         </div>
-        <div class="submit-area">
-          <button class="btn-pri" onclick="saveRecord()">💾 保存</button>
-          <button class="btn-sec" onclick="resetForm()">🔄 リセット</button>
-          <button class="btn-sec" onclick="exportToExcel()">📊 詳細Excel</button>
-          <button class="btn-sec" onclick="copyFormData()">📋 コピー</button>
-          <button class="btn-sec" onclick="pasteFormData()">📌 貼り付け</button>
-          <button class="btn-sec btn-cancel" id="cancelEditBtn" style="display:none;" onclick="cancelEdit()">❌ キャンセル</button>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-records">
+      <div class="card">
+        <div class="card-body">
+          <div class="search-bar">
+            <input type="text" class="inp" id="searchInput" placeholder="樹種・場所・点検者で検索">
+            <select class="inp" id="sortSelect">
+              <option value="date-desc">日付(新→古)</option>
+              <option value="date-asc">日付(古→新)</option>
+              <option value="grade">判定順</option>
+            </select>
+          </div>
+          <div id="recordsList"></div>
+          <div style="margin-top:16px; display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn-sec" onclick="printInspectionPage()">🖨️ 現在画面を印刷</button>
+            <button class="btn-sec" onclick="exportAllToExcel()">📊 全件Excel出力</button>
+            <button class="btn-sec" onclick="exportAllToJSON()">📦 JSONバックアップ</button>
+            <button class="btn-sec" onclick="exportSummaryToExcel()">📋 一覧表Excel出力</button>
+            <button class="btn-sec" onclick="exportAllToCSV()">📄 CSV出力</button>
+            <input type="file" id="jsonImportInput" accept=".json,application/json" style="display:none;">
+            <button class="btn-sec" onclick="document.getElementById('jsonImportInput').click()">📂 JSON復元</button>
+            <button class="btn-sec" onclick="removeInvalidRecords()" style="background:#ffcdd2;">🧹 無効記録削除</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-allmap">
+      <div class="card">
+        <div class="card-hdr green">🗺️ 全樹木位置マップ</div>
+        <div class="card-body">
+          <div id="allMap"></div>
+          <div style="margin-top:12px; display:flex; gap:8px;">
+            <button class="btn-sec" onclick="printAllMap()">🖨️ マップ印刷</button>
+            <button class="btn-sec" onclick="saveAllMapAsImage()">📸 画像保存</button>
+          </div>
+          <p style="margin-top:8px; font-size:0.8rem;">ピンをタップ → 「編集画面へ」で点検入力に移動</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-guide">
+      <div class="card">
+        <div class="card-body">
+          <h3>活力度 0〜4</h3>
+          <p>各項目の状態を0(最良)〜4(最悪)で評価</p>
+          <h3>健全度 A〜D</h3>
+          <p>A:異常なし B:軽微な異常 C:危険性あり D:非常に危険</p>
+          <h3>総合判定基準</h3>
+          <table style="width:100%; border-collapse:collapse; margin-top:12px;">
+            <tr><th style="border:1px solid #ccc; padding:4px;">活力度</th><th style="border:1px solid #ccc; padding:4px;">健全度</th><th style="border:1px solid #ccc; padding:4px;">総合判定</th></tr>
+            <tr><td style="border:1px solid #ccc; padding:4px;">Ⅰ（0.8未満）</td><td style="border:1px solid #ccc; padding:4px;">A</td><td style="border:1px solid #ccc; padding:4px;">A 健全</td></tr>
+            <tr><td style="border:1px solid #ccc; padding:4px;">Ⅱ（0.8〜1.6）</td><td style="border:1px solid #ccc; padding:4px;">B</td><td style="border:1px solid #ccc; padding:4px;">B 健全に近い</td></tr>
+            <tr><td style="border:1px solid #ccc; padding:4px;">Ⅲ（1.6〜2.4）</td><td style="border:1px solid #ccc; padding:4px;">C</td><td style="border:1px solid #ccc; padding:4px;">C 要注意</td></tr>
+            <tr><td style="border:1px solid #ccc; padding:4px;">Ⅳ・Ⅴ（2.4以上）</td><td style="border:1px solid #ccc; padding:4px;">D</td><td style="border:1px solid #ccc; padding:4px;">D 危険木</td></tr>
+          </table>
+          <div style="margin-top: 16px; text-align: center;">
+            <a href="criteria.html" style="display: inline-block; background: #1565c0; color: white; padding: 10px 20px; border-radius: 30px; text-decoration: none; font-weight: 700; font-size: 0.9rem;">📖 詳細判定基準ページを開く →</a>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="tab-panel" id="tab-records">
-    <div class="card">
-      <div class="card-body">
-        <div class="search-bar">
-          <input type="text" class="inp" id="searchInput" placeholder="樹種・場所・点検者で検索">
-          <select class="inp" id="sortSelect">
-            <option value="date-desc">日付(新→古)</option>
-            <option value="date-asc">日付(古→新)</option>
-            <option value="grade">判定順</option>
-          </select>
+  <!-- ヘルプポップアップ -->
+  <div class="help-popup-overlay" id="helpPopupOverlay" onclick="closeHelpPopup()">
+    <div class="help-popup" id="helpPopup" onclick="event.stopPropagation()">
+      <button class="help-close" onclick="closeHelpPopup()">✕</button>
+      <div id="helpPopupContent"></div>
+    </div>
+  </div>
+
+  <div id="photoEditModal">
+    <div class="pe-container">
+      <div class="pe-toolbar">
+        <button class="pe-btn active" id="pt-pen" onclick="setPETool('pen')">✏️ ペン</button>
+        <button class="pe-btn" id="pt-line" onclick="setPETool('line')">➖ 直線</button>
+        <button class="pe-btn" id="pt-rect" onclick="setPETool('rect')">▭ 矩形</button>
+        <button class="pe-btn" id="pt-circle" onclick="setPETool('circle')">⭕ 円</button>
+        <button class="pe-btn" id="pt-arrow" onclick="setPETool('arrow')">➡ 矢印</button>
+        <button class="pe-btn" id="pt-text" onclick="setPETool('text')">T 文字</button>
+        <button class="pe-btn" id="pt-eraser" onclick="setPETool('eraser')">🧹 消し</button>
+        <button class="pe-btn" onclick="clearPECanvas()">🗑️ 全消去</button>
+        <div class="pe-colors">
+          <span class="pe-swatch active" style="background:#ff3333;" data-color="#ff3333" onclick="setPEColor(this)"></span>
+          <span class="pe-swatch" style="background:#ff8800;" data-color="#ff8800" onclick="setPEColor(this)"></span>
+          <span class="pe-swatch" style="background:#ffdd00;" data-color="#ffdd00" onclick="setPEColor(this)"></span>
+          <span class="pe-swatch" style="background:#22cc44;" data-color="#22cc44" onclick="setPEColor(this)"></span>
+          <span class="pe-swatch" style="background:#0088ff;" data-color="#0088ff" onclick="setPEColor(this)"></span>
+          <span class="pe-swatch" style="background:#cc00ff;" data-color="#cc00ff" onclick="setPEColor(this)"></span>
+          <span class="pe-swatch" style="background:#ffffff;" data-color="#ffffff" onclick="setPEColor(this)"></span>
+          <input type="color" value="#ff3333" onchange="setPEColorVal(this.value)" style="width:22px;height:22px;border:none;background:none;cursor:pointer;">
         </div>
-        <div id="recordsList"></div>
-        <div style="margin-top:16px; display:flex; gap:8px; flex-wrap:wrap;">
-          <button class="btn-sec" onclick="printInspectionPage()">🖨️ 現在画面を印刷</button>
-          <button class="btn-sec" onclick="exportAllToExcel()">📊 全件Excel出力</button>
-          <button class="btn-sec" onclick="exportAllToJSON()">📦 JSONバックアップ</button>
-          <button class="btn-sec" onclick="exportSummaryToExcel()">📋 一覧表Excel出力</button>
-          <button class="btn-sec" onclick="exportAllToCSV()">📄 CSV出力</button>
-          <input type="file" id="jsonImportInput" accept=".json,application/json" style="display:none;">
-          <button class="btn-sec" onclick="document.getElementById('jsonImportInput').click()">📂 JSON復元</button>
-          <button class="btn-sec" onclick="removeInvalidRecords()" style="background:#ffcdd2;">🧹 無効記録削除</button>
+        <div class="pe-size-wrap">
+          <span class="pe-size-lbl">太さ</span>
+          <input type="range" id="peSizeSlider" min="1" max="40" value="5" oninput="updatePESize(this.value)">
+          <span id="peSizeLbl" style="color:#aaa;font-size:0.75rem;">5px</span>
         </div>
       </div>
-    </div>
-  </div>
-
-  <div class="tab-panel" id="tab-allmap">
-    <div class="card">
-      <div class="card-hdr green">🗺️ 全樹木位置マップ</div>
-      <div class="card-body">
-        <div id="allMap"></div>
-        <div style="margin-top:12px; display:flex; gap:8px;">
-          <button class="btn-sec" onclick="printAllMap()">🖨️ マップ印刷</button>
-          <button class="btn-sec" onclick="saveAllMapAsImage()">📸 画像保存</button>
-        </div>
-        <p style="margin-top:8px; font-size:0.8rem;">ピンをタップ → 「編集画面へ」で点検入力に移動</p>
+      <div id="peTextRow">
+        <input type="text" id="peTextInput" placeholder="文字入力後、画像をタップ">
+        <input type="number" id="peFontSize" value="28" min="8" max="120" style="width:55px;">
+        <span style="color:#aaa;">px</span>
+      </div>
+      <div class="pe-canvas-wrap">
+        <canvas id="editCanvas"></canvas>
+      </div>
+      <div class="pe-footer">
+        <button class="pe-btn" onclick="undoPE()">↩ 元に戻す</button>
+        <button class="pe-save-btn" onclick="savePECanvas()">💾 保存して閉じる</button>
+        <button class="pe-close-btn" onclick="closePEModal()">閉じる</button>
       </div>
     </div>
   </div>
 
-  <div class="tab-panel" id="tab-guide">
-    <div class="card"><div class="card-body">
-      <h3>活力度 0〜4</h3><p>各項目の状態を0(最良)〜4(最悪)で評価</p>
-      <h3>健全度 A〜D</h3><p>A:異常なし B:軽微な異常 C:危険性あり D:非常に危険</p>
-      <h3>総合判定基準</h3>
-      <table style="width:100%; border-collapse:collapse; margin-top:12px;">
-        <tr><th style="border:1px solid #ccc; padding:4px;">活力度</th><th style="border:1px solid #ccc; padding:4px;">健全度</th><th style="border:1px solid #ccc; padding:4px;">総合判定</th></tr>
-        <tr><td style="border:1px solid #ccc; padding:4px;">Ⅰ（0.8未満）</td><td style="border:1px solid #ccc; padding:4px;">A</td><td style="border:1px solid #ccc; padding:4px;">A 健全</td></tr>
-        <tr><td style="border:1px solid #ccc; padding:4px;">Ⅱ（0.8〜1.6）</td><td style="border:1px solid #ccc; padding:4px;">B</td><td style="border:1px solid #ccc; padding:4px;">B 健全に近い</td></tr>
-        <tr><td style="border:1px solid #ccc; padding:4px;">Ⅲ（1.6〜2.4）</td><td style="border:1px solid #ccc; padding:4px;">C</td><td style="border:1px solid #ccc; padding:4px;">C 要注意</td></tr>
-        <tr><td style="border:1px solid #ccc; padding:4px;">Ⅳ・Ⅴ（2.4以上）</td><td style="border:1px solid #ccc; padding:4px;">D</td><td style="border:1px solid #ccc; padding:4px;">D 危険木</td></tr>
-      </table>
-      <div style="margin-top: 16px; text-align: center;">
-        <a href="criteria.html" style="display: inline-block; background: #1565c0; color: white; padding: 10px 20px; border-radius: 30px; text-decoration: none; font-weight: 700; font-size: 0.9rem;">📖 詳細判定基準ページを開く →</a>
-      </div>
-    </div></div>
-  </div>
-</div>
+  <script>
+    (function() {
+      "use strict";
 
-<!-- ヘルプポップアップ -->
-<div class="help-popup-overlay" id="helpPopupOverlay" onclick="closeHelpPopup()">
-  <div class="help-popup" id="helpPopup" onclick="event.stopPropagation()">
-    <button class="help-close" onclick="closeHelpPopup()">✕</button>
-    <div id="helpPopupContent"></div>
-  </div>
-</div>
+      let editingId = null;
+      const scores = {};
+      const healthGrades = {};
+      let photos = [];
+      let records = [];
+      let locationPhoto = null;
 
-<div id="photoEditModal">
-  <div class="pe-container">
-    <div class="pe-toolbar">
-      <button class="pe-btn active" id="pt-pen" onclick="setPETool('pen')">✏️ ペン</button>
-      <button class="pe-btn" id="pt-line" onclick="setPETool('line')">➖ 直線</button>
-      <button class="pe-btn" id="pt-rect" onclick="setPETool('rect')">▭ 矩形</button>
-      <button class="pe-btn" id="pt-circle" onclick="setPETool('circle')">⭕ 円</button>
-      <button class="pe-btn" id="pt-arrow" onclick="setPETool('arrow')">➡ 矢印</button>
-      <button class="pe-btn" id="pt-text" onclick="setPETool('text')">T 文字</button>
-      <button class="pe-btn" id="pt-eraser" onclick="setPETool('eraser')">🧹 消し</button>
-      <button class="pe-btn" onclick="clearPECanvas()">🗑️ 全消去</button>
-      <div class="pe-colors">
-        <span class="pe-swatch active" style="background:#ff3333;" data-color="#ff3333" onclick="setPEColor(this)"></span>
-        <span class="pe-swatch" style="background:#ff8800;" data-color="#ff8800" onclick="setPEColor(this)"></span>
-        <span class="pe-swatch" style="background:#ffdd00;" data-color="#ffdd00" onclick="setPEColor(this)"></span>
-        <span class="pe-swatch" style="background:#22cc44;" data-color="#22cc44" onclick="setPEColor(this)"></span>
-        <span class="pe-swatch" style="background:#0088ff;" data-color="#0088ff" onclick="setPEColor(this)"></span>
-        <span class="pe-swatch" style="background:#cc00ff;" data-color="#cc00ff" onclick="setPEColor(this)"></span>
-        <span class="pe-swatch" style="background:#ffffff;" data-color="#ffffff" onclick="setPEColor(this)"></span>
-        <input type="color" value="#ff3333" onchange="setPEColorVal(this.value)" style="width:22px;height:22px;border:none;background:none;cursor:pointer;">
-      </div>
-      <div class="pe-size-wrap">
-        <span class="pe-size-lbl">太さ</span>
-        <input type="range" id="peSizeSlider" min="1" max="40" value="5" oninput="updatePESize(this.value)">
-        <span id="peSizeLbl" style="color:#aaa;font-size:0.75rem;">5px</span>
-      </div>
-    </div>
-    <div id="peTextRow">
-      <input type="text" id="peTextInput" placeholder="文字入力後、画像をタップ">
-      <input type="number" id="peFontSize" value="28" min="8" max="120" style="width:55px;">
-      <span style="color:#aaa;">px</span>
-    </div>
-    <div class="pe-canvas-wrap">
-      <canvas id="editCanvas"></canvas>
-    </div>
-    <div class="pe-footer">
-      <button class="pe-btn" onclick="undoPE()">↩ 元に戻す</button>
-      <button class="pe-save-btn" onclick="savePECanvas()">💾 保存して閉じる</button>
-      <button class="pe-close-btn" onclick="closePEModal()">閉じる</button>
-    </div>
-  </div>
-</div>
+      // ══════════════════════════════════════════════
+      // IndexedDB 写真ストレージ（v27.1）
+      // ══════════════════════════════════════════════
+      const IDB_NAME = 'TreeInspectDB';
+      const IDB_VER = 1;
+      const IDB_STORE = 'photos';
+      let _db = null;
 
-<script>
-  (function(){
-    "use strict";
-
-    let editingId = null;
-    const scores = {};
-    const healthGrades = {};
-    let photos = [];
-    let records = [];
-    let locationPhoto = null;
-
-    let map, marker;
-    let allMap = null;
-    let markersLayer = null;
-
-    const declineItems = [
-      { id: 'vigor', name: '樹勢', desc: ['旺盛で被害なし', '幾分影響あるが目立たず', '異常が明らか', '極めて劣悪', 'ほとんど枯死'] },
-      { id: 'shape', name: '樹形', desc: ['自然樹形', '若干の乱れ', '大きく変化', '乱れ著しい', '完全に崩壊'] },
-      { id: 'density', name: '枝葉密度', desc: ['十分な量', 'やや劣る', '枯枝目立つ、やや少ない', '著しく少ない', 'ほとんど葉なし'] },
-      { id: 'shoot', name: '枝伸長量', desc: ['十分伸長', 'やや小さい', '短く細い', '極度に短小', '萌芽のみ'] },
-      { id: 'leafSize', name: '葉の大きさ', desc: ['十分な大きさ', '所々小さい', '全体にやや小', '著しく小', 'わずかで小さい'] },
-      { id: 'leafColor', name: '葉色', desc: ['濃い緑色', 'やや薄い緑', '黄変目立つ', '大部分薄緑', '薄緑・黄変のみ'] },
-      { id: 'topDieback', name: '梢端枯損', desc: ['なし', '少し', '随所にあり', 'かなり目立つ', '梢端・主枝なし'] },
-      { id: 'lowerDieback', name: '下枝枯損', desc: ['なし', '少し', '随所・切断目立つ', 'かなり目立つ', '健全枝端なし'] },
-      { id: 'largeBranch', name: '大枝欠損', desc: ['なし', '少し回復', '随所に目立つ', 'かなり目立つ', '幹上部喪失'] },
-      { id: 'pruning', name: '剪定痕', desc: ['旺盛に巻込', '巻込成長', '活力なし', 'ほとんど巻込なし', '全く巻込なし'] },
-      { id: 'barkWound', name: '樹皮傷', desc: ['ほとんどなし', '少し', '古傷残る', '腐朽著しい', '大空洞・剥がれ'] },
-      { id: 'barkTurnover', name: '新陳代謝', desc: ['活発', '一部不活発', '全体に活力なし', '著しく衰弱', '大部分壊死'] },
-      { id: 'sprout', name: '胴吹き', desc: ['なし', '枝葉多いが胴吹きあり', '枝葉少＋胴吹きあり', '枝葉極少＋胴吹き多', '枝葉極少＋胴吹き少'] },
-      { id: 'bud', name: '芽', desc: ['大きく多数', 'やや劣る', '小さい/少ない', '著しく少なく貧弱', 'ほとんど見られず'] },
-      { id: 'autumnColor', name: '紅黄葉', desc: ['鮮やか', 'やや劣る', '一部のみ', '見られない', '正常な紅黄葉なし'] },
-      { id: 'flower', name: '開花', desc: ['花つき良好', 'やや劣る', '花小さく疎', '小さい花多く疎', 'ほとんど開花なし'] },
-      { id: 'fruit', name: '結実', desc: ['実つき良好', 'やや劣る', '実小さく疎', '小さい実多く疎', 'ほとんど結実なし'] }
-    ];
-
-    const healthItems = [
-      { id: 'sway', name: '揺らぎ', grades: ['A','B','C','D'], desc: ['なし','該当なし','あり（小）','あり（大）'], inactive: { B: true } },
-      { id: 'lean', name: '不自然な傾斜', grades: ['A','B','C','D'], desc: ['なし','根付き異常なし','該当なし','地際変状あり'], inactive: { C: true } },
-      { id: 'crack', name: '亀裂', grades: ['A','B','C','D'], desc: ['なし','該当なし','あり（小）','あり（大）'], inactive: { B: true } },
-      { id: 'fungusBody', name: '子実体(キノコ)', grades: ['A','B','C','D'], desc: ['なし','該当なし','あり（小）','あり（大）'], inactive: { B: true } },
-      { id: 'cavity', name: '開口空洞', grades: ['A','B','C','D'], desc: ['なし','芯に達しない','芯に達し1/3未満','芯に達し1/3以上'] },
-      { id: 'bulge', name: '隆起', grades: ['A','B','C','D'], desc: ['なし','該当なし','あり（小）','あり（大）'], inactive: { B: true } },
-      { id: 'decayExposed', name: '腐朽部露出', grades: ['A','B','C','D'], desc: ['なし','該当なし','周囲長比1/3未満','周囲長比1/3以上'], inactive: { B: true } },
-      { id: 'barkDamage', name: '樹皮枯死･欠損', grades: ['A','B','C','D'], desc: ['なし','周囲長比1/3未満','周囲長比1/3以上','該当なし'], inactive: { D: true } },
-      { id: 'jointAbnormality', name: '結合部の変状', grades: ['A','B','C','D'], desc: ['なし','該当なし','あり（小）','あり（大）'], inactive: { B: true } },
-      { id: 'pestDamage', name: '穿孔害虫等', grades: ['A','B','C','D'], desc: ['なし','あり（小）','あり（大）','該当なし'], inactive: { D: true } },
-      { id: 'rootVisible', name: '根張り', grades: ['A','B','C','D'], desc: ['見える','該当なし','見えない','該当なし'], inactive: { B: true, D: true } },
-      { id: 'tappingSound', name: '打診音異常', grades: ['A','B','C','D'], desc: ['なし','該当なし','あり（小）','あり（大）'], inactive: { B: true } },
-      { id: 'penetrationAbnormality', name: '貫入異常', grades: ['A','B','C','D'], desc: ['なし','該当なし','あり（小）','あり（大）'], inactive: { B: true } },
-      { id: 'hangingBranch', name: 'ぶら下がり枝', grades: ['A','B','C','D'], desc: ['なし','あり（小）','あり（大）','該当なし'], inactive: { D: true } }
-    ];
-
-    // 活力度の詳細解説データ
-    const declineDetailGuide = {
-      'vigor': {
-        title: '樹勢',
-        summary: '枝の伸び・葉の密度・葉色などから木全体の元気さを総合的に判断します。最初に見たときの印象を大切にしてください。',
-        criteria: [
-          { grade: '0', desc: '旺盛な生育状態を示し被害が全くみられない' },
-          { grade: '1', desc: '幾分影響を受けているがあまり目立たない' },
-          { grade: '2', desc: '異常が明らかに認められる' },
-          { grade: '3', desc: '生育状態が極めて劣悪である' },
-          { grade: '4', desc: 'ほとんど枯死' }
-        ],
-        checkPoint: '同じ樹種の健全な木と比べて、葉の色つや、枝の伸び具合、全体のボリューム感を比較しましょう。',
-        dangerSign: '梢端が枯れている場合、根系や幹の障害のサインのことがあります。'
-      },
-      'shape': {
-        title: '樹形',
-        summary: '主幹・大枝の枯損や欠損、葉の密度と配置から評価します。剪定で人工樹形にしている場合は留意が必要です。',
-        criteria: [
-          { grade: '0', desc: '自然な樹形を保っている' },
-          { grade: '1', desc: '若干の乱れはあるが、自然樹形に近い' },
-          { grade: '2', desc: '自然樹形から大きく変化している' },
-          { grade: '3', desc: '樹形の乱れが著しい' },
-          { grade: '4', desc: 'ほとんど完全に崩壊' }
-        ],
-        checkPoint: 'その樹種本来の自然な樹形と比べて、枝の配置や全体のシルエットが崩れていないか確認します。',
-        dangerSign: '大枝が欠損して樹形が著しく乱れている場合は、腐朽や過去の折損が疑われます。'
-      },
-      'density': {
-        title: '枝葉密度',
-        summary: '樹冠全体の枝と葉の密度を評価します。落葉期は小枝や冬芽の量で判断します。',
-        criteria: [
-          { grade: '0', desc: '十分な量の枝葉を着けている' },
-          { grade: '1', desc: '0に比べてやや劣る' },
-          { grade: '2', desc: '枯枝がやや目立ち、枝葉量がやや少ない' },
-          { grade: '3', desc: '枯枝がかなり目立ち、枝葉量が著しく少ない' },
-          { grade: '4', desc: '枝の数が少なく葉もほとんどない' }
-        ],
-        checkPoint: '樹冠を見上げて、隙間が多くないか、枯れ枝が目立たないかを確認します。',
-        dangerSign: '枝葉密度が著しく低い場合、根系の障害や病害虫の深刻な被害が疑われます。'
+      function openDB() {
+        return new Promise((resolve, reject) => {
+          if (_db) { resolve(_db); return; }
+          const req = indexedDB.open(IDB_NAME, IDB_VER);
+          req.onupgradeneeded = e => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(IDB_STORE)) {
+              db.createObjectStore(IDB_STORE); // key = recordId
+            }
+          };
+          req.onsuccess = e => { _db = e.target.result; resolve(_db); };
+          req.onerror = e => { console.error('IDB error', e); reject(e); };
+        });
       }
-      // 他の活力度項目も同様に追加可能（ここでは代表3項目のみ。必要に応じて拡張してください）
-    };
 
-    // 健全度の詳細解説データ
-    const healthDetailGuide = {
-      'sway': {
-        title: '揺らぎ',
-        summary: '樹木を揺らしたときの根元の安定性を評価します。体重をかけて幹を押し、根元が動くかどうかを確認します。',
-        criteria: [
-          { grade: 'A', desc: '異常なし' },
-          { grade: 'C', desc: '小さな揺れはあるが、すぐに倒れる心配はない' },
-          { grade: 'D', desc: '根元から大きく揺れ、地面と根の間に隙間が見える。非常に危険' }
-        ],
-        checkPoint: '体重をかけて幹を押してみましょう。根元が動くか、根の周りの土に割れ目がないか確認します。',
-        dangerSign: '根元がグラグラと動いたり、根と地面の間に隙間がある場合は「D」評価です。すぐに専門家に相談してください。'
-      },
-      'lean': {
-        title: '不自然な傾斜',
-        summary: '周囲の建物や他の木による日陰で傾くこともあります。問題なのは根の支持力不足による傾きです。',
-        criteria: [
-          { grade: 'A', desc: 'まっすぐ、または自然な傾き' },
-          { grade: 'B', desc: '傾いているが、根はしっかりしている' },
-          { grade: 'D', desc: '傾きに加えて、根元の地面が盛り上がったり、亀裂が入っている' }
-        ],
-        checkPoint: '傾いている側の地面が盛り上がっていないか、反対側の地面に亀裂がないか観察します。',
-        dangerSign: '地際周辺の亀裂や異常な盛り上がりがある場合は非常に危険です。必要に応じて機器診断を行ってください。'
-      },
-      'crack': {
-        title: '亀裂',
-        summary: '樹幹に入った裂け目です。腐朽や落雷、衝突などが原因です。幹が裂ける途中段階で非常に危険な状態です。',
-        criteria: [
-          { grade: 'A', desc: '異常なし' },
-          { grade: 'C', desc: '小さな亀裂がある' },
-          { grade: 'D', desc: '樹体の存立に明らかに影響する大きな亀裂がある' }
-        ],
-        checkPoint: '亀裂の深さと長さを確認します。雨水が入り込んで内部で腐朽が進んでいないかも注意します。',
-        dangerSign: '大きく深い亀裂がある場合は、倒木や枝折れの危険が非常に高いため「D」評価です。'
-      },
-      'fungusBody': {
-        title: '子実体(キノコ)',
-        summary: '幹や根元に発生するキノコです。特にベッコウタケやコフキサルノコシカケは腐朽力が強く危険です。',
-        criteria: [
-          { grade: 'A', desc: '異常なし' },
-          { grade: 'C', desc: 'キノコの発生を認めた場合' },
-          { grade: 'D', desc: '腐朽力の強いキノコ（ベッコウタケ等）、または剪定等でも対処できないほど腐朽している場合' }
-        ],
-        checkPoint: 'キノコの種類を見分けます。ベッコウタケ（茶色い傘）、コフキサルノコシカケ（白い粉をふく）など腐朽力の強いものは特に要注意です。',
-        dangerSign: 'ベッコウタケやコフキサルノコシカケが発生している場合は、内部で腐朽がかなり進行している可能性があります。'
-      },
-      'cavity': {
-        title: '開口空洞',
-        summary: '樹幹に開いた穴（空洞）です。開口角度が120度以上（幹周の1/3以上）になると幹折れの危険が高まります。',
-        criteria: [
-          { grade: 'A', desc: '異常なし' },
-          { grade: 'B', desc: '空洞はあるが芯に達していない' },
-          { grade: 'C', desc: '芯に達し、周囲長の1/3未満' },
-          { grade: 'D', desc: '芯に達し、周囲長の1/3以上' }
-        ],
-        checkPoint: '空洞の深さ（芯まで達しているか）と、幹の周囲長に対する空洞の幅の割合を確認します。',
-        dangerSign: '空洞が大きく、幹の周囲の1/3以上に及ぶ場合は非常に危険です。'
-      },
-      'bulge': {
-        title: '隆起',
-        summary: '樹体内の大規模な腐朽や空洞に対して、樹木が力学的に補強しようとして盛り上がる現象です。',
-        criteria: [
-          { grade: 'A', desc: '異常なし' },
-          { grade: 'C', desc: '小さな隆起がある' },
-          { grade: 'D', desc: '幹周全体または根元に大きな隆起がある' }
-        ],
-        checkPoint: '隆起の範囲が幹の一部か全体かを確認します。根元に発生している場合も要注意です。',
-        dangerSign: '幹周全体に及ぶ隆起や、根元の大きな隆起は内部に深刻な腐朽がある可能性が高いです。'
-      },
-      'decayExposed': {
-        title: '腐朽部露出',
-        summary: '樹幹の傷口や枝から腐朽した部分が見えている状態です。材がスポンジ状になったり、白や茶色に変色します。',
-        criteria: [
-          { grade: 'A', desc: '異常なし' },
-          { grade: 'C', desc: '周囲長の1/3未満' },
-          { grade: 'D', desc: '周囲長の1/3以上' }
-        ],
-        checkPoint: '腐朽の範囲を幹の周囲長と比較し、どの程度広がっているかを確認します。',
-        dangerSign: '腐朽が幹周の1/3以上に及んでいる場合は非常に危険です。'
-      },
-      'barkDamage': {
-        title: '樹皮枯死･欠損',
-        summary: '衝突や病害虫などで樹皮が枯れたり剥がれたりしている状態です。傷口から腐朽菌が侵入することがあります。',
-        criteria: [
-          { grade: 'A', desc: '異常なし' },
-          { grade: 'B', desc: '周囲長の1/3未満' },
-          { grade: 'C', desc: '周囲長の1/3以上' }
-        ],
-        checkPoint: '枯死欠損部を剥がして内部の腐朽の有無を確認します。周囲長に対する割合が重要です。',
-        dangerSign: '周囲長の1/3以上に及ぶ樹皮枯死は、樹木の衰弱が進んでいる可能性があります。'
-      },
-      'jointAbnormality': {
-        title: '結合部の変状',
-        summary: '幹と枝の分かれ目（又）に樹皮が挟まった「入り皮」状態です。強風で裂ける危険があります。',
-        criteria: [
-          { grade: 'A', desc: '異常なし' },
-          { grade: 'C', desc: '小さな変状がある' },
-          { grade: 'D', desc: '強風等で被害が発生する危険性の高い大きな変状がある' }
-        ],
-        checkPoint: '分岐角度が狭い枝や双幹木の又の部分を注意深く観察します。樹皮が挟まっている深さを確認します。',
-        dangerSign: '入り皮が深く、強風で裂けそうなものは「D」評価です。'
-      },
-      'pestDamage': {
-        title: '穿孔害虫等',
-        summary: 'カミキリムシやコスカシバなど、幹や枝の中を食害する害虫です。侵入口からオガクズのような虫糞が出ます。',
-        criteria: [
-          { grade: 'A', desc: '異常なし' },
-          { grade: 'B', desc: '小さな被害がある' },
-          { grade: 'C', desc: '枯損の兆候が見られる' }
-        ],
-        checkPoint: '幹や枝に小さな穴がないか、穴の周りにオガクズ状の虫糞が落ちていないか確認します。',
-        dangerSign: '穿孔害虫による枯損の兆候（枝先の枯れ込みなど）が見られる場合は「C」評価です。'
-      },
-      'rootVisible': {
-        title: '根張り',
-        summary: '地際で幹が根に向けて広がる部分（ルートカラー）が見えるかどうかです。見えない場合は深植えや根の腐朽が疑われます。',
-        criteria: [
-          { grade: 'A', desc: '見える' },
-          { grade: 'C', desc: '見えない' }
-        ],
-        checkPoint: '地面と幹の境界がはっきり見えるか確認します。見えない場合は地際を掘削して確認する必要があります。',
-        dangerSign: '根張りが見えず、地際を掘削して腐朽が確認された場合は早急な対応が必要です。'
-      },
-      'tappingSound': {
-        title: '打診音異常',
-        summary: '木槌で幹を叩き、その音で内部の腐朽を推定します。響く音や音が吸収される場合は内部に腐朽があることが多いです。',
-        criteria: [
-          { grade: 'A', desc: '異常なし' },
-          { grade: 'C', desc: '一部で音の異常がある' },
-          { grade: 'D', desc: '広範囲で音の異常がある' }
-        ],
-        checkPoint: '木槌で軽く幹を叩き、健全な部分と音の違いを比較します。腐っていると「ポコポコ」という鈍い音がします。',
-        dangerSign: '広範囲で打診音の異常がある場合は、大規模な腐朽や空洞の可能性があります。'
-      },
-      'penetrationAbnormality': {
-        title: '貫入異常',
-        summary: '先端の尖った鋼棒を地際に刺し、抵抗感で根の腐朽を調べます。腐朽していると抵抗なく貫入します。',
-        criteria: [
-          { grade: 'A', desc: '異常なし' },
-          { grade: 'C', desc: '一部で貫入異常がある' },
-          { grade: 'D', desc: '芯に達する異常、または広範囲の腐朽が発見された場合' }
-        ],
-        checkPoint: '鋼棒を地際の周囲数カ所に刺してみて、手応えの違いを確認します。',
-        dangerSign: '抵抗なく深くまで貫入する場合は、根の腐朽が深刻です。根元周りを掘削して確認してください。'
-      },
-      'hangingBranch': {
-        title: 'ぶら下がり枝',
-        summary: '枝折れを起こして落下せずに木に引っかかっている枝です。わずかな風でも落下する危険があります。',
-        criteria: [
-          { grade: 'A', desc: '異常なし' },
-          { grade: 'B', desc: '小さなぶら下がり枝がある' },
-          { grade: 'C', desc: '大きなぶら下がり枝がある' }
-        ],
-        checkPoint: '樹冠を見上げて、折れて引っかかっている枝がないか確認します。',
-        dangerSign: '大きなぶら下がり枝は直ちに落下する危険があるため、速やかに除去が必要です。'
+      // IndexedDBに写真データを保存（key = recordId）
+      async function savePhotosToIDB(recordId, photoArr) {
+        const db = await openDB();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(IDB_STORE, 'readwrite');
+          tx.objectStore(IDB_STORE).put(photoArr, recordId);
+          tx.oncomplete = () => resolve();
+          tx.onerror = e => reject(e);
+        });
       }
-    };
 
-    function updateEditModeUI() {
-      const cancelBtn = document.getElementById('cancelEditBtn');
-      if (cancelBtn) cancelBtn.style.display = editingId ? 'block' : 'none';
-    }
-
-    window.cancelEdit = function() {
-      if (editingId && confirm('編集をキャンセルしますか？')) {
-        editingId = null;
-        resetForm();
-        updateEditModeUI();
-        showTab('records');
+      // IndexedDBから写真データを取得
+      async function loadPhotosFromIDB(recordId) {
+        const db = await openDB();
+        return new Promise((resolve) => {
+          const tx = db.transaction(IDB_STORE, 'readonly');
+          const req = tx.objectStore(IDB_STORE).get(recordId);
+          req.onsuccess = e => resolve(e.target.result || []);
+          req.onerror = () => resolve([]);
+        });
       }
-    };
 
-    // ヘルプポップアップ
-    window.showHelpPopup = function(itemId, type) {
-      const guide = type === 'decline' ? declineDetailGuide[itemId] : healthDetailGuide[itemId];
-      if (!guide) return;
-      const content = document.getElementById('helpPopupContent');
-      content.innerHTML = `
+      // IndexedDBから写真データを削除
+      async function deletePhotosFromIDB(recordId) {
+        const db = await openDB();
+        return new Promise((resolve) => {
+          const tx = db.transaction(IDB_STORE, 'readwrite');
+          tx.objectStore(IDB_STORE).delete(recordId);
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => resolve();
+        });
+      }
+
+      // 画像をリサイズして返す（長辺1600px上限）
+      function resizeImage(dataUrl, maxSize = 1600) {
+        return new Promise(resolve => {
+          const img = new Image();
+          img.onload = () => {
+            let w = img.width,
+              h = img.height;
+            if (w > maxSize || h > maxSize) {
+              if (w >= h) { h = Math.round(h * maxSize / w);
+                w = maxSize; } else { w = Math.round(w * maxSize / h);
+                h = maxSize; }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL('image/jpeg', 0.85));
+          };
+          img.onerror = () => resolve(dataUrl);
+          img.src = dataUrl;
+        });
+      }
+
+      // 現在の写真件数・容量目安を表示（参考情報）
+      function updatePhotoCounter() {
+        const el = document.getElementById('photoCounter');
+        if (el) el.textContent = `📸 ${photos.length}枚`;
+      }
+      // ══════════════════════════════════════════════
+
+      let map, marker;
+      let allMap = null;
+      let markersLayer = null;
+
+      const declineItems = [
+        { id: 'vigor', name: '樹勢', desc: ['旺盛で被害なし', '幾分影響あるが目立たず', '異常が明らか', '極めて劣悪',
+            'ほとんど枯死'
+          ] },
+        { id: 'shape', name: '樹形', desc: ['自然樹形', '若干の乱れ', '大きく変化', '乱れ著しい', '完全に崩壊'] },
+        { id: 'density', name: '枝葉密度', desc: ['十分な量', 'やや劣る', '枯枝目立つ、やや少ない', '著しく少ない',
+            'ほとんど葉なし'
+          ] },
+        { id: 'shoot', name: '枝伸長量', desc: ['十分伸長', 'やや小さい', '短く細い', '極度に短小', '萌芽のみ'] },
+        { id: 'leafSize', name: '葉の大きさ', desc: ['十分な大きさ', '所々小さい', '全体にやや小', '著しく小', 'わずかで小さい'] },
+        { id: 'leafColor', name: '葉色', desc: ['濃い緑色', 'やや薄い緑', '黄変目立つ', '大部分薄緑', '薄緑・黄変のみ'] },
+        { id: 'topDieback', name: '梢端枯損', desc: ['なし', '少し', '随所にあり', 'かなり目立つ', '梢端・主枝なし'] },
+        { id: 'lowerDieback', name: '下枝枯損', desc: ['なし', '少し', '随所・切断目立つ', 'かなり目立つ', '健全枝端なし'] },
+        { id: 'largeBranch', name: '大枝欠損', desc: ['なし', '少し回復', '随所に目立つ', 'かなり目立つ', '幹上部喪失'] },
+        { id: 'pruning', name: '剪定痕', desc: ['旺盛に巻込', '巻込成長', '活力なし', 'ほとんど巻込なし', '全く巻込なし'] },
+        { id: 'barkWound', name: '樹皮傷', desc: ['ほとんどなし', '少し', '古傷残る', '腐朽著しい', '大空洞・剥がれ'] },
+        { id: 'barkTurnover', name: '新陳代謝', desc: ['活発', '一部不活発', '全体に活力なし', '著しく衰弱', '大部分壊死'] },
+        { id: 'sprout', name: '胴吹き', desc: ['なし', '枝葉多いが胴吹きあり', '枝葉少＋胴吹きあり', '枝葉極少＋胴吹き多',
+            '枝葉極少＋胴吹き少'
+          ] },
+        { id: 'bud', name: '芽', desc: ['大きく多数', 'やや劣る', '小さい/少ない', '著しく少なく貧弱', 'ほとんど見られず'] },
+        { id: 'autumnColor', name: '紅黄葉', desc: ['鮮やか', 'やや劣る', '一部のみ', '見られない', '正常な紅黄葉なし'] },
+        { id: 'flower', name: '開花', desc: ['花つき良好', 'やや劣る', '花小さく疎', '小さい花多く疎', 'ほとんど開花なし'] },
+        { id: 'fruit', name: '結実', desc: ['実つき良好', 'やや劣る', '実小さく疎', '小さい実多く疎', 'ほとんど結実なし'] }
+      ];
+
+      const healthItems = [
+        { id: 'sway', name: '揺らぎ', grades: ['A', 'B', 'C', 'D'], desc: ['なし', '該当なし', 'あり（小）', 'あり（大）'],
+          inactive: { B: true } },
+        { id: 'lean', name: '不自然な傾斜', grades: ['A', 'B', 'C', 'D'], desc: ['なし', '根付き異常なし', '該当なし', '地際変状あり'],
+          inactive: { C: true } },
+        { id: 'crack', name: '亀裂', grades: ['A', 'B', 'C', 'D'], desc: ['なし', '該当なし', 'あり（小）', 'あり（大）'],
+          inactive: { B: true } },
+        { id: 'fungusBody', name: '子実体(キノコ)', grades: ['A', 'B', 'C', 'D'], desc: ['なし', '該当なし', 'あり（小）', 'あり（大）'],
+          inactive: { B: true } },
+        { id: 'cavity', name: '開口空洞', grades: ['A', 'B', 'C', 'D'], desc: ['なし', '芯に達しない', '芯に達し1/3未満',
+            '芯に達し1/3以上'
+          ] },
+        { id: 'bulge', name: '隆起', grades: ['A', 'B', 'C', 'D'], desc: ['なし', '該当なし', 'あり（小）', 'あり（大）'],
+          inactive: { B: true } },
+        { id: 'decayExposed', name: '腐朽部露出', grades: ['A', 'B', 'C', 'D'], desc: ['なし', '該当なし', '周囲長比1/3未満',
+            '周囲長比1/3以上'
+          ], inactive: { B: true } },
+        { id: 'barkDamage', name: '樹皮枯死･欠損', grades: ['A', 'B', 'C', 'D'], desc: ['なし', '周囲長比1/3未満',
+            '周囲長比1/3以上', '該当なし'
+          ], inactive: { D: true } },
+        { id: 'jointAbnormality', name: '結合部の変状', grades: ['A', 'B', 'C', 'D'], desc: ['なし', '該当なし', 'あり（小）',
+            'あり（大）'
+          ], inactive: { B: true } },
+        { id: 'pestDamage', name: '穿孔害虫等', grades: ['A', 'B', 'C', 'D'], desc: ['なし', 'あり（小）', 'あり（大）',
+            '該当なし'
+          ], inactive: { D: true } },
+        { id: 'rootVisible', name: '根張り', grades: ['A', 'B', 'C', 'D'], desc: ['見える', '該当なし', '見えない', '該当なし'],
+          inactive: { B: true, D: true } },
+        { id: 'tappingSound', name: '打診音異常', grades: ['A', 'B', 'C', 'D'], desc: ['なし', '該当なし', 'あり（小）',
+            'あり（大）'
+          ], inactive: { B: true } },
+        { id: 'penetrationAbnormality', name: '貫入異常', grades: ['A', 'B', 'C', 'D'], desc: ['なし', '該当なし', 'あり（小）',
+            'あり（大）'
+          ], inactive: { B: true } },
+        { id: 'hangingBranch', name: 'ぶら下がり枝', grades: ['A', 'B', 'C', 'D'], desc: ['なし', 'あり（小）', 'あり（大）',
+            '該当なし'
+          ], inactive: { D: true } }
+      ];
+
+      // ★修正：全17項目の活力度詳細解説データを追加
+      const declineDetailGuide = {
+        'vigor': {
+          title: '樹勢',
+          summary: '枝の伸び・葉の密度・葉色などから木全体の元気さを総合的に判断します。最初に見たときの印象を大切にしてください。',
+          criteria: [
+            { grade: '0', desc: '旺盛な生育状態を示し被害が全くみられない' },
+            { grade: '1', desc: '幾分影響を受けているがあまり目立たない' },
+            { grade: '2', desc: '異常が明らかに認められる' },
+            { grade: '3', desc: '生育状態が極めて劣悪である' },
+            { grade: '4', desc: 'ほとんど枯死' }
+          ],
+          checkPoint: '同じ樹種の健全な木と比べて、葉の色つや、枝の伸び具合、全体のボリューム感を比較しましょう。',
+          dangerSign: '梢端が枯れている場合、根系や幹の障害のサインのことがあります。'
+        },
+        'shape': {
+          title: '樹形',
+          summary: '主幹・大枝の枯損や欠損、葉の密度と配置から評価します。剪定で人工樹形にしている場合は留意が必要です。',
+          criteria: [
+            { grade: '0', desc: '自然な樹形を保っている' },
+            { grade: '1', desc: '若干の乱れはあるが、自然樹形に近い' },
+            { grade: '2', desc: '自然樹形から大きく変化している' },
+            { grade: '3', desc: '樹形の乱れが著しい' },
+            { grade: '4', desc: 'ほとんど完全に崩壊' }
+          ],
+          checkPoint: 'その樹種本来の自然な樹形と比べて、枝の配置や全体のシルエットが崩れていないか確認します。',
+          dangerSign: '大枝が欠損して樹形が著しく乱れている場合は、腐朽や過去の折損が疑われます。'
+        },
+        'density': {
+          title: '枝葉密度',
+          summary: '樹冠全体の枝と葉の密度を評価します。落葉期は小枝や冬芽の量で判断します。',
+          criteria: [
+            { grade: '0', desc: '十分な量の枝葉を着けている' },
+            { grade: '1', desc: '0に比べてやや劣る' },
+            { grade: '2', desc: '枯枝がやや目立ち、枝葉量がやや少ない' },
+            { grade: '3', desc: '枯枝がかなり目立ち、枝葉量が著しく少ない' },
+            { grade: '4', desc: '枝の数が少なく葉もほとんどない' }
+          ],
+          checkPoint: '樹冠を見上げて、隙間が多くないか、枯れ枝が目立たないかを確認します。',
+          dangerSign: '枝葉密度が著しく低い場合、根系の障害や病害虫の深刻な被害が疑われます。'
+        },
+        'shoot': {
+          title: '枝伸長量',
+          summary: '当年枝の伸び具合で樹木の活力を評価します。枝の先端から節までの長さを測ります。',
+          criteria: [
+            { grade: '0', desc: '十分に伸長している' },
+            { grade: '1', desc: 'やや小さい' },
+            { grade: '2', desc: '枝は短くなり細い' },
+            { grade: '3', desc: '枝は極度に短小、しょうが状の節間がある' },
+            { grade: '4', desc: '下からの萌芽枝のみわずかに成長' }
+          ],
+          checkPoint: '同じ樹種の健全な木と当年枝の長さを比較するか、過去の伸長量と比較します。',
+          dangerSign: '極度に短小な場合は、根系の深刻な障害や土壌条件の悪化が疑われます。'
+        },
+        'leafSize': {
+          title: '葉の大きさ',
+          summary: '葉の大きさで樹木の活力を評価します。樹冠全体の平均的な葉のサイズを見ます。',
+          criteria: [
+            { grade: '0', desc: '葉がすべて十分な大きさ' },
+            { grade: '1', desc: '所々に小さい葉がある' },
+            { grade: '2', desc: '全体にやや小さい' },
+            { grade: '3', desc: '全体に著しく小さい' },
+            { grade: '4', desc: 'わずかな葉しかなく、それも小さい' }
+          ],
+          checkPoint: '健全な個体と葉のサイズを比較します。ストレスを受けると葉は小さくなる傾向があります。',
+          dangerSign: '葉が著しく小さい場合は、根系障害や栄養不足、病害虫被害が疑われます。'
+        },
+        'leafColor': {
+          title: '葉色',
+          summary: '葉の色で樹木の健康状態を評価します。黄変や褐変は栄養不足や病害虫のサインです。',
+          criteria: [
+            { grade: '0', desc: '全体に濃い緑色を保っている' },
+            { grade: '1', desc: 'やや薄いが緑色を保っている' },
+            { grade: '2', desc: '黄色、赤褐色の葉が目立つ' },
+            { grade: '3', desc: '大部分が薄い緑色' },
+            { grade: '4', desc: '薄い緑色と黄色、赤褐色のみ' }
+          ],
+          checkPoint: '樹冠全体の葉色の均一性を見ます。一部だけ変色している場合は枝単位の障害の可能性があります。',
+          dangerSign: '全体が黄変している場合は、根系障害や土壌pH異常、深刻な栄養不足が疑われます。'
+        },
+        'topDieback': {
+          title: '梢端枯損',
+          summary: '梢(樹冠の頂上部)や上枝の先端が枯れている状態です。根系の障害や乾燥ストレスのサインです。',
+          criteria: [
+            { grade: '0', desc: 'なし' },
+            { grade: '1', desc: '少しあるがあまり目立たない' },
+            { grade: '2', desc: '随所に見られる' },
+            { grade: '3', desc: 'かなり目立つ' },
+            { grade: '4', desc: '梢端・主枝がない' }
+          ],
+          checkPoint: '樹冠の頂上付近を中心に、枝先が枯れていないか観察します。',
+          dangerSign: '梢端枯損が進行している場合、根系の深刻な障害や水分供給不足が疑われます。'
+        },
+        'lowerDieback': {
+          title: '下枝枯損',
+          summary: '下の方の枝の先端が枯れている状態です。日照不足や自然な枝の整理の場合もあります。',
+          criteria: [
+            { grade: '0', desc: 'なし' },
+            { grade: '1', desc: '少しあるがあまり目立たない' },
+            { grade: '2', desc: '随所にあり、切断が目立つ' },
+            { grade: '3', desc: 'かなり目立つ、大きな切断がある' },
+            { grade: '4', desc: 'ほとんど健全な枝端がない' }
+          ],
+          checkPoint: '自然な下枝の枯れ上がりと、異常な枯損を区別するため、樹種特性を考慮します。',
+          dangerSign: '急激な下枝枯れが進行している場合は、根系障害や病害虫被害を疑います。'
+        },
+        'largeBranch': {
+          title: '大枝欠損',
+          summary: '大枝や幹の一部が失われている状態です。台風被害や腐朽が原因となることが多いです。',
+          criteria: [
+            { grade: '0', desc: 'なし' },
+            { grade: '1', desc: '少しあるが回復している' },
+            { grade: '2', desc: '随所に目立つ' },
+            { grade: '3', desc: 'かなり目立つ、大きく切断されている' },
+            { grade: '4', desc: '大枝・幹の上部を失っている' }
+          ],
+          checkPoint: '欠損部の巻き込み状態や腐朽の有無を確認します。',
+          dangerSign: '大枝の欠損が大きく、巻き込みが不十分な場合は腐朽が進行している可能性があります。'
+        },
+        'pruning': {
+          title: '剪定痕',
+          summary: '剪定した切り口が治癒していく状態（巻き込み成長）を評価します。',
+          criteria: [
+            { grade: '0', desc: 'さかんに巻き込み成長している' },
+            { grade: '1', desc: '巻き込み成長している' },
+            { grade: '2', desc: '巻き込み成長はしているが、被覆材に活力なし' },
+            { grade: '3', desc: 'ほとんど巻き込み成長は見られない' },
+            { grade: '4', desc: 'まったく巻き込み成長していない' }
+          ],
+          checkPoint: '剪定痕の周囲にカルス（治癒組織）が形成されているか確認します。',
+          dangerSign: '巻き込みが全くない場合は樹勢が著しく低下しており、傷口から腐朽菌が侵入している可能性があります。'
+        },
+        'barkWound': {
+          title: '樹皮傷',
+          summary: '樹皮の剥がれや壊死部分の状態を評価します。傷口から腐朽菌が侵入します。',
+          criteria: [
+            { grade: '0', desc: '傷などほとんどなし' },
+            { grade: '1', desc: '穿孔・傷が少しあるが、あまり目立たない' },
+            { grade: '2', desc: '古傷が残る' },
+            { grade: '3', desc: '傷からの腐朽が著しい' },
+            { grade: '4', desc: '大きな空洞、剥がれがある' }
+          ],
+          checkPoint: '傷の大きさ、深さ、腐朽の有無を確認します。',
+          dangerSign: '大きな空洞や樹皮の剥がれがある場合は、材の腐朽がかなり進行していると考えられます。'
+        },
+        'barkTurnover': {
+          title: '新陳代謝',
+          summary: '樹皮の新陳代謝（古い樹皮が剥がれ新しい樹皮が形成される過程）が正常に行われているかを評価します。',
+          criteria: [
+            { grade: '0', desc: '樹皮は新鮮な色をしていて新陳代謝が活発である' },
+            { grade: '1', desc: '大部分は新鮮だが所々不活発な部分がある' },
+            { grade: '2', desc: '全体に樹皮に活力がない' },
+            { grade: '3', desc: '著しく活力が無く衰弱気味である' },
+            { grade: '4', desc: '樹皮の大部分が壊死' }
+          ],
+          checkPoint: '樹皮の色つや、剥がれ方を観察します。',
+          dangerSign: '樹皮の大部分が壊死している場合は、形成層が広範囲で死んでおり、樹木全体の枯死が近い可能性があります。'
+        },
+        'sprout': {
+          title: '胴吹き',
+          summary: '幹や大枝から発生する不定芽（胴吹き芽）や株元からのひこばえの発生状態です。ストレス反応です。',
+          criteria: [
+            { grade: '0', desc: '枝葉量が多く、胴吹きひこばえもない' },
+            { grade: '1', desc: '枝葉量は多いが胴吹きあるいはひこばえもある' },
+            { grade: '2', desc: '枝葉量が少なく胴吹き、ひこばえがある' },
+            { grade: '3', desc: '枝葉量が極めて少なく、胴吹き・ひこばえが多い' },
+            { grade: '4', desc: '枝葉量が極めて少なく、胴吹き、ひこばえも少ない' }
+          ],
+          checkPoint: '胴吹きやひこばえの量と、通常の枝葉の量のバランスを見ます。',
+          dangerSign: '枝葉が極めて少ないのに胴吹きも少ない場合(グレード4)、樹木が衰弱しきって緊急反応すら出せない危険な状態です。'
+        },
+        'bud': {
+          title: '芽',
+          summary: '冬芽や花芽の大きさと数を評価します。落葉期の重要な活力指標です。',
+          criteria: [
+            { grade: '0', desc: '大きく多数の芽が着いている' },
+            { grade: '1', desc: '0に比べてやや劣る' },
+            { grade: '2', desc: '芽が小さいまたは数が少ない' },
+            { grade: '3', desc: '芽の数が著しく少なく、貧弱' },
+            { grade: '4', desc: '芽がほとんど見られない' }
+          ],
+          checkPoint: '枝の先端部の芽の状態を中心に、樹冠全体を確認します。',
+          dangerSign: '芽がほとんど見られない場合は、来シーズンの成長が期待できず、枯死が進行している可能性があります。'
+        },
+        'autumnColor': {
+          title: '紅黄葉',
+          summary: '秋の紅葉・黄葉の美しさを評価します。落葉樹にのみ適用します（常緑樹は評価対象外）。',
+          criteria: [
+            { grade: '0', desc: '鮮やかな紅黄葉が見られる' },
+            { grade: '1', desc: '0に比べてやや劣る' },
+            { grade: '2', desc: '鮮やかな紅黄葉は一部にしか見られない' },
+            { grade: '3', desc: '鮮やかな紅黄葉が見られない' },
+            { grade: '4', desc: 'ほとんど正常な紅黄葉が見られない' }
+          ],
+          checkPoint: '常緑樹の場合は未記入とし、落葉樹のみで評価します。',
+          dangerSign: '紅葉せずに枯れ落ちる葉が多い場合は、樹木の衰弱が進行しています。'
+        },
+        'flower': {
+          title: '開花',
+          summary: '花つきの状態を評価します。豊富な開花は樹木の生殖成長が健全であることを示します。',
+          criteria: [
+            { grade: '0', desc: '花つきがよい' },
+            { grade: '1', desc: '0に比べてやや劣る' },
+            { grade: '2', desc: '花が小さくやや疎' },
+            { grade: '3', desc: '小さい花が多く、著しく疎' },
+            { grade: '4', desc: 'ほとんど花がついていない' }
+          ],
+          checkPoint: '開花期に観察できない場合は未記入とします。',
+          dangerSign: '花つきが極端に悪い場合は、栄養状態や樹勢の低下が疑われます。'
+        },
+        'fruit': {
+          title: '結実',
+          summary: '実つきの状態を評価します。豊富な結実は樹木の生殖成長が健全であることを示します。',
+          criteria: [
+            { grade: '0', desc: '実つきがよい' },
+            { grade: '1', desc: '0に比べてやや劣る' },
+            { grade: '2', desc: '実が小さくやや疎' },
+            { grade: '3', desc: '小さい実が多く、しかも疎' },
+            { grade: '4', desc: 'ほとんど実がついていない' }
+          ],
+          checkPoint: '結実期に観察できない場合は未記入とします。',
+          dangerSign: '実つきが極端に悪い場合は、栄養状態や樹勢の低下が疑われます。'
+        }
+      };
+
+      // 健全度の詳細解説データ（全14項目）
+      const healthDetailGuide = {
+        'sway': {
+          title: '揺らぎ',
+          summary: '樹木を揺らしたときの根元の安定性を評価します。体重をかけて幹を押し、根元が動くかどうかを確認します。',
+          criteria: [
+            { grade: 'A', desc: '異常なし' },
+            { grade: 'C', desc: '小さな揺れはあるが、すぐに倒れる心配はない' },
+            { grade: 'D', desc: '根元から大きく揺れ、地面と根の間に隙間が見える。非常に危険' }
+          ],
+          checkPoint: '体重をかけて幹を押してみましょう。根元が動くか、根の周りの土に割れ目がないか確認します。',
+          dangerSign: '根元がグラグラと動いたり、根と地面の間に隙間がある場合は「D」評価です。すぐに専門家に相談してください。'
+        },
+        'lean': {
+          title: '不自然な傾斜',
+          summary: '周囲の建物や他の木による日陰で傾くこともあります。問題なのは根の支持力不足による傾きです。',
+          criteria: [
+            { grade: 'A', desc: 'まっすぐ、または自然な傾き' },
+            { grade: 'B', desc: '傾いているが、根はしっかりしている' },
+            { grade: 'D', desc: '傾きに加えて、根元の地面が盛り上がったり、亀裂が入っている' }
+          ],
+          checkPoint: '傾いている側の地面が盛り上がっていないか、反対側の地面に亀裂がないか観察します。',
+          dangerSign: '地際周辺の亀裂や異常な盛り上がりがある場合は非常に危険です。必要に応じて機器診断を行ってください。'
+        },
+        'crack': {
+          title: '亀裂',
+          summary: '樹幹に入った裂け目です。腐朽や落雷、衝突などが原因です。幹が裂ける途中段階で非常に危険な状態です。',
+          criteria: [
+            { grade: 'A', desc: '異常なし' },
+            { grade: 'C', desc: '小さな亀裂がある' },
+            { grade: 'D', desc: '樹体の存立に明らかに影響する大きな亀裂がある' }
+          ],
+          checkPoint: '亀裂の深さと長さを確認します。雨水が入り込んで内部で腐朽が進んでいないかも注意します。',
+          dangerSign: '大きく深い亀裂がある場合は、倒木や枝折れの危険が非常に高いため「D」評価です。'
+        },
+        'fungusBody': {
+          title: '子実体(キノコ)',
+          summary: '幹や根元に発生するキノコです。特にベッコウタケやコフキサルノコシカケは腐朽力が強く危険です。',
+          criteria: [
+            { grade: 'A', desc: '異常なし' },
+            { grade: 'C', desc: 'キノコの発生を認めた場合' },
+            { grade: 'D', desc: '腐朽力の強いキノコ（ベッコウタケ等）、または剪定等でも対処できないほど腐朽している場合' }
+          ],
+          checkPoint: 'キノコの種類を見分けます。ベッコウタケ（茶色い傘）、コフキサルノコシカケ（白い粉をふく）など腐朽力の強いものは特に要注意です。',
+          dangerSign: 'ベッコウタケやコフキサルノコシカケが発生している場合は、内部で腐朽がかなり進行している可能性があります。'
+        },
+        'cavity': {
+          title: '開口空洞',
+          summary: '樹幹に開いた穴（空洞）です。開口角度が120度以上（幹周の1/3以上）になると幹折れの危険が高まります。',
+          criteria: [
+            { grade: 'A', desc: '異常なし' },
+            { grade: 'B', desc: '空洞はあるが芯に達していない' },
+            { grade: 'C', desc: '芯に達し、周囲長の1/3未満' },
+            { grade: 'D', desc: '芯に達し、周囲長の1/3以上' }
+          ],
+          checkPoint: '空洞の深さ（芯まで達しているか）と、幹の周囲長に対する空洞の幅の割合を確認します。',
+          dangerSign: '空洞が大きく、幹の周囲の1/3以上に及ぶ場合は非常に危険です。'
+        },
+        'bulge': {
+          title: '隆起',
+          summary: '樹体内の大規模な腐朽や空洞に対して、樹木が力学的に補強しようとして盛り上がる現象です。',
+          criteria: [
+            { grade: 'A', desc: '異常なし' },
+            { grade: 'C', desc: '小さな隆起がある' },
+            { grade: 'D', desc: '幹周全体または根元に大きな隆起がある' }
+          ],
+          checkPoint: '隆起の範囲が幹の一部か全体かを確認します。根元に発生している場合も要注意です。',
+          dangerSign: '幹周全体に及ぶ隆起や、根元の大きな隆起は内部に深刻な腐朽がある可能性が高いです。'
+        },
+        'decayExposed': {
+          title: '腐朽部露出',
+          summary: '樹幹の傷口や枝から腐朽した部分が見えている状態です。材がスポンジ状になったり、白や茶色に変色します。',
+          criteria: [
+            { grade: 'A', desc: '異常なし' },
+            { grade: 'C', desc: '周囲長の1/3未満' },
+            { grade: 'D', desc: '周囲長の1/3以上' }
+          ],
+          checkPoint: '腐朽の範囲を幹の周囲長と比較し、どの程度広がっているかを確認します。',
+          dangerSign: '腐朽が幹周の1/3以上に及んでいる場合は非常に危険です。'
+        },
+        'barkDamage': {
+          title: '樹皮枯死･欠損',
+          summary: '衝突や病害虫などで樹皮が枯れたり剥がれたりしている状態です。傷口から腐朽菌が侵入することがあります。',
+          criteria: [
+            { grade: 'A', desc: '異常なし' },
+            { grade: 'B', desc: '周囲長の1/3未満' },
+            { grade: 'C', desc: '周囲長の1/3以上' }
+          ],
+          checkPoint: '枯死欠損部を剥がして内部の腐朽の有無を確認します。周囲長に対する割合が重要です。',
+          dangerSign: '周囲長の1/3以上に及ぶ樹皮枯死は、樹木の衰弱が進んでいる可能性があります。'
+        },
+        'jointAbnormality': {
+          title: '結合部の変状',
+          summary: '幹と枝の分かれ目（又）に樹皮が挟まった「入り皮」状態です。強風で裂ける危険があります。',
+          criteria: [
+            { grade: 'A', desc: '異常なし' },
+            { grade: 'C', desc: '小さな変状がある' },
+            { grade: 'D', desc: '強風等で被害が発生する危険性の高い大きな変状がある' }
+          ],
+          checkPoint: '分岐角度が狭い枝や双幹木の又の部分を注意深く観察します。樹皮が挟まっている深さを確認します。',
+          dangerSign: '入り皮が深く、強風で裂けそうなものは「D」評価です。'
+        },
+        'pestDamage': {
+          title: '穿孔害虫等',
+          summary: 'カミキリムシやコスカシバなど、幹や枝の中を食害する害虫です。侵入口からオガクズのような虫糞が出ます。',
+          criteria: [
+            { grade: 'A', desc: '異常なし' },
+            { grade: 'B', desc: '小さな被害がある' },
+            { grade: 'C', desc: '枯損の兆候が見られる' }
+          ],
+          checkPoint: '幹や枝に小さな穴がないか、穴の周りにオガクズ状の虫糞が落ちていないか確認します。',
+          dangerSign: '穿孔害虫による枯損の兆候（枝先の枯れ込みなど）が見られる場合は「C」評価です。'
+        },
+        'rootVisible': {
+          title: '根張り',
+          summary: '地際で幹が根に向けて広がる部分（ルートカラー）が見えるかどうかです。見えない場合は深植えや根の腐朽が疑われます。',
+          criteria: [
+            { grade: 'A', desc: '見える' },
+            { grade: 'C', desc: '見えない' }
+          ],
+          checkPoint: '地面と幹の境界がはっきり見えるか確認します。見えない場合は地際を掘削して確認する必要があります。',
+          dangerSign: '根張りが見えず、地際を掘削して腐朽が確認された場合は早急な対応が必要です。'
+        },
+        'tappingSound': {
+          title: '打診音異常',
+          summary: '木槌で幹を叩き、その音で内部の腐朽を推定します。響く音や音が吸収される場合は内部に腐朽があることが多いです。',
+          criteria: [
+            { grade: 'A', desc: '異常なし' },
+            { grade: 'C', desc: '一部で音の異常がある' },
+            { grade: 'D', desc: '広範囲で音の異常がある' }
+          ],
+          checkPoint: '木槌で軽く幹を叩き、健全な部分と音の違いを比較します。腐っていると「ポコポコ」という鈍い音がします。',
+          dangerSign: '広範囲で打診音の異常がある場合は、大規模な腐朽や空洞の可能性があります。'
+        },
+        'penetrationAbnormality': {
+          title: '貫入異常',
+          summary: '先端の尖った鋼棒を地際に刺し、抵抗感で根の腐朽を調べます。腐朽していると抵抗なく貫入します。',
+          criteria: [
+            { grade: 'A', desc: '異常なし' },
+            { grade: 'C', desc: '一部で貫入異常がある' },
+            { grade: 'D', desc: '芯に達する異常、または広範囲の腐朽が発見された場合' }
+          ],
+          checkPoint: '鋼棒を地際の周囲数カ所に刺してみて、手応えの違いを確認します。',
+          dangerSign: '抵抗なく深くまで貫入する場合は、根の腐朽が深刻です。根元周りを掘削して確認してください。'
+        },
+        'hangingBranch': {
+          title: 'ぶら下がり枝',
+          summary: '枝折れを起こして落下せずに木に引っかかっている枝です。わずかな風でも落下する危険があります。',
+          criteria: [
+            { grade: 'A', desc: '異常なし' },
+            { grade: 'B', desc: '小さなぶら下がり枝がある' },
+            { grade: 'C', desc: '大きなぶら下がり枝がある' }
+          ],
+          checkPoint: '樹冠を見上げて、折れて引っかかっている枝がないか確認します。',
+          dangerSign: '大きなぶら下がり枝は直ちに落下する危険があるため、速やかに除去が必要です。'
+        }
+      };
+
+      function updateEditModeUI() {
+        const cancelBtn = document.getElementById('cancelEditBtn');
+        if (cancelBtn) cancelBtn.style.display = editingId ? 'block' : 'none';
+      }
+
+      window.cancelEdit = function() {
+        if (editingId && confirm('編集をキャンセルしますか？')) {
+          editingId = null;
+          resetForm();
+          updateEditModeUI();
+          showTab('records');
+        }
+      };
+
+      // ヘルプポップアップ
+      window.showHelpPopup = function(itemId, type) {
+        const guide = type === 'decline' ? declineDetailGuide[itemId] : healthDetailGuide[itemId];
+        if (!guide) {
+          // ★修正：ガイドがない場合は簡易表示
+          const item = type === 'decline' ?
+            declineItems.find(d => d.id === itemId) :
+            healthItems.find(h => h.id === itemId);
+          const content = document.getElementById('helpPopupContent');
+          if (item) {
+            content.innerHTML = `
+            <h3>${item.name}</h3>
+            <div class="help-source">出典：国交省指針(案)・日本緑化センター資料</div>
+            <div class="help-summary">${type === 'decline' ? '0(最良)〜4(最悪)の5段階で評価します。' : 'A(異常なし)〜D(非常に危険)の4段階で評価します。'}</div>
+            <table class="help-criteria">
+              <thead><tr><th>評価</th><th>状態の目安</th></tr></thead>
+              <tbody>${(type === 'decline' ? ['0','1','2','3','4'] : item.grades).map((g, i) => `<tr><td style="font-weight:700;text-align:center;">${g}</td><td>${item.desc[i] || ''}</td></tr>`).join('')}</tbody>
+            </table>
+            <div class="help-check">🔍 <strong>現場での確認ポイント：</strong>樹木全体の状態と比較しながら評価してください。</div>
+          `;
+          } else {
+            content.innerHTML = `<h3>解説準備中</h3><p>この項目の詳細解説は現在準備中です。</p>`;
+          }
+          document.getElementById('helpPopupOverlay').classList.add('open');
+          return;
+        }
+        const content = document.getElementById('helpPopupContent');
+        content.innerHTML = `
         <h3>${guide.title}</h3>
         <div class="help-source">出典：国交省指針(案)・日本緑化センター資料</div>
         <div class="help-summary">${guide.summary}</div>
@@ -667,17 +1540,17 @@
         <div class="help-check">🔍 <strong>現場での確認ポイント：</strong>${guide.checkPoint}</div>
         ${guide.dangerSign ? `<div class="help-danger">⚠️ <strong>特に危険なサイン：</strong>${guide.dangerSign}</div>` : ''}
       `;
-      document.getElementById('helpPopupOverlay').classList.add('open');
-    };
+        document.getElementById('helpPopupOverlay').classList.add('open');
+      };
 
-    window.closeHelpPopup = function() {
-      document.getElementById('helpPopupOverlay').classList.remove('open');
-    };
+      window.closeHelpPopup = function() {
+        document.getElementById('helpPopupOverlay').classList.remove('open');
+      };
 
-    function buildUI() {
-      const dCont = document.getElementById('decline-items');
-      if (dCont) {
-        dCont.innerHTML = declineItems.map(item => `
+      function buildUI() {
+        const dCont = document.getElementById('decline-items');
+        if (dCont) {
+          dCont.innerHTML = declineItems.map(item => `
           <div class="fg">
             <label class="lbl">
               ${item.name}
@@ -688,10 +1561,10 @@
             </div>
           </div>
         `).join('');
-      }
-      const hCont = document.getElementById('health-items');
-      if (hCont) {
-        hCont.innerHTML = healthItems.map(item => `
+        }
+        const hCont = document.getElementById('health-items');
+        if (hCont) {
+          hCont.innerHTML = healthItems.map(item => `
           <div class="fg">
             <label class="lbl">
               ${item.name}
@@ -708,63 +1581,89 @@
             </div>
           </div>
         `).join('');
+        }
       }
-    }
 
-    window.setScore = function(btn) {
-      const type = btn.dataset.type, id = btn.dataset.id, val = btn.dataset.val;
-      const isSelected = btn.classList.contains('sel');
-      document.querySelectorAll(`[data-type="${type}"][data-id="${id}"]`).forEach(b => b.classList.remove('sel'));
-      if (isSelected) {
-        if (type === 'decline') delete scores[id];
-        else delete healthGrades[id];
-      } else {
-        btn.classList.add('sel');
-        if (type === 'decline') scores[id] = parseInt(val);
-        else healthGrades[id] = val;
+      window.setScore = function(btn) {
+        const type = btn.dataset.type,
+          id = btn.dataset.id,
+          val = btn.dataset.val;
+        const isSelected = btn.classList.contains('sel');
+        document.querySelectorAll(`[data-type="${type}"][data-id="${id}"]`).forEach(b => b.classList.remove(
+          'sel'));
+        if (isSelected) {
+          if (type === 'decline') delete scores[id];
+          else delete healthGrades[id];
+        } else {
+          btn.classList.add('sel');
+          if (type === 'decline') scores[id] = parseInt(val);
+          else healthGrades[id] = val;
+        }
+        updateOverall();
+      };
+
+      function calcDeclineAvg() { let sum = 0,
+          cnt = 0;
+        declineItems.forEach(i => { if (scores[i.id] !== undefined) { sum += scores[i.id];
+            cnt++; } }); return cnt ? sum / cnt : 0; }
+
+      function worstHealth() { const order = { A: 0, B: 1, C: 2, D: 3 }; let worst = 'A';
+        healthItems.forEach(i => { const g = healthGrades[i.id]; if (g && order[g] > order[worst]) worst = g; }); return worst; }
+
+      function updateOverall() {
+        const avg = calcDeclineAvg(),
+          worst = worstHealth();
+        let grade = '-',
+          text = '',
+          declineLevel = '';
+        if (avg < 0.8) declineLevel = 'Ⅰ（良）';
+        else if (avg < 1.6) declineLevel = 'Ⅱ（やや不良）';
+        else if (avg < 2.4) declineLevel = 'Ⅲ（不良）';
+        else if (avg < 3.2) declineLevel = 'Ⅳ（著しく不良）';
+        else declineLevel = 'Ⅴ（枯死寸前）';
+        if (worst === 'D' || avg >= 3.2) { grade = 'D';
+          text = '危険木（緊急対応）'; } else if (worst === 'C' || avg >= 2.4) { grade = 'C';
+          text = '要注意'; } else if (worst === 'B' || avg >= 1.6) { grade = 'B';
+          text = '健全に近い（経過観察）'; } else { grade = 'A';
+          text = '健全'; }
+        document.getElementById('declineAvgDisplay').textContent = avg.toFixed(2);
+        document.getElementById('declineLevelDisplay').textContent = declineLevel;
+        document.getElementById('overallGradeDisplay').textContent = grade;
+        document.getElementById('overallLevelDisplay').textContent = text;
       }
-      updateOverall();
-    };
 
-    function calcDeclineAvg() { let sum=0, cnt=0; declineItems.forEach(i=>{ if(scores[i.id]!==undefined){ sum+=scores[i.id]; cnt++; } }); return cnt? sum/cnt : 0; }
-    function worstHealth() { const order = {A:0,B:1,C:2,D:3}; let worst='A'; healthItems.forEach(i=>{ const g=healthGrades[i.id]; if(g && order[g]>order[worst]) worst=g; }); return worst; }
-    function updateOverall() {
-      const avg = calcDeclineAvg(), worst = worstHealth();
-      let grade='-', text='', declineLevel = '';
-      if (avg < 0.8) declineLevel = 'Ⅰ（良）';
-      else if (avg < 1.6) declineLevel = 'Ⅱ（やや不良）';
-      else if (avg < 2.4) declineLevel = 'Ⅲ（不良）';
-      else if (avg < 3.2) declineLevel = 'Ⅳ（著しく不良）';
-      else declineLevel = 'Ⅴ（枯死寸前）';
-      if(worst==='D' || avg>=3.2) { grade='D'; text='危険木（緊急対応）'; }
-      else if(worst==='C' || avg>=2.4) { grade='C'; text='要注意'; }
-      else if(worst==='B' || avg>=1.6) { grade='B'; text='健全に近い（経過観察）'; }
-      else { grade='A'; text='健全'; }
-      document.getElementById('declineAvgDisplay').textContent = avg.toFixed(2);
-      document.getElementById('declineLevelDisplay').textContent = declineLevel;
-      document.getElementById('overallGradeDisplay').textContent = grade;
-      document.getElementById('overallLevelDisplay').textContent = text;
-    }
-
-    function createLabelIcon(text) {
-      return L.divIcon({
-        html: `<div style="position: relative; display: inline-block;">
+      function createLabelIcon(text) {
+        return L.divIcon({
+          html: `<div style="position: relative; display: inline-block;">
                 <div style="background: rgba(255, 255, 255, 0.85); border: 1.5px solid #2d5016; border-radius: 12px; padding: 2px 6px; font-weight: bold; font-size: 9px; color: #2d5016; box-shadow: 0 1px 3px rgba(0,0,0,0.2); white-space: nowrap; backdrop-filter: blur(2px);">${text}</div>
                 <div style="position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%); width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid #2d5016;"></div>
               </div>`,
-        className: 'custom-marker', iconSize: [60, 24], iconAnchor: [30, 30], popupAnchor: [0, -20]
-      });
-    }
+          className: 'custom-marker',
+          iconSize: [60, 24],
+          iconAnchor: [30, 30],
+          popupAnchor: [0, -20]
+        });
+      }
 
-    window.takePhoto = () => { const inp=document.getElementById('photoInput'); inp.setAttribute('capture','environment'); inp.click(); };
-    window.selectFromAlbum = () => { const inp=document.getElementById('photoInput'); inp.removeAttribute('capture'); inp.click(); };
-    document.getElementById('photoInput').addEventListener('change', e => {
-      Array.from(e.target.files).forEach(f => { const r=new FileReader(); r.onload=ev=>{ photos.push(ev.target.result); renderPhotos(); }; r.readAsDataURL(f); });
-      e.target.value = '';
-    });
-    function renderPhotos() {
-      const cont = document.getElementById('photoContainer');
-      if(cont) cont.innerHTML = photos.map((p,i)=> `
+      window.takePhoto = () => { const inp = document.getElementById('photoInput');
+        inp.setAttribute('capture', 'environment');
+        inp.click(); };
+      window.selectFromAlbum = () => { const inp = document.getElementById('photoInput');
+        inp.removeAttribute('capture');
+        inp.click(); };
+      document.getElementById('photoInput').addEventListener('change', e => {
+        Array.from(e.target.files).forEach(f => { const r = new FileReader();
+          r.onload = async ev => { const resized = await resizeImage(ev.target.result);
+            photos.push(resized);
+            renderPhotos();
+            updatePhotoCounter(); };
+          r.readAsDataURL(f); });
+        e.target.value = '';
+      });
+
+      function renderPhotos() {
+        const cont = document.getElementById('photoContainer');
+        if (cont) cont.innerHTML = photos.map((p, i) => `
         <div class="photo-item">
           <img src="${p}" class="photo-thumb" onclick="openPhotoEditor(${i})">
           <button class="photo-del" onclick="removePhoto(${i})">✕</button>
@@ -772,181 +1671,727 @@
           <button class="photo-edit" onclick="openPhotoEditor(${i})" title="編集">✏️</button>
         </div>
       `).join('');
+      }
+      window.removePhoto = (i) => { photos.splice(i, 1);
+        renderPhotos();
+        updatePhotoCounter(); };
+      window.savePhoto = (i) => { const a = document.createElement('a');
+        a.href = photos[i];
+        a.download = `photo_${Date.now()}.png`;
+        a.click(); };
+
+      let peIndex = -1,
+        peTool = 'pen',
+        peColor = '#ff3333',
+        peSize = 5;
+      let peDrawing = false,
+        peStartX = 0,
+        peStartY = 0;
+      let peUndoStack = [],
+        peOrigData = null,
+        peTempSnapshot = null;
+      const peCanvas = document.getElementById('editCanvas');
+      const peCtx = peCanvas.getContext('2d');
+
+      window.setPETool = function(tool) { peTool = tool;
+        document.querySelectorAll('.pe-toolbar .pe-btn').forEach(b => b.classList.remove('active')); const btn =
+          document.getElementById('pt-' + tool); if (btn) btn.classList.add('active');
+        document.getElementById('peTextRow').classList.toggle('vis', tool === 'text');
+        peCanvas.style.cursor = tool === 'text' ? 'text' : tool === 'eraser' ? 'cell' : 'crosshair'; };
+      window.setPEColor = function(el) { peColor = el.dataset.color;
+        document.querySelectorAll('.pe-swatch').forEach(s => s.classList.remove('active'));
+        el.classList.add('active'); };
+      window.setPEColorVal = function(v) { peColor = v;
+        document.querySelectorAll('.pe-swatch').forEach(s => s.classList.remove('active')); };
+      window.updatePESize = function(v) { peSize = +v;
+        document.getElementById('peSizeLbl').textContent = v + 'px'; };
+
+      function peSaveUndo() { peUndoStack.push(peCtx.getImageData(0, 0, peCanvas.width, peCanvas.height)); if (
+          peUndoStack.length > 20) peUndoStack.shift(); }
+      window.undoPE = function() { if (peUndoStack.length) peCtx.putImageData(peUndoStack.pop(), 0, 0); };
+      window.clearPECanvas = function() { if (confirm('描画を全消去しますか？')) { peSaveUndo(); if (peOrigData) peCtx
+            .putImageData(peOrigData, 0, 0); } };
+
+      function getPEPos(e) { const rect = peCanvas.getBoundingClientRect(); const sx = peCanvas.width / rect.width,
+          sy = peCanvas.height / rect.height; const cx = e.touches ? e.touches[0].clientX : e.clientX; const cy = e
+          .touches ? e.touches[0].clientY : e.clientY; return { x: (cx - rect.left) * sx, y: (cy - rect.top) * sy }; }
+      peCanvas.addEventListener('mousedown', peStartHandler);
+      peCanvas.addEventListener('touchstart', peStartHandler, { passive: false });
+      peCanvas.addEventListener('mousemove', peMoveHandler);
+      peCanvas.addEventListener('touchmove', peMoveHandler, { passive: false });
+      peCanvas.addEventListener('mouseup', peEndHandler);
+      peCanvas.addEventListener('touchend', peEndHandler);
+
+      function peStartHandler(e) { e.preventDefault(); if (peTool === 'text') { placeText(e); return; }
+        peDrawing = true; const p = getPEPos(e);
+        peStartX = p.x;
+        peStartY = p.y;
+        peSaveUndo(); if (peTool === 'pen' || peTool === 'eraser') { peCtx.beginPath();
+          peCtx.moveTo(peStartX, peStartY); } else { peTempSnapshot = peCtx.getImageData(0, 0, peCanvas.width, peCanvas
+            .height); } }
+
+      function peMoveHandler(e) { e.preventDefault(); if (!peDrawing) return; const p = getPEPos(e); if (peTool ===
+          'pen') { peCtx.lineTo(p.x, p.y);
+          peCtx.strokeStyle = peColor;
+          peCtx.lineWidth = peSize;
+          peCtx.lineCap = 'round';
+          peCtx.lineJoin = 'round';
+          peCtx.stroke(); } else if (peTool === 'eraser') { peCtx.globalCompositeOperation = 'destination-out';
+          peCtx.lineTo(p.x, p.y);
+          peCtx.lineWidth = peSize * 3;
+          peCtx.stroke();
+          peCtx.globalCompositeOperation = 'source-over'; } else { if (peTempSnapshot) peCtx.putImageData(peTempSnapshot, 0,
+            0);
+          drawShape(peTool, peStartX, peStartY, p.x, p.y); } }
+
+      function peEndHandler() { peDrawing = false;
+        peTempSnapshot = null;
+        peCtx.beginPath(); }
+
+      function drawShape(tool, x1, y1, x2, y2) { peCtx.strokeStyle = peColor;
+        peCtx.fillStyle = peColor;
+        peCtx.lineWidth = peSize;
+        peCtx.lineCap = 'round'; if (tool === 'line') { peCtx.beginPath();
+          peCtx.moveTo(x1, y1);
+          peCtx.lineTo(x2, y2);
+          peCtx.stroke(); } else if (tool === 'rect') { peCtx.beginPath();
+          peCtx.strokeRect(x1, y1, x2 - x1, y2 - y1); } else if (tool === 'circle') { const rx = Math.abs(x2 - x1) / 2,
+            ry = Math.abs(y2 - y1) / 2; const cx = (x1 + x2) / 2,
+            cy = (y1 + y2) / 2;
+          peCtx.beginPath();
+          peCtx.ellipse(cx, cy, rx, ry, 0, 0, 2 * Math.PI);
+          peCtx.stroke(); } else if (tool === 'arrow') { const headLen = Math.max(peSize * 4, 20); const angle = Math.atan2(
+            y2 - y1, x2 - x1);
+          peCtx.beginPath();
+          peCtx.moveTo(x1, y1);
+          peCtx.lineTo(x2, y2);
+          peCtx.stroke();
+          peCtx.beginPath();
+          peCtx.moveTo(x2, y2);
+          peCtx.lineTo(x2 - headLen * Math.cos(angle - Math.PI / 6), y2 - headLen * Math.sin(angle - Math.PI / 6));
+          peCtx.lineTo(x2 - headLen * Math.cos(angle + Math.PI / 6), y2 - headLen * Math.sin(angle + Math.PI / 6));
+          peCtx.closePath();
+          peCtx.fill(); } }
+
+      function placeText(e) { const text = document.getElementById('peTextInput').value.trim(); if (!text) { alert(
+          'テキストを入力'); return; } const fs = parseInt(document.getElementById('peFontSize').value) || 28;
+        peSaveUndo(); const p = getPEPos(e);
+        peCtx.font = `bold ${fs}px 'Noto Sans JP', sans-serif`;
+        peCtx.fillStyle = peColor;
+        peCtx.shadowColor = 'rgba(0,0,0,0.6)';
+        peCtx.shadowBlur = 3;
+        peCtx.fillText(text, p.x, p.y);
+        peCtx.shadowBlur = 0; }
+      window.openPhotoEditor = function(index) { peIndex = index;
+        peUndoStack = []; const img = new Image();
+        img.onload = function() { const maxW = Math.min(img.width, window.innerWidth - 40); const maxH = Math.min(img
+            .height, window.innerHeight * 0.45); const scale = Math.min(maxW / img.width, maxH / img.height);
+          peCanvas.width = img.width * scale;
+          peCanvas.height = img.height * scale;
+          peCtx.clearRect(0, 0, peCanvas.width, peCanvas.height);
+          peCtx.drawImage(img, 0, 0, peCanvas.width, peCanvas.height);
+          peOrigData = peCtx.getImageData(0, 0, peCanvas.width, peCanvas.height);
+          setPETool('pen');
+          updatePESize(5);
+          document.getElementById('peSizeSlider').value = 5;
+          document.getElementById('photoEditModal').classList.add('open'); };
+        img.src = photos[index]; };
+      window.savePECanvas = function() { if (peIndex >= 0) { photos[peIndex] = peCanvas.toDataURL('image/jpeg', 0.9);
+          renderPhotos(); }
+        closePEModal(); };
+      window.closePEModal = function() { document.getElementById('photoEditModal').classList.remove('open');
+        peIndex = -1; };
+
+      window.takeLocationPhoto = () => { const inp = document.getElementById('locPhotoInput');
+        inp.setAttribute('capture', 'environment');
+        inp.click(); };
+      window.selectLocationPhoto = () => { const inp = document.getElementById('locPhotoInput');
+        inp.removeAttribute('capture');
+        inp.click(); };
+      document.getElementById('locPhotoInput').addEventListener('change', e => { const file = e.target.files[0]; if (
+          file) { const r = new FileReader();
+          r.onload = ev => { locationPhoto = ev.target.result; const preview = document.getElementById(
+              'locPhotoPreview');
+            preview.src = locationPhoto;
+            preview.style.display = 'block'; };
+          r.readAsDataURL(file); }
+        e.target.value = ''; });
+      window.clearLocationPhoto = () => { locationPhoto = null;
+        document.getElementById('locPhotoPreview').style.display = 'none'; };
+
+      const memoCanvas = document.getElementById('memoCanvas');
+      const memoCtx = memoCanvas.getContext('2d');
+      let memoDrawing = false;
+      memoCanvas.addEventListener('pointerdown', e => { memoDrawing = true;
+        memoCtx.beginPath();
+        memoCtx.moveTo(e.offsetX, e.offsetY); });
+      memoCanvas.addEventListener('pointermove', e => { if (!memoDrawing) return;
+        memoCtx.lineTo(e.offsetX, e.offsetY);
+        memoCtx.strokeStyle = '#333';
+        memoCtx.lineWidth = 3;
+        memoCtx.stroke(); });
+      memoCanvas.addEventListener('pointerup', () => { memoDrawing = false; });
+      memoCanvas.addEventListener('pointerleave', () => { memoDrawing = false; });
+      window.clearMemo = () => { memoCtx.clearRect(0, 0, memoCanvas.width, memoCanvas.height); };
+      window.saveMemo = () => { const dataUrl = memoCanvas.toDataURL('image/png'); const a = document.createElement(
+          'a');
+        a.href = dataUrl;
+        a.download = `memo_${Date.now()}.png`;
+        a.click(); };
+
+      function initMap() { const defaultLat = 35.681236,
+          defaultLng = 139.767125;
+        map = L.map('map').setView([defaultLat, defaultLng], 17);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '©OSM', crossOrigin: true }).addTo(
+          map); const treeNo = document.getElementById('treeNo').value || '●';
+        marker = L.marker([defaultLat, defaultLng], { draggable: true, icon: createLabelIcon(treeNo) }).addTo(map);
+        marker.on('dragend', e => { const pos = marker.getLatLng();
+          document.getElementById('latitude').value = pos.lat.toFixed(6);
+          document.getElementById('longitude').value = pos.lng.toFixed(6); });
+        map.on('click', e => { marker.setLatLng(e.latlng);
+          document.getElementById('latitude').value = e.latlng.lat.toFixed(6);
+          document.getElementById('longitude').value = e.latlng.lng.toFixed(6); });
+        document.getElementById('treeNo').addEventListener('input', function() { marker.setIcon(createLabelIcon(this
+            .value || '●')); });
+        document.getElementById('latitude').value = defaultLat.toFixed(6);
+        document.getElementById('longitude').value = defaultLng.toFixed(6); }
+
+      function initAllMap() { if (allMap) return;
+        allMap = L.map('allMap').setView([35.681236, 139.767125], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '©OSM', crossOrigin: true }).addTo(
+          allMap);
+        markersLayer = L.layerGroup().addTo(allMap);
+        updateAllMapMarkers(); }
+      window.jumpToEdit = function(id) { if (typeof editRecord === 'function') editRecord(id);
+        showTab('inspect'); };
+
+      function updateAllMapMarkers() { if (!markersLayer) return;
+        markersLayer.clearLayers(); const valid = records.filter(r => r?.id && r.latitude && r.longitude);
+        valid.forEach(r => { const lat = parseFloat(r.latitude),
+            lng = parseFloat(r.longitude); if (isNaN(lat) || isNaN(lng)) return; const popupContent =
+            `<b>${r.treeNo} : ${r.species}</b><br>${r.location||''}<br>調査日: ${r.surveyDate}<br>判定: ${r.overall}<br><button onclick="window.jumpToEdit('${r.id}')" style="margin-top:6px;padding:4px 12px;background:#4a7c2f;color:white;border:none;border-radius:20px;font-size:12px;cursor:pointer;">✏️ 編集画面へ</button>`;
+          L.marker([lat, lng], { icon: createLabelIcon(r.treeNo || '●') }).bindPopup(popupContent).addTo(markersLayer); }); if (
+          valid.length) { const bounds = L.featureGroup(valid.map(r => L.marker([parseFloat(r.latitude), parseFloat(r
+            .longitude)]))).getBounds(); if (bounds.isValid()) allMap.fitBounds(bounds.pad(0.1)); } }
+      window.getGPS = () => { if (!navigator.geolocation) { alert('非対応'); return; } const btn = document.getElementById(
+          'gpsButton');
+        btn.textContent = '取得中...';
+        btn.disabled = true;
+        navigator.geolocation.getCurrentPosition(pos => { const { latitude: lat, longitude: lng } = pos.coords;
+          document.getElementById('latitude').value = lat.toFixed(6);
+          document.getElementById('longitude').value = lng.toFixed(6); if (map && marker) { map.setView([lat, lng],
+            17);
+            marker.setLatLng([lat, lng]); }
+          btn.textContent = '📍 現在位置を取得';
+          btn.disabled = false; }, () => { alert('取得失敗');
+          btn.textContent = '📍 現在位置を取得';
+          btn.disabled = false; }); };
+
+      function collectData() { const memoDataUrl = memoCanvas.toDataURL('image/png'); return { id: editingId || Date.now() +
+          '-' + Math.random().toString(36),
+          treeNo: document.getElementById('treeNo').value,
+          surveyDate: document.getElementById('surveyDate').value,
+          weather: document.getElementById('weather').value,
+          inspector: document.getElementById('inspector').value,
+          species: document.getElementById('species').value,
+          family: document.getElementById('family').value,
+          scientificName: document.getElementById('scientificName').value,
+          nickname: document.getElementById('nickname').value,
+          location: document.getElementById('location').value,
+          treeHeight: document.getElementById('treeHeight').value,
+          trunkGirth: document.getElementById('trunkGirth').value,
+          latitude: document.getElementById('latitude').value,
+          longitude: document.getElementById('longitude').value,
+          locationPhoto: locationPhoto,
+          scores: { ...scores },
+          health: { ...healthGrades },
+          fungus: [...document.querySelectorAll('.fungus-check:checked')].map(c => c.value),
+          fungusOther: document.getElementById('fungusOther').value,
+          comment: document.getElementById('overallComment').value,
+          measures: [...document.querySelectorAll('.measure-check:checked')].map(c => c.value),
+          photos: [...photos],
+          avg: calcDeclineAvg(),
+          worstHealth: worstHealth(),
+          overall: document.getElementById('overallGradeDisplay').textContent,
+          memo: memoDataUrl
+        }; }
+      window.saveRecord = async () => {
+        // 必須チェック（赤枠ハイライト付き）
+        const required = ['treeNo', 'surveyDate', 'inspector', 'species'];
+        let missing = false;
+        required.forEach(id => {
+          const el = document.getElementById(id);
+          if (!el.value.trim()) {
+            el.style.border = '2px solid #c62828';
+            el.style.background = '#ffebee';
+            missing = true;
+          } else {
+            el.style.border = '';
+            el.style.background = '';
+          }
+        });
+        if (missing) {
+          const firstEmpty = required.map(id => document.getElementById(id)).find(el => !el.value.trim());
+          if (firstEmpty) firstEmpty.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          alert('⚠️ 赤枠の必須項目を入力してください');
+          return;
+        }
+
+        const data = collectData();
+        const recordId = data.id;
+
+        // 写真をIndexedDBに保存（localStorageには含めない）
+        const photosToSave = [...photos];
+        await savePhotosToIDB(recordId, photosToSave);
+
+        // localStorageには写真以外を保存
+        const dataForLS = { ...data };
+        dataForLS.photos = []; // 写真はIDBに分離
+        dataForLS._hasIDBPhotos = true; // IDBに写真あるフラグ
+
+        if (editingId) {
+          // 編集時：古い写真をIDBから削除して新しいものを保存済み
+          const idx = records.findIndex(r => r.id === editingId);
+          if (idx !== -1) records[idx] = dataForLS;
+          editingId = null;
+        } else {
+          records.unshift(dataForLS);
+        }
+
+        try {
+          localStorage.setItem('treeRecords', JSON.stringify(records));
+        } catch (e) {
+          alert('⚠️ テキストデータの保存に失敗しました。localStorageの容量不足の可能性があります。JSONバックアップをお試しください。');
+          return;
+        }
+
+        // バックアップリマインダー（50件ごと）
+        if (records.length > 0 && records.length % 50 === 0) {
+          setTimeout(() => alert(`📦 ${records.length}件に達しました！定期的にJSONバックアップをお勧めします。`), 500);
+        }
+
+        alert('✅ 保存しました（写真はこの端末内に安全に保存されました）');
+        updateAllMapMarkers();
+        resetForm();
+        updateEditModeUI();
+        renderRecordsList();
+        showTab('records');
+      };
+      window.resetForm = function() { document.getElementById('treeNo').value = '';
+        document.getElementById('surveyDate').value = new Date().toISOString().split('T')[0];
+        document.getElementById('weather').value = '晴れ';
+        document.getElementById('inspector').value = '';
+        document.getElementById('species').value = '';
+        document.getElementById('family').value = '';
+        document.getElementById('scientificName').value = '';
+        document.getElementById('nickname').value = '';
+        document.getElementById('location').value = '';
+        document.getElementById('treeHeight').value = '';
+        document.getElementById('trunkGirth').value = '';
+        document.getElementById('latitude').value = '35.681236';
+        document.getElementById('longitude').value = '139.767125'; if (map && marker) { map.setView([35.681236, 139.767125],
+          17);
+          marker.setLatLng([35.681236, 139.767125]);
+          marker.setIcon(createLabelIcon('●')); }
+        clearLocationPhoto();
+        document.getElementById('overallComment').value = '';
+        document.getElementById('fungusOther').value = '';
+        Object.keys(scores).forEach(k => delete scores[k]);
+        Object.keys(healthGrades).forEach(k => delete healthGrades[k]);
+        document.querySelectorAll('.rbtn').forEach(b => b.classList.remove('sel'));
+        photos = [];
+        renderPhotos();
+        updatePhotoCounter();
+        document.querySelectorAll('.fungus-check').forEach(cb => cb.checked = false);
+        document.querySelectorAll('.measure-check').forEach(cb => cb.checked = false);
+        clearMemo();
+        updateOverall();
+        editingId = null;
+        updateEditModeUI(); // 必須項目の赤枠をリセット
+        ['treeNo', 'surveyDate', 'inspector', 'species'].forEach(id => { const el = document.getElementById(id);
+          el.style.border = '';
+          el.style.background = ''; }); };
+      window.copyFormData = async () => { const d = collectData();
+        delete d.id;
+        delete d.memo; try { await navigator.clipboard.writeText(JSON.stringify(d));
+          alert('コピーしました'); } catch (e) { prompt('手動コピー', JSON.stringify(d)); } };
+      window.pasteFormData = async () => { try { const t = await navigator.clipboard.readText(); const d = JSON.parse(t);
+          const map = { 'treeNo': 'treeNo', 'surveyDate': 'surveyDate', 'weather': 'weather', 'inspector': 'inspector',
+            'species': 'species', 'family': 'family', 'scientificName': 'scientificName', 'nickname': 'nickname',
+            'location': 'location', 'treeHeight': 'treeHeight', 'trunkGirth': 'trunkGirth', 'latitude': 'latitude',
+            'longitude': 'longitude', 'comment': 'overallComment', 'fungusOther': 'fungusOther'
+          };
+          Object.entries(map).forEach(([dk, fk]) => { if (d[dk]) document.getElementById(fk).value = d[dk]; });
+          alert('貼り付けました'); } catch { alert('貼り付け失敗'); } };
+
+      function renderRecordsList() { const valid = records.filter(r => r?.id); const q = document.getElementById('searchInput')
+          .value.toLowerCase(); let f = valid.filter(r => (r.species || '').toLowerCase().includes(q) || (r.location || '')
+            .toLowerCase().includes(q) || (r.inspector || '').toLowerCase().includes(q)); const s = document.getElementById(
+            'sortSelect').value; if (s === 'date-desc') f.sort((a, b) => a.surveyDate < b.surveyDate ? 1 : -1); else if (s ===
+          'date-asc') f.sort((a, b) => a.surveyDate > b.surveyDate ? 1 : -1); else { const o = { A: 1, B: 2, C: 3, D: 4 };
+          f.sort((a, b) => (o[a.overall] || 5) - (o[b.overall] || 5)); }
+        document.getElementById('recordsList').innerHTML = f.map(r => `
+        <div class="record-item">
+          <div style="display:flex;justify-content:space-between;">
+            <strong>${r.species} (${r.treeNo})</strong>
+            <span class="grade-badge grade-${r.overall}">${r.overall}</span>
+          </div>
+          <div>📍 ${r.location} 📅 ${r.surveyDate}</div>
+          <div>👤 ${r.inspector}</div>
+          <div class="record-actions">
+            <button class="btn-small" onclick="editRecord('${r.id}')">✏️ 編集</button>
+            <button class="btn-small" onclick="deleteRecord('${r.id}')">🗑️ 削除</button>
+            <button class="btn-small" onclick="printRecord('${r.id}')">📊 詳細Excel</button>
+          </div>
+        </div>
+      `).join('') || '<p>記録がありません</p>'; }
+
+      // ★修正：写真のフォールバック読み込み対応
+      window.editRecord = async (id) => { const r = records.find(r => r.id === id); if (!r) return;
+        editingId = r.id;
+        document.getElementById('treeNo').value = r.treeNo || '';
+        document.getElementById('surveyDate').value = r.surveyDate || '';
+        document.getElementById('weather').value = r.weather || '晴れ';
+        document.getElementById('inspector').value = r.inspector || '';
+        document.getElementById('species').value = r.species || '';
+        document.getElementById('family').value = r.family || '';
+        document.getElementById('scientificName').value = r.scientificName || '';
+        document.getElementById('nickname').value = r.nickname || '';
+        document.getElementById('location').value = r.location || '';
+        document.getElementById('treeHeight').value = r.treeHeight || '';
+        document.getElementById('trunkGirth').value = r.trunkGirth || '';
+        document.getElementById('latitude').value = r.latitude || '35.681236';
+        document.getElementById('longitude').value = r.longitude || '139.767125'; if (map && marker) { const la = parseFloat(r
+            .latitude) || 35.681236,
+            ln = parseFloat(r.longitude) || 139.767125;
+          map.setView([la, ln], 17);
+          marker.setLatLng([la, ln]);
+          marker.setIcon(createLabelIcon(r.treeNo || '●')); }
+        locationPhoto = r.locationPhoto || null; const pv = document.getElementById('locPhotoPreview'); if (
+          locationPhoto) { pv.src = locationPhoto;
+          pv.style.display = 'block'; } else pv.style.display = 'none';
+        document.getElementById('overallComment').value = r.comment || '';
+        document.getElementById('fungusOther').value = r.fungusOther || '';
+        Object.assign(scores, r.scores || {});
+        Object.assign(healthGrades, r.health || {});
+        document.querySelectorAll('.rbtn').forEach(b => b.classList.remove('sel'));
+        declineItems.forEach(it => { if (scores[it.id] !== undefined) document.querySelector(
+            `[data-type="decline"][data-id="${it.id}"][data-val="${scores[it.id]}"]`)?.classList.add(
+          'sel'); });
+        healthItems.forEach(it => { if (healthGrades[it.id]) document.querySelector(
+            `[data-type="health"][data-id="${it.id}"][data-val="${healthGrades[it.id]}"]`)?.classList.add(
+          'sel'); });
+
+        // ★修正：写真の読み込み（IDB→localStorageのフォールバック対応）
+        if (r._hasIDBPhotos) {
+          // IDBから読み込みを試みる
+          photos = await loadPhotosFromIDB(r.id);
+          // IDBになければlocalStorageの写真をフォールバック
+          if (photos.length === 0 && r.photos && r.photos.length > 0) {
+            photos = [...r.photos];
+            // IDBに移行する
+            await savePhotosToIDB(r.id, photos);
+            // localStorageの写真をクリア
+            r.photos = [];
+            localStorage.setItem('treeRecords', JSON.stringify(records));
+          }
+        } else {
+          // 旧形式：localStorageから読み込み
+          photos = r.photos || [];
+          // IDBに移行
+          if (photos.length > 0) {
+            await savePhotosToIDB(r.id, photos);
+            r._hasIDBPhotos = true;
+            r.photos = [];
+            localStorage.setItem('treeRecords', JSON.stringify(records));
+          }
+        }
+
+        renderPhotos();
+        updatePhotoCounter();
+        document.querySelectorAll('.fungus-check').forEach(cb => cb.checked = (r.fungus || []).includes(cb.value));
+        document.querySelectorAll('.measure-check').forEach(cb => cb.checked = (r.measures || []).includes(cb.value));
+        updateOverall();
+        updateEditModeUI();
+        showTab('inspect'); };
+      window.deleteRecord = async (id) => { if (confirm('削除しますか？')) { records = records.filter(r => r.id !== id);
+          localStorage.setItem('treeRecords', JSON.stringify(records)); await deletePhotosFromIDB(id);
+          updateAllMapMarkers();
+          renderRecordsList(); } };
+      window.removeInvalidRecords = () => { records = records.filter(r => r?.id);
+        localStorage.setItem('treeRecords', JSON.stringify(records));
+        updateAllMapMarkers();
+        renderRecordsList();
+        alert('無効記録を削除しました'); };
+
+      function setColWidths(ws, widths) { ws['!cols'] = widths.map(w => ({ wch: w })); }
+
+      function sanitizeSheetName(name) { return name.replace(/[:\\\/\?\*\[\]]/g, '_').slice(0, 31); }
+
+      function dlBlob(blob, filename) { const url = URL.createObjectURL(blob); const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000); }
+
+      // ★ Excel出力修正：様式Ⅰ-2のPDFレイアウトに近づける
+      window.printRecord = function(id) { const r = records.find(r => r.id === id); if (!r) return; const wb = XLSX.utils
+          .book_new();
+
+        // 様式Ⅰ-1
+        const ws1 = XLSX.utils.aoa_to_sheet([
+          ['様式Ⅰ-1　調査木位置図', '', '', '', '', '', '', ''],
+          ['樹木No.', r.treeNo, '調査日', r.surveyDate, '天候', r.weather, '調査者', r.inspector],
+          ['樹種名', r.species, '', '', '科名', r.family, '', ''],
+          ['学名', r.scientificName, '', '', '樹木の名称(愛称)', r.nickname, '', ''],
+          ['所在地', r.location, '', '', '', '', '', ''],
+          ['樹高(m)', r.treeHeight, '幹周(cm)', r.trunkGirth, '', '', '', ''],
+          ['緯度', r.latitude, '経度', r.longitude, '', '', '', ''],
+          ['写真枚数', (r.photos || []).length, '', '', '', '', '', '']
+        ]);
+        setColWidths(ws1, [20, 20, 15, 20, 15, 20, 15, 20]);
+        XLSX.utils.book_append_sheet(wb, ws1, '様式Ⅰ-1_位置図');
+
+        // 様式Ⅰ-2：PDFのレイアウトに合わせた表形式
+        const ws2 = XLSX.utils.aoa_to_sheet([
+          ['様式Ⅰ-2　地上部の衰退度判定票', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+          ['評価項目', '0', '', '1', '', '2', '', '3', '', '4', '', '評点'],
+          ['樹勢', '旺盛な生育状態を示し被害が全くみられない', '', '幾分影響を受けているがあまり目立たない', '', '異常が明らかに認められる', '', '生育状態が極めて劣悪である', '',
+            'ほとんど枯死', '', r.scores?.vigor ?? ''
+          ],
+          ['樹形', '自然な樹形を保っている', '', '若干の乱れはあるが、自然樹形に近い', '', '自然樹形から大きく変化している', '', '樹形の乱れが著しい', '',
+            'ほとんど完全に崩壊', '', r.scores?.shape ?? ''
+          ],
+          ['枝葉の密度', '十分な量の枝葉を着けている', '', '0に比べてやや劣る', '', '枯枝がやや目立ち、枝葉量がやや少ない', '', '枯枝がかなり目立ち、枝葉量が著しく少ない', '',
+            '枝の数が少なく葉もほとんどない', '', r.scores?.density ?? ''
+          ],
+          ['枝の伸長量(節間の長さ)', '十分に伸長している', '', 'やや小さい', '', '枝は短くなり細い', '', '枝は極度に短小、しょうが状の節間がある', '',
+            '下からの萌芽枝のみわずかに成長', '', r.scores?.shoot ?? ''
+          ],
+          ['葉の大きさ', '葉がすべて十分な大きさ', '', '所々に小さい葉がある', '', '全体にやや小さい', '', '全体に著しく小さい', '', 'わずかな葉しかなく、それも小さい', '',
+            r.scores?.leafSize ?? ''
+          ],
+          ['葉色', '全体に濃い緑色を保っている', '', 'やや薄いが緑色を保っている', '', '黄色、赤褐色の葉が目立つ', '', '大部分が薄い緑色', '', '薄い緑色と黄色、赤褐色のみ', '',
+            r.scores?.leafColor ?? ''
+          ],
+          ['梢や上枝の先端の枯損', 'なし', '', '少しあるがあまり目立たない', '', '随所に見られる', '', 'かなり目立つ', '', '梢端・主枝がない', '',
+            r.scores?.topDieback ?? ''
+          ],
+          ['下枝の先端の枯損', 'なし', '', '少しあるがあまり目立たない', '', '随所にあり、切断が目立つ', '', 'かなり目立つ、大きな切断がある', '', 'ほとんど健全な枝端がない',
+            '', r.scores?.lowerDieback ?? ''
+          ],
+          ['大枝・幹の欠損', 'なし', '', '少しあるが回復している', '', '随所に目立つ', '', 'かなり目立つ、大きく切断されている', '', '大枝・幹の上部を失っている', '',
+            r.scores?.largeBranch ?? ''
+          ],
+          ['剪定痕の損傷被覆材形成', 'さかんに巻き込み成長している', '', '巻き込み成長している', '', '巻き込み成長はしているが、被覆材に活力なし', '', 'ほとんど巻き込み成長は見られない',
+            '', 'まったく巻き込み成長していない', '', r.scores?.pruning ?? ''
+          ],
+          ['樹皮の傷(剥皮・壊死)', '傷などほとんどなし', '', '穿孔・傷が少しあるが、あまり目立たない', '', '古傷が残る', '', '傷からの腐朽が著しい', '', '大きな空洞、剥がれがある',
+            '', r.scores?.barkWound ?? ''
+          ],
+          ['樹皮の新陳代謝', '樹皮は新鮮な色をしていて新陳代謝が活発である', '', '大部分は新鮮だが所々不活発な部分がある', '', '全体に樹皮に活力がない', '', '著しく活力が無く衰弱気味である',
+            '', '樹皮の大部分が壊死', '', r.scores?.barkTurnover ?? ''
+          ],
+          ['胴吹き・ひこばえ', '枝葉量が多く、胴吹きひこばえもない', '', '枝葉量は多いが胴吹きあるいはひこばえもある', '', '枝葉量が少なく胴吹き、ひこばえがある', '',
+            '枝葉量が極めて少なく、胴吹き・ひこばえが多い', '', '枝葉量が極めて少なく、胴吹き、ひこばえも少ない', '', r.scores?.sprout ?? ''
+          ],
+          ['芽の大きさと量', '大きく多数の芽が着いている', '', '0に比べてやや劣る', '', '芽が小さいまたは数が少ない', '', '芽の数が著しく少なく、貧弱', '', '芽がほとんど見られない', '',
+            r.scores?.bud ?? ''
+          ],
+          ['紅黄葉状況', '鮮やかな紅黄葉が見られる', '', '0に比べてやや劣る', '', '鮮やかな紅黄葉は一部にしか見られない', '', '鮮やかな紅黄葉が見られない', '',
+            'ほとんど正常な紅黄葉が見られない', '', r.scores?.autumnColor ?? ''
+          ],
+          ['開花状況', '花つきがよい', '', '0に比べてやや劣る', '', '花が小さくやや疎', '', '小さい花が多く、著しく疎', '', 'ほとんど花がついていない', '',
+            r.scores?.flower ?? ''
+          ],
+          ['結実状況', '実つきがよい', '', '0に比べてやや劣る', '', '実が小さくやや疎', '', '小さい実が多く、しかも疎', '', 'ほとんど実がついていない', '',
+            r.scores?.fruit ?? ''
+          ],
+          ['', '', '', '', '', '', '', '', '', '', '', ''],
+          ['衰退度（平均評点）', '', '', '', '', '', '', '', '', '', '', r.avg?.toFixed(2) ?? ''],
+          ['判定区分', '', '', '', '', '', '', '', '', '', '', (() => { const a = r.avg || 0; return a < 0.8 ? 'Ⅰ（良）' :
+              a < 1.6 ? 'Ⅱ（やや不良）' : a < 2.4 ? 'Ⅲ（不良）' : a < 3.2 ? 'Ⅳ（著しく不良）' : 'Ⅴ（枯死寸前）'; })()],
+          ['', '', '', '', '', '', '', '', '', '', '', ''],
+          ['衰退度判定基準', '', '', '', '', '', '', '', '', '', '', ''],
+          ['Ⅰ', 'Ⅱ', 'Ⅲ', 'Ⅳ', 'Ⅴ', '', '', '', '', '', '', ''],
+          ['0.8未満', '0.8~1.6未満', '1.6~2.4未満', '2.4~3.2未満', '3.2以上', '', '', '', '', '', '', ''],
+          ['良', 'やや不良', '不良', '著しく不良', '枯死寸前', '', '', '', '', '', '', '']
+        ]);
+        setColWidths(ws2, [12, 30, 2, 30, 2, 30, 2, 30, 2, 30, 2, 8]);
+        XLSX.utils.book_append_sheet(wb, ws2, '様式Ⅰ-2_衰退度');
+
+        // 様式Ⅰ-3
+        const ws3 = XLSX.utils.aoa_to_sheet([
+          ['様式Ⅰ-3　倒木、枝折れ等危険度判定票', '', '', '', '', '', ''],
+          ['項目', '', 'A(0)', 'B(1)', 'C(2)', 'D(3)', '判定'],
+          ...healthItems.map(it => [it.name, '', it.desc[0], it.desc[1], it.desc[2], it.desc[3], r.health?.[it.id] ?? '']),
+          ['腐朽菌', '', '', '', '', '', [...(r.fungus || []), r.fungusOther].filter(Boolean).join('、')],
+          ['総合判定', '', '', '', '', '', r.overall],
+          ['所見', '', '', '', '', '', r.comment],
+          ['必要な措置', '', '', '', '', '', (r.measures || []).join('、')]
+        ]);
+        setColWidths(ws3, [20, 5, 30, 30, 30, 30, 15]);
+        XLSX.utils.book_append_sheet(wb, ws3, '様式Ⅰ-3_危険度');
+
+        dlBlob(new Blob([XLSX.write(wb, { bookType: 'xlsx', type: 'array' })], { type: 'application/octet-stream' }),
+          `詳細_${r.treeNo}.xlsx`);
+      };
+
+      window.exportToExcel = () => { const d = collectData(); if (!d.treeNo) { alert('樹木Noを入力'); return; }
+        printRecord(d.id); };
+      window.exportSummaryToExcel = () => { if (!records.filter(r => r?.id).length) { alert('データなし'); return; } const wb =
+          XLSX.utils.book_new(); const rows = [
+            ['調査日', '樹木No', '樹種', '場所', '点検者', '樹高', '幹周', '緯度', '経度', '判定', '所見', '必要な措置']
+          ];
+        records.filter(r => r?.id).forEach(r => rows.push([r.surveyDate, r.treeNo, r.species, r.location, r.inspector, r
+          .treeHeight, r.trunkGirth, r.latitude, r.longitude, r.overall, r.comment, (r.measures || []).join('、')
+        ])); const ws = XLSX.utils.aoa_to_sheet(rows);
+        setColWidths(ws, [12, 10, 15, 20, 12, 8, 8, 12, 12, 8, 30, 30]);
+        XLSX.utils.book_append_sheet(wb, ws, '一覧表');
+        dlBlob(new Blob([XLSX.write(wb, { bookType: 'xlsx', type: 'array' })], { type: 'application/octet-stream' }),
+          '樹木点検一覧.xlsx'); };
+      window.exportAllToExcel = () => { const valid = records.filter(r => r?.id); if (!valid.length) { alert('データなし'); return; }
+        const wb = XLSX.utils.book_new();
+        valid.forEach(r => { const ws = XLSX.utils.aoa_to_sheet([
+            ['樹木No', r.treeNo], ['調査日', r.surveyDate], ['天候', r.weather], ['調査者', r.inspector],
+            ['樹種', r.species], ['科名', r.family], ['学名', r.scientificName], ['愛称', r.nickname],
+            ['所在地', r.location], ['樹高(m)', r.treeHeight], ['幹周(cm)', r.trunkGirth],
+            ['緯度', r.latitude], ['経度', r.longitude], ['総合判定', r.overall],
+            ['所見', r.comment], ['腐朽菌', [...(r.fungus || []), r.fungusOther].filter(Boolean).join('、')],
+            ['必要な措置', (r.measures || []).join('、')]
+          ]);
+          setColWidths(ws, [20, 40]);
+          XLSX.utils.book_append_sheet(wb, ws, sanitizeSheetName(r.treeNo || r.id)); }); const summary = [
+          ['調査日', '樹木No', '樹種', '場所', '点検者', '樹高', '幹周', '緯度', '経度', '判定', '所見', '必要な措置']
+        ];
+        valid.forEach(r => summary.push([r.surveyDate, r.treeNo, r.species, r.location, r.inspector, r.treeHeight, r
+          .trunkGirth, r.latitude, r.longitude, r.overall, r.comment, (r.measures || []).join('、')
+        ])); const wsSum = XLSX.utils.aoa_to_sheet(summary);
+        setColWidths(wsSum, [12, 10, 15, 20, 12, 8, 8, 12, 12, 8, 30, 30]);
+        XLSX.utils.book_append_sheet(wb, wsSum, '一覧表');
+        dlBlob(new Blob([XLSX.write(wb, { bookType: 'xlsx', type: 'array' })], { type: 'application/octet-stream' }),
+          '全件樹木診断.xlsx'); };
+      window.exportAllToJSON = async () => {
+        const valid = records.filter(r => r?.id);
+        if (!valid.length) { alert('データなし'); return; }
+        // IDBから写真を取り出して含める（完全バックアップ）
+        const full = await Promise.all(valid.map(async r => {
+          const idbPhotos = r._hasIDBPhotos ? await loadPhotosFromIDB(r.id) : (r.photos || []);
+          return { ...r, photos: idbPhotos, _hasIDBPhotos: undefined };
+        }));
+        dlBlob(new Blob([JSON.stringify(full, null, 2)], { type: 'application/json' }),
+          `backup_${new Date().toISOString().slice(0,10)}.json`);
+        alert('✅ バックアップ完了！写真も含めて保存されました。大切に保管してください。');
+      };
+      window.exportAllToCSV = function() {
+        const valid = records.filter(r => r?.id);
+        if (!valid.length) { alert('出力する記録がありません'); return; }
+        const header = ['通し番号', '樹木番号', '樹種名', '点検者', '所在地', '調査日', '総合判定', '必要な処置', '緯度X', '経度Y'];
+        const rows = valid.map((r, i) => [
+          i + 1,
+          r.treeNo || '',
+          r.species || '',
+          r.inspector || '',
+          r.location || '',
+          r.surveyDate || '',
+          r.overall || '',
+          (r.measures || []).join('、'),
+          r.latitude || '',
+          r.longitude || ''
+        ]);
+        const csvContent = [header, ...rows].map(row => row.map(cell =>
+          `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+        const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `樹木点検一覧_${new Date().toISOString().slice(0,10)}.csv`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        alert('CSVを出力しました');
+      };
+      document.getElementById('jsonImportInput').addEventListener('change', function(e) { const file = e.target.files[
+          0]; if (!file) return; const reader = new FileReader();
+        reader.onload = async ev => { try { let text = ev.target.result; if (text.charCodeAt(0) === 0xFEFF) text =
+              text.slice(1); const imported = JSON.parse(text); if (Array.isArray(imported)) { const vl = imported
+              .filter(r => r?.id); if (vl.length && confirm(
+                // ★修正：上書き→置き換えに文言変更
+                `${vl.length}件のデータを読み込みました。\n\n⚠️ 現在の記録(${records.length}件)は全て削除され、読み込んだデータに置き換えられます。\n※写真データも復元されます。\n\n続行しますか？`
+                )) {
+              // 各レコードの写真をIDBに保存し、localStorageには写真なしで保存
+              records = await Promise.all(vl.map(async r => {
+                if (r.photos && r.photos.length > 0) {
+                  await savePhotosToIDB(r.id, r.photos);
+                  return { ...r, photos: [], _hasIDBPhotos: true };
+                }
+                return r;
+              }));
+              localStorage.setItem('treeRecords', JSON.stringify(records));
+              updateAllMapMarkers();
+              renderRecordsList();
+              alert('✅ 復元完了（写真も含めて復元されました）');
+            }
+          } else alert('無効な形式'); } catch { alert('JSON解析エラー'); }
+          e.target.value = ''; };
+        reader.readAsText(file, 'UTF-8'); });
+      window.printInspectionPage = () => window.print();
+      window.printAllMap = function() { showTab('allmap');
+        setTimeout(() => { if (allMap) allMap.invalidateSize();
+          document.body.classList.add('print-map-only');
+          window.print();
+          setTimeout(() => document.body.classList.remove('print-map-only'), 200); }, 300); };
+      window.saveAllMapAsImage = () => { const mapElement = document.getElementById('allMap');
+        html2canvas(mapElement, { scale: 2, backgroundColor: null, useCORS: true, allowTaint: false }).then(canvas => {
+          const link = document.createElement('a');
+          link.download = '全体マップ.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+        }).catch(err => alert('画像保存に失敗しました')); };
+
+      function showTab(tab) { document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById(`tab-${tab}`).classList.add('active');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector(`[data-tab="${tab}"]`).classList.add('active'); if (tab === 'records')
+        renderRecordsList(); if (tab === 'allmap') { setTimeout(() => { if (!allMap) initAllMap(); else { allMap
+              .invalidateSize();
+            updateAllMapMarkers(); } }, 100); } }
+      window.showTab = showTab;
+
+      function init() { buildUI();
+        initMap();
+        openDB().catch(e => console.warn('IDB init failed', e)); const saved = localStorage.getItem('treeRecords'); if (
+        saved) { try { records = JSON.parse(saved); } catch {} }
+        records = records.filter(r => r?.id);
+        document.getElementById('surveyDate').value = new Date().toISOString().split('T')[0];
+        document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+        document.getElementById('searchInput').addEventListener('input', renderRecordsList);
+        document.getElementById('sortSelect').addEventListener('change', renderRecordsList);
+        renderPhotos();
+        updateOverall();
+        updateEditModeUI();
+        updatePhotoCounter(); }
+      init();
+    })();
+  </script>
+  <!-- ★修正：Service Worker のパスを相対パスに変更 -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js', { scope: './' }).then(reg => {
+        if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+        reg.addEventListener('updatefound', () => {
+          const nw = reg.installing;
+          nw.addEventListener('statechange', () => {
+            if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+              if (confirm('最新バージョンがあります。更新しますか？')) {
+                nw.postMessage({ type: 'SKIP_WAITING' });
+                window.location.reload();
+              }
+            }
+          });
+        });
+      }).catch(() => {});
+      navigator.serviceWorker.addEventListener('controllerchange', () => window.location.reload());
     }
-    window.removePhoto = (i) => { photos.splice(i,1); renderPhotos(); };
-    window.savePhoto = (i) => { const a=document.createElement('a'); a.href=photos[i]; a.download=`photo_${Date.now()}.png`; a.click(); };
-
-    let peIndex = -1, peTool = 'pen', peColor = '#ff3333', peSize = 5;
-    let peDrawing = false, peStartX = 0, peStartY = 0;
-    let peUndoStack = [], peOrigData = null, peTempSnapshot = null;
-    const peCanvas = document.getElementById('editCanvas');
-    const peCtx = peCanvas.getContext('2d');
-
-    window.setPETool = function(tool) { peTool = tool; document.querySelectorAll('.pe-toolbar .pe-btn').forEach(b => b.classList.remove('active')); const btn = document.getElementById('pt-' + tool); if (btn) btn.classList.add('active'); document.getElementById('peTextRow').classList.toggle('vis', tool === 'text'); peCanvas.style.cursor = tool === 'text' ? 'text' : tool === 'eraser' ? 'cell' : 'crosshair'; };
-    window.setPEColor = function(el) { peColor = el.dataset.color; document.querySelectorAll('.pe-swatch').forEach(s => s.classList.remove('active')); el.classList.add('active'); };
-    window.setPEColorVal = function(v) { peColor = v; document.querySelectorAll('.pe-swatch').forEach(s => s.classList.remove('active')); };
-    window.updatePESize = function(v) { peSize = +v; document.getElementById('peSizeLbl').textContent = v + 'px'; };
-    function peSaveUndo() { peUndoStack.push(peCtx.getImageData(0,0,peCanvas.width,peCanvas.height)); if(peUndoStack.length > 20) peUndoStack.shift(); }
-    window.undoPE = function() { if(peUndoStack.length) peCtx.putImageData(peUndoStack.pop(),0,0); };
-    window.clearPECanvas = function() { if(confirm('描画を全消去しますか？')) { peSaveUndo(); if(peOrigData) peCtx.putImageData(peOrigData,0,0); } };
-    function getPEPos(e) { const rect = peCanvas.getBoundingClientRect(); const sx = peCanvas.width / rect.width, sy = peCanvas.height / rect.height; const cx = e.touches ? e.touches[0].clientX : e.clientX; const cy = e.touches ? e.touches[0].clientY : e.clientY; return { x: (cx - rect.left) * sx, y: (cy - rect.top) * sy }; }
-    peCanvas.addEventListener('mousedown', peStartHandler); peCanvas.addEventListener('touchstart', peStartHandler, { passive: false }); peCanvas.addEventListener('mousemove', peMoveHandler); peCanvas.addEventListener('touchmove', peMoveHandler, { passive: false }); peCanvas.addEventListener('mouseup', peEndHandler); peCanvas.addEventListener('touchend', peEndHandler);
-    function peStartHandler(e) { e.preventDefault(); if (peTool === 'text') { placeText(e); return; } peDrawing = true; const p = getPEPos(e); peStartX = p.x; peStartY = p.y; peSaveUndo(); if (peTool === 'pen' || peTool === 'eraser') { peCtx.beginPath(); peCtx.moveTo(peStartX, peStartY); } else { peTempSnapshot = peCtx.getImageData(0, 0, peCanvas.width, peCanvas.height); } }
-    function peMoveHandler(e) { e.preventDefault(); if (!peDrawing) return; const p = getPEPos(e); if (peTool === 'pen') { peCtx.lineTo(p.x, p.y); peCtx.strokeStyle = peColor; peCtx.lineWidth = peSize; peCtx.lineCap = 'round'; peCtx.lineJoin = 'round'; peCtx.stroke(); } else if (peTool === 'eraser') { peCtx.globalCompositeOperation = 'destination-out'; peCtx.lineTo(p.x, p.y); peCtx.lineWidth = peSize * 3; peCtx.stroke(); peCtx.globalCompositeOperation = 'source-over'; } else { if (peTempSnapshot) peCtx.putImageData(peTempSnapshot, 0, 0); drawShape(peTool, peStartX, peStartY, p.x, p.y); } }
-    function peEndHandler() { peDrawing = false; peTempSnapshot = null; peCtx.beginPath(); }
-    function drawShape(tool, x1, y1, x2, y2) { peCtx.strokeStyle = peColor; peCtx.fillStyle = peColor; peCtx.lineWidth = peSize; peCtx.lineCap = 'round'; if (tool === 'line') { peCtx.beginPath(); peCtx.moveTo(x1,y1); peCtx.lineTo(x2,y2); peCtx.stroke(); } else if (tool === 'rect') { peCtx.beginPath(); peCtx.strokeRect(x1, y1, x2-x1, y2-y1); } else if (tool === 'circle') { const rx=Math.abs(x2-x1)/2, ry=Math.abs(y2-y1)/2; const cx=(x1+x2)/2, cy=(y1+y2)/2; peCtx.beginPath(); peCtx.ellipse(cx,cy,rx,ry,0,0,2*Math.PI); peCtx.stroke(); } else if (tool === 'arrow') { const headLen = Math.max(peSize*4, 20); const angle = Math.atan2(y2-y1, x2-x1); peCtx.beginPath(); peCtx.moveTo(x1,y1); peCtx.lineTo(x2,y2); peCtx.stroke(); peCtx.beginPath(); peCtx.moveTo(x2, y2); peCtx.lineTo(x2 - headLen * Math.cos(angle - Math.PI/6), y2 - headLen * Math.sin(angle - Math.PI/6)); peCtx.lineTo(x2 - headLen * Math.cos(angle + Math.PI/6), y2 - headLen * Math.sin(angle + Math.PI/6)); peCtx.closePath(); peCtx.fill(); } }
-    function placeText(e) { const text = document.getElementById('peTextInput').value.trim(); if (!text) { alert('テキストを入力'); return; } const fs = parseInt(document.getElementById('peFontSize').value) || 28; peSaveUndo(); const p = getPEPos(e); peCtx.font = `bold ${fs}px 'Noto Sans JP', sans-serif`; peCtx.fillStyle = peColor; peCtx.shadowColor = 'rgba(0,0,0,0.6)'; peCtx.shadowBlur = 3; peCtx.fillText(text, p.x, p.y); peCtx.shadowBlur = 0; }
-    window.openPhotoEditor = function(index) { peIndex = index; peUndoStack = []; const img = new Image(); img.onload = function() { const maxW = Math.min(img.width, window.innerWidth - 40); const maxH = Math.min(img.height, window.innerHeight * 0.45); const scale = Math.min(maxW / img.width, maxH / img.height); peCanvas.width = img.width * scale; peCanvas.height = img.height * scale; peCtx.clearRect(0, 0, peCanvas.width, peCanvas.height); peCtx.drawImage(img, 0, 0, peCanvas.width, peCanvas.height); peOrigData = peCtx.getImageData(0, 0, peCanvas.width, peCanvas.height); setPETool('pen'); updatePESize(5); document.getElementById('peSizeSlider').value = 5; document.getElementById('photoEditModal').classList.add('open'); }; img.src = photos[index]; };
-    window.savePECanvas = function() { if (peIndex >= 0) { photos[peIndex] = peCanvas.toDataURL('image/jpeg', 0.9); renderPhotos(); } closePEModal(); };
-    window.closePEModal = function() { document.getElementById('photoEditModal').classList.remove('open'); peIndex = -1; };
-
-    window.takeLocationPhoto = () => { const inp=document.getElementById('locPhotoInput'); inp.setAttribute('capture','environment'); inp.click(); };
-    window.selectLocationPhoto = () => { const inp=document.getElementById('locPhotoInput'); inp.removeAttribute('capture'); inp.click(); };
-    document.getElementById('locPhotoInput').addEventListener('change', e => { const file = e.target.files[0]; if (file) { const r=new FileReader(); r.onload=ev=>{ locationPhoto=ev.target.result; const preview=document.getElementById('locPhotoPreview'); preview.src=locationPhoto; preview.style.display='block'; }; r.readAsDataURL(file); } e.target.value = ''; });
-    window.clearLocationPhoto = () => { locationPhoto=null; document.getElementById('locPhotoPreview').style.display='none'; };
-
-    const memoCanvas = document.getElementById('memoCanvas'); const memoCtx = memoCanvas.getContext('2d'); let memoDrawing = false;
-    memoCanvas.addEventListener('pointerdown', e => { memoDrawing=true; memoCtx.beginPath(); memoCtx.moveTo(e.offsetX, e.offsetY); });
-    memoCanvas.addEventListener('pointermove', e => { if(!memoDrawing) return; memoCtx.lineTo(e.offsetX, e.offsetY); memoCtx.strokeStyle='#333'; memoCtx.lineWidth=3; memoCtx.stroke(); });
-    memoCanvas.addEventListener('pointerup', () => { memoDrawing=false; });
-    memoCanvas.addEventListener('pointerleave', () => { memoDrawing=false; });
-    window.clearMemo = () => { memoCtx.clearRect(0,0,memoCanvas.width,memoCanvas.height); };
-    window.saveMemo = () => { const dataUrl=memoCanvas.toDataURL('image/png'); const a=document.createElement('a'); a.href=dataUrl; a.download=`memo_${Date.now()}.png`; a.click(); };
-
-    function initMap() { const defaultLat=35.681236, defaultLng=139.767125; map = L.map('map').setView([defaultLat, defaultLng], 17); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'©OSM',crossOrigin:true}).addTo(map); const treeNo = document.getElementById('treeNo').value || '●'; marker = L.marker([defaultLat, defaultLng], { draggable:true, icon:createLabelIcon(treeNo) }).addTo(map); marker.on('dragend', e => { const pos = marker.getLatLng(); document.getElementById('latitude').value = pos.lat.toFixed(6); document.getElementById('longitude').value = pos.lng.toFixed(6); }); map.on('click', e => { marker.setLatLng(e.latlng); document.getElementById('latitude').value = e.latlng.lat.toFixed(6); document.getElementById('longitude').value = e.latlng.lng.toFixed(6); }); document.getElementById('treeNo').addEventListener('input', function(){ marker.setIcon(createLabelIcon(this.value||'●')); }); document.getElementById('latitude').value = defaultLat.toFixed(6); document.getElementById('longitude').value = defaultLng.toFixed(6); }
-    function initAllMap() { if(allMap) return; allMap = L.map('allMap').setView([35.681236, 139.767125], 12); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'©OSM',crossOrigin:true}).addTo(allMap); markersLayer = L.layerGroup().addTo(allMap); updateAllMapMarkers(); }
-    window.jumpToEdit = function(id) { if(typeof editRecord === 'function') editRecord(id); showTab('inspect'); };
-    function updateAllMapMarkers() { if(!markersLayer) return; markersLayer.clearLayers(); const valid = records.filter(r => r?.id && r.latitude && r.longitude); valid.forEach(r => { const lat=parseFloat(r.latitude), lng=parseFloat(r.longitude); if(isNaN(lat)||isNaN(lng)) return; const popupContent = `<b>${r.treeNo} : ${r.species}</b><br>${r.location||''}<br>調査日: ${r.surveyDate}<br>判定: ${r.overall}<br><button onclick="window.jumpToEdit('${r.id}')" style="margin-top:6px;padding:4px 12px;background:#4a7c2f;color:white;border:none;border-radius:20px;font-size:12px;cursor:pointer;">✏️ 編集画面へ</button>`; L.marker([lat,lng],{icon:createLabelIcon(r.treeNo||'●')}).bindPopup(popupContent).addTo(markersLayer); }); if(valid.length) { const bounds = L.featureGroup(valid.map(r=>L.marker([parseFloat(r.latitude),parseFloat(r.longitude)]))).getBounds(); if(bounds.isValid()) allMap.fitBounds(bounds.pad(0.1)); } }
-    window.getGPS = () => { if(!navigator.geolocation){alert('非対応');return;} const btn=document.getElementById('gpsButton'); btn.textContent='取得中...'; btn.disabled=true; navigator.geolocation.getCurrentPosition(pos=>{ const {latitude:lat,longitude:lng}=pos.coords; document.getElementById('latitude').value=lat.toFixed(6); document.getElementById('longitude').value=lng.toFixed(6); if(map&&marker){map.setView([lat,lng],17);marker.setLatLng([lat,lng]);} btn.textContent='📍 現在位置を取得'; btn.disabled=false; },()=>{alert('取得失敗');btn.textContent='📍 現在位置を取得';btn.disabled=false;}); };
-    function collectData() { const memoDataUrl = memoCanvas.toDataURL('image/png'); return { id: editingId || Date.now()+'-'+Math.random().toString(36), treeNo: document.getElementById('treeNo').value, surveyDate: document.getElementById('surveyDate').value, weather: document.getElementById('weather').value, inspector: document.getElementById('inspector').value, species: document.getElementById('species').value, family: document.getElementById('family').value, scientificName: document.getElementById('scientificName').value, nickname: document.getElementById('nickname').value, location: document.getElementById('location').value, treeHeight: document.getElementById('treeHeight').value, trunkGirth: document.getElementById('trunkGirth').value, latitude: document.getElementById('latitude').value, longitude: document.getElementById('longitude').value, locationPhoto: locationPhoto, scores: {...scores}, health: {...healthGrades}, fungus: [...document.querySelectorAll('.fungus-check:checked')].map(c=>c.value), fungusOther: document.getElementById('fungusOther').value, comment: document.getElementById('overallComment').value, measures: [...document.querySelectorAll('.measure-check:checked')].map(c=>c.value), photos: [...photos], avg: calcDeclineAvg(), worstHealth: worstHealth(), overall: document.getElementById('overallGradeDisplay').textContent, memo: memoDataUrl }; }
-    window.saveRecord = () => { if(!document.getElementById('treeNo').value || !document.getElementById('surveyDate').value || !document.getElementById('inspector').value || !document.getElementById('species').value) { alert('必須項目を入力'); return; } const data = collectData(); if(editingId) { const idx=records.findIndex(r=>r.id===editingId); if(idx!==-1) records[idx]=data; editingId=null; } else records.unshift(data); localStorage.setItem('treeRecords', JSON.stringify(records)); alert('✅ 保存しました'); updateAllMapMarkers(); resetForm(); updateEditModeUI(); renderRecordsList(); showTab('records'); };
-    window.resetForm = function() { document.getElementById('treeNo').value=''; document.getElementById('surveyDate').value=new Date().toISOString().split('T')[0]; document.getElementById('weather').value='晴れ'; document.getElementById('inspector').value=''; document.getElementById('species').value=''; document.getElementById('family').value=''; document.getElementById('scientificName').value=''; document.getElementById('nickname').value=''; document.getElementById('location').value=''; document.getElementById('treeHeight').value=''; document.getElementById('trunkGirth').value=''; document.getElementById('latitude').value='35.681236'; document.getElementById('longitude').value='139.767125'; if(map&&marker){map.setView([35.681236,139.767125],17);marker.setLatLng([35.681236,139.767125]);marker.setIcon(createLabelIcon('●'));} clearLocationPhoto(); document.getElementById('overallComment').value=''; document.getElementById('fungusOther').value=''; Object.keys(scores).forEach(k=>delete scores[k]); Object.keys(healthGrades).forEach(k=>delete healthGrades[k]); document.querySelectorAll('.rbtn').forEach(b=>b.classList.remove('sel')); photos=[]; renderPhotos(); document.querySelectorAll('.fungus-check').forEach(cb=>cb.checked=false); document.querySelectorAll('.measure-check').forEach(cb=>cb.checked=false); clearMemo(); updateOverall(); editingId=null; updateEditModeUI(); };
-    window.copyFormData = async () => { const d=collectData(); delete d.id; delete d.memo; try{await navigator.clipboard.writeText(JSON.stringify(d));alert('コピーしました');}catch(e){prompt('手動コピー',JSON.stringify(d));} };
-    window.pasteFormData = async () => { try{ const t=await navigator.clipboard.readText(); const d=JSON.parse(t); const map={'treeNo':'treeNo','surveyDate':'surveyDate','weather':'weather','inspector':'inspector','species':'species','family':'family','scientificName':'scientificName','nickname':'nickname','location':'location','treeHeight':'treeHeight','trunkGirth':'trunkGirth','latitude':'latitude','longitude':'longitude','comment':'overallComment','fungusOther':'fungusOther'}; Object.entries(map).forEach(([dk,fk])=>{if(d[dk])document.getElementById(fk).value=d[dk];}); alert('貼り付けました'); }catch{alert('貼り付け失敗');} };
-    function renderRecordsList() { const valid=records.filter(r=>r?.id); const q=document.getElementById('searchInput').value.toLowerCase(); let f=valid.filter(r=>(r.species||'').toLowerCase().includes(q)||(r.location||'').toLowerCase().includes(q)||(r.inspector||'').toLowerCase().includes(q)); const s=document.getElementById('sortSelect').value; if(s==='date-desc')f.sort((a,b)=>a.surveyDate<b.surveyDate?1:-1); else if(s==='date-asc')f.sort((a,b)=>a.surveyDate>b.surveyDate?1:-1); else{const o={A:1,B:2,C:3,D:4};f.sort((a,b)=>(o[a.overall]||5)-(o[b.overall]||5));} document.getElementById('recordsList').innerHTML = f.map(r=>`<div class="record-item"><div style="display:flex;justify-content:space-between;"><strong>${r.species} (${r.treeNo})</strong><span class="grade-badge grade-${r.overall}">${r.overall}</span></div><div>📍 ${r.location} 📅 ${r.surveyDate}</div><div>👤 ${r.inspector}</div><div class="record-actions"><button class="btn-small" onclick="editRecord('${r.id}')">✏️ 編集</button><button class="btn-small" onclick="deleteRecord('${r.id}')">🗑️ 削除</button><button class="btn-small" onclick="printRecord('${r.id}')">📊 詳細Excel</button></div></div>`).join('')||'<p>記録がありません</p>'; }
-    window.editRecord = (id) => { const r=records.find(r=>r.id===id); if(!r)return; editingId=r.id; document.getElementById('treeNo').value=r.treeNo||''; document.getElementById('surveyDate').value=r.surveyDate||''; document.getElementById('weather').value=r.weather||'晴れ'; document.getElementById('inspector').value=r.inspector||''; document.getElementById('species').value=r.species||''; document.getElementById('family').value=r.family||''; document.getElementById('scientificName').value=r.scientificName||''; document.getElementById('nickname').value=r.nickname||''; document.getElementById('location').value=r.location||''; document.getElementById('treeHeight').value=r.treeHeight||''; document.getElementById('trunkGirth').value=r.trunkGirth||''; document.getElementById('latitude').value=r.latitude||'35.681236'; document.getElementById('longitude').value=r.longitude||'139.767125'; if(map&&marker){const la=parseFloat(r.latitude)||35.681236,ln=parseFloat(r.longitude)||139.767125;map.setView([la,ln],17);marker.setLatLng([la,ln]);marker.setIcon(createLabelIcon(r.treeNo||'●'));} locationPhoto=r.locationPhoto||null; const pv=document.getElementById('locPhotoPreview'); if(locationPhoto){pv.src=locationPhoto;pv.style.display='block';}else pv.style.display='none'; document.getElementById('overallComment').value=r.comment||''; document.getElementById('fungusOther').value=r.fungusOther||''; Object.assign(scores,r.scores||{}); Object.assign(healthGrades,r.health||{}); document.querySelectorAll('.rbtn').forEach(b=>b.classList.remove('sel')); declineItems.forEach(it=>{if(scores[it.id]!==undefined)document.querySelector(`[data-type="decline"][data-id="${it.id}"][data-val="${scores[it.id]}"]`)?.classList.add('sel');}); healthItems.forEach(it=>{if(healthGrades[it.id])document.querySelector(`[data-type="health"][data-id="${it.id}"][data-val="${healthGrades[it.id]}"]`)?.classList.add('sel');}); photos=r.photos||[]; renderPhotos(); document.querySelectorAll('.fungus-check').forEach(cb=>cb.checked=(r.fungus||[]).includes(cb.value)); document.querySelectorAll('.measure-check').forEach(cb=>cb.checked=(r.measures||[]).includes(cb.value)); updateOverall(); updateEditModeUI(); showTab('inspect'); };
-    window.deleteRecord = (id) => { if(confirm('削除しますか？')){records=records.filter(r=>r.id!==id);localStorage.setItem('treeRecords',JSON.stringify(records));updateAllMapMarkers();renderRecordsList();} };
-    window.removeInvalidRecords = () => { records=records.filter(r=>r?.id);localStorage.setItem('treeRecords',JSON.stringify(records));updateAllMapMarkers();renderRecordsList();alert('無効記録を削除しました'); };
-    function setColWidths(ws, widths) { ws['!cols'] = widths.map(w => ({ wch: w })); }
-    function sanitizeSheetName(name) { return name.replace(/[:\\\/\?\*\[\]]/g, '_').slice(0,31); }
-    function dlBlob(blob, filename) { const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000); }
-    
-    // ★ Excel出力修正：様式Ⅰ-2のPDFレイアウトに近づける
-    window.printRecord = function(id) {
-      const r=records.find(r=>r.id===id); if(!r) return;
-      const wb=XLSX.utils.book_new();
-      
-      // 様式Ⅰ-1
-      const ws1 = XLSX.utils.aoa_to_sheet([
-        ['様式Ⅰ-1　調査木位置図', '', '', '', '', '', '', ''],
-        ['樹木No.', r.treeNo, '調査日', r.surveyDate, '天候', r.weather, '調査者', r.inspector],
-        ['樹種名', r.species, '', '', '科名', r.family, '', ''],
-        ['学名', r.scientificName, '', '', '樹木の名称(愛称)', r.nickname, '', ''],
-        ['所在地', r.location, '', '', '', '', '', ''],
-        ['樹高(m)', r.treeHeight, '幹周(cm)', r.trunkGirth, '', '', '', ''],
-        ['緯度', r.latitude, '経度', r.longitude, '', '', '', ''],
-        ['写真枚数', (r.photos||[]).length, '', '', '', '', '', '']
-      ]);
-      setColWidths(ws1, [20,20,15,20,15,20,15,20]);
-      XLSX.utils.book_append_sheet(wb, ws1, '様式Ⅰ-1_位置図');
-      
-      // 様式Ⅰ-2：PDFのレイアウトに合わせた表形式
-      const ws2 = XLSX.utils.aoa_to_sheet([
-        ['様式Ⅰ-2　地上部の衰退度判定票', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
-        ['評価項目', '0', '', '1', '', '2', '', '3', '', '4', '', '評点'],
-        ['樹勢', '旺盛な生育状態を示し被害が全くみられない', '', '幾分影響を受けているがあまり目立たない', '', '異常が明らかに認められる', '', '生育状態が極めて劣悪である', '', 'ほとんど枯死', '', r.scores?.vigor??''],
-        ['樹形', '自然な樹形を保っている', '', '若干の乱れはあるが、自然樹形に近い', '', '自然樹形から大きく変化している', '', '樹形の乱れが著しい', '', 'ほとんど完全に崩壊', '', r.scores?.shape??''],
-        ['枝葉の密度', '十分な量の枝葉を着けている', '', '0に比べてやや劣る', '', '枯枝がやや目立ち、枝葉量がやや少ない', '', '枯枝がかなり目立ち、枝葉量が著しく少ない', '', '枝の数が少なく葉もほとんどない', '', r.scores?.density??''],
-        ['枝の伸長量(節間の長さ)', '十分に伸長している', '', 'やや小さい', '', '枝は短くなり細い', '', '枝は極度に短小、しょうが状の節間がある', '', '下からの萌芽枝のみわずかに成長', '', r.scores?.shoot??''],
-        ['葉の大きさ', '葉がすべて十分な大きさ', '', '所々に小さい葉がある', '', '全体にやや小さい', '', '全体に著しく小さい', '', 'わずかな葉しかなく、それも小さい', '', r.scores?.leafSize??''],
-        ['葉色', '全体に濃い緑色を保っている', '', 'やや薄いが緑色を保っている', '', '黄色、赤褐色の葉が目立つ', '', '大部分が薄い緑色', '', '薄い緑色と黄色、赤褐色のみ', '', r.scores?.leafColor??''],
-        ['梢や上枝の先端の枯損', 'なし', '', '少しあるがあまり目立たない', '', '随所に見られる', '', 'かなり目立つ', '', '梢端・主枝がない', '', r.scores?.topDieback??''],
-        ['下枝の先端の枯損', 'なし', '', '少しあるがあまり目立たない', '', '随所にあり、切断が目立つ', '', 'かなり目立つ、大きな切断がある', '', 'ほとんど健全な枝端がない', '', r.scores?.lowerDieback??''],
-        ['大枝・幹の欠損', 'なし', '', '少しあるが回復している', '', '随所に目立つ', '', 'かなり目立つ、大きく切断されている', '', '大枝・幹の上部を失っている', '', r.scores?.largeBranch??''],
-        ['剪定痕の損傷被覆材形成', 'さかんに巻き込み成長している', '', '巻き込み成長している', '', '巻き込み成長はしているが、被覆材に活力なし', '', 'ほとんど巻き込み成長は見られない', '', 'まったく巻き込み成長していない', '', r.scores?.pruning??''],
-        ['樹皮の傷(剥皮・壊死)', '傷などほとんどなし', '', '穿孔・傷が少しあるが、あまり目立たない', '', '古傷が残る', '', '傷からの腐朽が著しい', '', '大きな空洞、剥がれがある', '', r.scores?.barkWound??''],
-        ['樹皮の新陳代謝', '樹皮は新鮮な色をしていて新陳代謝が活発である', '', '大部分は新鮮だが所々不活発な部分がある', '', '全体に樹皮に活力がない', '', '著しく活力が無く衰弱気味である', '', '樹皮の大部分が壊死', '', r.scores?.barkTurnover??''],
-        ['胴吹き・ひこばえ', '枝葉量が多く、胴吹きひこばえもない', '', '枝葉量は多いが胴吹きあるいはひこばえもある', '', '枝葉量が少なく胴吹き、ひこばえがある', '', '枝葉量が極めて少なく、胴吹き・ひこばえが多い', '', '枝葉量が極めて少なく、胴吹き、ひこばえも少ない', '', r.scores?.sprout??''],
-        ['芽の大きさと量', '大きく多数の芽が着いている', '', '0に比べてやや劣る', '', '芽が小さいまたは数が少ない', '', '芽の数が著しく少なく、貧弱', '', '芽がほとんど見られない', '', r.scores?.bud??''],
-        ['紅黄葉状況', '鮮やかな紅黄葉が見られる', '', '0に比べてやや劣る', '', '鮮やかな紅黄葉は一部にしか見られない', '', '鮮やかな紅黄葉が見られない', '', 'ほとんど正常な紅黄葉が見られない', '', r.scores?.autumnColor??''],
-        ['開花状況', '花つきがよい', '', '0に比べてやや劣る', '', '花が小さくやや疎', '', '小さい花が多く、著しく疎', '', 'ほとんど花がついていない', '', r.scores?.flower??''],
-        ['結実状況', '実つきがよい', '', '0に比べてやや劣る', '', '実が小さくやや疎', '', '小さい実が多く、しかも疎', '', 'ほとんど実がついていない', '', r.scores?.fruit??''],
-        ['', '', '', '', '', '', '', '', '', '', '', ''],
-        ['衰退度（平均評点）', '', '', '', '', '', '', '', '', '', '', r.avg?.toFixed(2)??''],
-        ['判定区分', '', '', '', '', '', '', '', '', '', '', (()=>{ const a=r.avg||0; return a<0.8?'Ⅰ（良）':a<1.6?'Ⅱ（やや不良）':a<2.4?'Ⅲ（不良）':a<3.2?'Ⅳ（著しく不良）':'Ⅴ（枯死寸前）'; })()],
-        ['', '', '', '', '', '', '', '', '', '', '', ''],
-        ['衰退度判定基準', '', '', '', '', '', '', '', '', '', '', ''],
-        ['Ⅰ', 'Ⅱ', 'Ⅲ', 'Ⅳ', 'Ⅴ', '', '', '', '', '', '', ''],
-        ['0.8未満', '0.8~1.6未満', '1.6~2.4未満', '2.4~3.2未満', '3.2以上', '', '', '', '', '', '', ''],
-        ['良', 'やや不良', '不良', '著しく不良', '枯死寸前', '', '', '', '', '', '', '']
-      ]);
-      setColWidths(ws2, [12, 30, 2, 30, 2, 30, 2, 30, 2, 30, 2, 8]);
-      XLSX.utils.book_append_sheet(wb, ws2, '様式Ⅰ-2_衰退度');
-      
-      // 様式Ⅰ-3
-      const ws3 = XLSX.utils.aoa_to_sheet([
-        ['様式Ⅰ-3　倒木、枝折れ等危険度判定票', '', '', '', '', '', ''],
-        ['項目', '', 'A(0)', 'B(1)', 'C(2)', 'D(3)', '判定'],
-        ...healthItems.map(it => [it.name, '', it.desc[0], it.desc[1], it.desc[2], it.desc[3], r.health?.[it.id]??'']),
-        ['腐朽菌', '', '', '', '', '', [...(r.fungus||[]), r.fungusOther].filter(Boolean).join('、')],
-        ['総合判定', '', '', '', '', '', r.overall],
-        ['所見', '', '', '', '', '', r.comment],
-        ['必要な措置', '', '', '', '', '', (r.measures||[]).join('、')]
-      ]);
-      setColWidths(ws3, [20,5,30,30,30,30,15]);
-      XLSX.utils.book_append_sheet(wb, ws3, '様式Ⅰ-3_危険度');
-      
-      dlBlob(new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:'application/octet-stream'}), `詳細_${r.treeNo}.xlsx`);
-    };
-    
-    window.exportToExcel = () => { const d=collectData(); if(!d.treeNo){alert('樹木Noを入力');return;} printRecord(d.id); };
-    window.exportSummaryToExcel = () => { if(!records.filter(r=>r?.id).length){alert('データなし');return;} const wb=XLSX.utils.book_new(); const rows=[['調査日','樹木No','樹種','場所','点検者','樹高','幹周','緯度','経度','判定','所見','必要な措置']]; records.filter(r=>r?.id).forEach(r=>rows.push([r.surveyDate,r.treeNo,r.species,r.location,r.inspector,r.treeHeight,r.trunkGirth,r.latitude,r.longitude,r.overall,r.comment,(r.measures||[]).join('、')])); const ws=XLSX.utils.aoa_to_sheet(rows); setColWidths(ws,[12,10,15,20,12,8,8,12,12,8,30,30]); XLSX.utils.book_append_sheet(wb,ws,'一覧表'); dlBlob(new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:'application/octet-stream'}),'樹木点検一覧.xlsx'); };
-    window.exportAllToExcel = () => { const valid=records.filter(r=>r?.id); if(!valid.length){alert('データなし');return;} const wb=XLSX.utils.book_new(); valid.forEach(r=>{const ws=XLSX.utils.aoa_to_sheet([['樹木No',r.treeNo],['調査日',r.surveyDate],['天候',r.weather],['調査者',r.inspector],['樹種',r.species],['科名',r.family],['学名',r.scientificName],['愛称',r.nickname],['所在地',r.location],['樹高(m)',r.treeHeight],['幹周(cm)',r.trunkGirth],['緯度',r.latitude],['経度',r.longitude],['総合判定',r.overall],['所見',r.comment],['腐朽菌',[...(r.fungus||[]),r.fungusOther].filter(Boolean).join('、')],['必要な措置',(r.measures||[]).join('、')]]);setColWidths(ws,[20,40]);XLSX.utils.book_append_sheet(wb,ws,sanitizeSheetName(r.treeNo||r.id));}); const summary=[['調査日','樹木No','樹種','場所','点検者','樹高','幹周','緯度','経度','判定','所見','必要な措置']]; valid.forEach(r=>summary.push([r.surveyDate,r.treeNo,r.species,r.location,r.inspector,r.treeHeight,r.trunkGirth,r.latitude,r.longitude,r.overall,r.comment,(r.measures||[]).join('、')])); const wsSum=XLSX.utils.aoa_to_sheet(summary);setColWidths(wsSum,[12,10,15,20,12,8,8,12,12,8,30,30]);XLSX.utils.book_append_sheet(wb,wsSum,'一覧表'); dlBlob(new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:'application/octet-stream'}),'全件樹木診断.xlsx'); };
-    window.exportAllToJSON = () => { const valid=records.filter(r=>r?.id); if(!valid.length){alert('データなし');return;} dlBlob(new Blob([JSON.stringify(valid,null,2)],{type:'application/json'}),'backup.json'); };
-    window.exportAllToCSV = function() {
-      const valid = records.filter(r => r?.id);
-      if (!valid.length) { alert('出力する記録がありません'); return; }
-      const header = ['通し番号','樹木番号','樹種名','点検者','所在地','調査日','総合判定','必要な処置','緯度X','経度Y'];
-      const rows = valid.map((r, i) => [
-        i + 1,
-        r.treeNo || '',
-        r.species || '',
-        r.inspector || '',
-        r.location || '',
-        r.surveyDate || '',
-        r.overall || '',
-        (r.measures || []).join('、'),
-        r.latitude || '',
-        r.longitude || ''
-      ]);
-      const csvContent = [header, ...rows].map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
-      const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `樹木点検一覧_${new Date().toISOString().slice(0,10)}.csv`;
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-      alert('CSVを出力しました');
-    };
-    document.getElementById('jsonImportInput').addEventListener('change',function(e){ const file=e.target.files[0]; if(!file)return; const reader=new FileReader(); reader.onload=ev=>{ try{ let text=ev.target.result; if(text.charCodeAt(0)===0xFEFF)text=text.slice(1); const imported=JSON.parse(text); if(Array.isArray(imported)){ const vl=imported.filter(r=>r?.id); if(vl.length&&confirm(`${vl.length}件で上書きしますか？`)){ records=vl; localStorage.setItem('treeRecords',JSON.stringify(records)); updateAllMapMarkers(); renderRecordsList(); alert('復元完了'); }} else alert('無効な形式'); }catch{ alert('JSON解析エラー'); } e.target.value=''; }; reader.readAsText(file,'UTF-8'); });
-    window.printInspectionPage = () => window.print();
-    window.printAllMap = function() { showTab('allmap'); setTimeout(()=>{ if(allMap)allMap.invalidateSize(); document.body.classList.add('print-map-only'); window.print(); setTimeout(()=>document.body.classList.remove('print-map-only'),200); },300); };
-    window.saveAllMapAsImage = () => { const mapElement=document.getElementById('allMap'); html2canvas(mapElement,{scale:2,backgroundColor:null,useCORS:true,allowTaint:false}).then(canvas=>{ const link=document.createElement('a'); link.download='全体マップ.png'; link.href=canvas.toDataURL('image/png'); link.click(); }).catch(err=>alert('画像保存に失敗しました')); };
-    function showTab(tab) { document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active')); document.getElementById(`tab-${tab}`).classList.add('active'); document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); document.querySelector(`[data-tab="${tab}"]`).classList.add('active'); if(tab==='records') renderRecordsList(); if(tab==='allmap'){setTimeout(()=>{if(!allMap)initAllMap();else{allMap.invalidateSize();updateAllMapMarkers();}},100);} }
-    window.showTab = showTab;
-    function init() { buildUI(); initMap(); const saved=localStorage.getItem('treeRecords'); if(saved){try{records=JSON.parse(saved);}catch{}} records=records.filter(r=>r?.id); document.getElementById('surveyDate').value=new Date().toISOString().split('T')[0]; document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab))); document.getElementById('searchInput').addEventListener('input',renderRecordsList); document.getElementById('sortSelect').addEventListener('change',renderRecordsList); renderPhotos(); updateOverall(); updateEditModeUI(); }
-    init();
-  })();
-</script>
-<script>
-  if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('/v26.1shindan/sw.js',{scope:'/v26.1shindan/'}).then(reg=>{
-      if(reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});
-      reg.addEventListener('updatefound',()=>{ const nw=reg.installing; nw.addEventListener('statechange',()=>{ if(nw.state==='installed'&&navigator.serviceWorker.controller){ if(confirm('最新バージョンがあります。更新しますか？')){nw.postMessage({type:'SKIP_WAITING'});window.location.reload();} } }); });
-    }).catch(()=>{});
-    navigator.serviceWorker.addEventListener('controllerchange',()=>window.location.reload());
-  }
-</script>
+  </script>
 </body>
 </html>
