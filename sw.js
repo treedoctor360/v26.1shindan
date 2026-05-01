@@ -1,135 +1,28 @@
-// ============================================================
-// 樹木点検システム - Service Worker
-// ============================================================
-const CACHE_NAME = 'tree-inspect-v26-5';
-const TILE_CACHE = 'tree-inspect-tiles-v26-5';
-
-// オフラインで動作するために必要なファイル
-const APP_SHELL = [
-  './',                     // start_url
-  './index.html',
-  './manifest.json',
-];
-
-// CDNから読み込む外部リソース（キャッシュ可能なもの）
-const CDN_ASSETS = [
-  'https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js',
-  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
-  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
-  'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap',
-];
-
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(async cache => {
-      // アプリ本体をキャッシュ
-      for (const url of APP_SHELL) {
-        try { await cache.add(url); } catch(e) { console.warn('[SW] App shell miss:', url); }
-      }
-      // CDNリソースをキャッシュ
-      for (const url of CDN_ASSETS) {
-        try {
-          const res = await fetch(url, { mode: 'cors' });
-          if (res.ok) await cache.put(url, res);
-        } catch(e) { console.warn('[SW] CDN miss:', url); }
-      }
-    }).then(() => self.skipWaiting())
-  );
-});
-
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys.filter(k => k !== CACHE_NAME && k !== TILE_CACHE)
-            .map(k => caches.delete(k))
-      )
-    ).then(() => self.clients.claim())
-  );
-});
-
-self.addEventListener('fetch', event => {
-  const url = new URL(event.request.url);
-
-  // 地図タイルは別キャッシュ
-  if (url.hostname.includes('tile.openstreetmap.org')) {
-    event.respondWith(tileStrategy(event.request));
-    return;
-  }
-
-  // Google Fontsはキャッシュ優先
-  if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
-    event.respondWith(cacheFirst(event.request, CACHE_NAME));
-    return;
-  }
-
-  // CDNリソースはキャッシュ優先
-  const isCDN = CDN_ASSETS.some(a => event.request.url.startsWith(a.split('?')[0]));
-  if (isCDN) {
-    event.respondWith(cacheFirst(event.request, CACHE_NAME));
-    return;
-  }
-
-  // 自分のオリジンのファイルはネットワーク優先＋キャッシュ
-  if (url.origin === self.location.origin) {
-    event.respondWith(networkFirst(event.request));
-    return;
-  }
-});
-
-// キャッシュ優先戦略（CDN/Fonts用）
-async function cacheFirst(request, cacheName) {
-  const cache = await caches.open(cacheName);
-  const cached = await cache.match(request);
-  if (cached) return cached;
-  try {
-    const res = await fetch(request);
-    if (res.ok) cache.put(request, res.clone());
-    return res;
-  } catch(e) {
-    return new Response('Offline', { status: 503 });
-  }
-}
-
-// ネットワーク優先戦略（アプリ本体用）
-async function networkFirst(request) {
-  const cache = await caches.open(CACHE_NAME);
-  try {
-    const res = await fetch(request);
-    if (res.ok) cache.put(request, res.clone());
-    return res;
-  } catch(e) {
-    const cached = await cache.match(request);
-    return cached || new Response('Offline', { status: 503 });
-  }
-}
-
-// 地図タイル専用戦略（容量制限付き）
-async function tileStrategy(request) {
-  const cache = await caches.open(TILE_CACHE);
-  const cached = await cache.match(request);
-  if (cached) return cached;
-  try {
-    const res = await fetch(request);
-    if (res.ok) {
-      cache.put(request, res.clone());
-      trimTileCache(cache, 500);
+{
+  "name": "樹木点検・診断システム",
+  "short_name": "樹木診断",
+  "description": "樹木点検・診断システム v26.7",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f4f6f0",
+  "theme_color": "#2d5016",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%232d5016'/%3E%3Ctext x='96' y='130' font-size='110' text-anchor='middle'%3E%F0%9F%8C%B3%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%232d5016'/%3E%3Ctext x='256' y='360' font-size='300' text-anchor='middle'%3E%F0%9F%8C%B3%3C/text%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
-    return res;
-  } catch(e) {
-    return new Response(
-      atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='),
-      { headers: { 'Content-Type': 'image/png' } }
-    );
-  }
-}
-
-// タイルキャッシュの上限管理
-async function trimTileCache(cache, maxEntries) {
-  const keys = await cache.keys();
-  if (keys.length > maxEntries) {
-    const toDelete = keys.slice(0, keys.length - maxEntries);
-    for (const key of toDelete) await cache.delete(key);
-  }
+  ],
+  "categories": ["utilities", "productivity"],
+  "prefer_related_applications": false
 }
