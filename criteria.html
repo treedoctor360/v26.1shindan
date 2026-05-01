@@ -53,16 +53,17 @@
     .header-links { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
     .header-link {
       display: inline-block;
-      padding: 7px 18px;
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.35);
+      padding: 8px 20px;
+      background: rgba(255,255,255,0.25);
+      border: 1.5px solid rgba(255,255,255,0.6);
       border-radius: 30px;
       color: white;
       text-decoration: none;
-      font-size: 0.82rem;
+      font-size: 0.85rem;
+      font-weight: 600;
       transition: background 0.2s;
     }
-    .header-link:hover { background: rgba(255,255,255,0.28); }
+    .header-link:hover { background: rgba(255,255,255,0.4); }
 
     /* ── 警告バナー ── */
     .alert-banner {
@@ -182,8 +183,6 @@
       transition: box-shadow 0.2s;
     }
     .acc-card:hover { box-shadow: 0 3px 14px rgba(0,0,0,0.1); }
-
-    /* アコーディオンのヘッダー（クリックで開閉） */
     .acc-head {
       display: flex;
       align-items: center;
@@ -199,7 +198,6 @@
     .acc-card[open] .acc-head { background: var(--green-light); }
     .acc-card.brown[open] .acc-head { background: var(--brown-light); }
     .acc-card.blue[open] .acc-head  { background: var(--blue-light); }
-
     .acc-num {
       background: var(--green-dark);
       color: white;
@@ -216,11 +214,8 @@
     }
     .acc-card.brown .acc-num { background: var(--brown); }
     .acc-card.blue  .acc-num { background: var(--blue); }
-
     .acc-title-text { font-weight: 700; font-size: 1rem; flex: 1; }
     .acc-subtitle { font-size: 0.78rem; color: var(--muted); font-weight: 400; margin-left: 4px; }
-
-    /* 最悪スコアバッジ */
     .worst-badge {
       font-size: 0.72rem;
       padding: 2px 9px;
@@ -231,8 +226,6 @@
     .wb-safe { background: #c8e6c9; color: #1b5e20; }
     .wb-warn { background: #ffe0b2; color: #bf360c; }
     .wb-danger { background: #ffcdd2; color: #b71c1c; }
-
-    /* 開閉矢印 */
     .acc-arrow {
       color: var(--muted);
       font-size: 0.85rem;
@@ -240,11 +233,7 @@
       transition: transform 0.25s;
     }
     details.acc-card[open] .acc-arrow { transform: rotate(180deg); }
-
-    /* アコーディオン中身 */
     .acc-body { padding: 14px 16px 16px; }
-
-    /* 概要テキスト */
     .item-summary {
       background: #fafafa;
       padding: 10px 13px;
@@ -457,7 +446,7 @@
         <li><a href="#decayExposed">⑦腐朽部露出</a></li>
         <li><a href="#barkDamage">⑧樹皮枯死･欠損</a></li>
         <li><a href="#jointAbnormality">⑨結合部の変状</a></li>
-        <li><a href="#pestDamage">⑩穿孔害虫等</a></li>
+        <li><a href="#pestDamage">⑩穿孔性害虫等</a></li>
         <li><a href="#rootVisible">⑪根張り</a></li>
         <li><a href="#tappingSound">⑫打診音異常</a></li>
         <li><a href="#penetrationAbnormality">⑬貫入異常</a></li>
@@ -545,7 +534,6 @@
 </section>
 
 <!-- ── 活力度 17項目 ── -->
-
 <details class="acc-card brown" id="vigor">
   <summary class="acc-head">
     <span class="acc-num">①</span>
@@ -861,7 +849,7 @@
     <span class="acc-arrow">▼</span>
   </summary>
   <div class="acc-body">
-    <div class="item-summary">枝先の<strong>冬芽（とうが）</strong>の大きさと数を見ます。元気な木は冬芽が大きく充実しています。</div>
+    <div class="item-summary">枝先の<strong>冬芽（ふゆめ）</strong>の大きさと数を見ます。元気な木は冬芽が大きく充実しています。</div>
     <table class="grade-table">
       <thead><tr><th style="width:52px;">評点</th><th>状態の目安</th></tr></thead>
       <tbody>
@@ -954,7 +942,6 @@
 </section>
 
 <!-- ── 健全度 14項目 ── -->
-
 <details class="acc-card blue" id="sway">
   <summary class="acc-head">
     <span class="acc-num">①</span>
@@ -1040,7 +1027,7 @@
       </tbody>
     </table>
     <div class="box box-check"><strong>🔍 現場での確認ポイント</strong>キノコの種類を見分けます。<a href="#fungus-list">主な腐朽菌の見分けかた</a>を参照してください。</div>
-    <div class="box box-danger"><strong>⚠️ 特に危険なサイン</strong>ベッコウタケやコフキサルノコシカケは「強毒」レベル。これらが発生している木は内部で腐朽が深刻です。</div>
+    <div class="box box-danger"><strong>⚠️ 特に危険なサイン</strong>ベッコウタケやコフキサルノコシカケは「腐朽力大」レベル。これらが発生している木は内部で腐朽が深刻です。</div>
     <div class="box box-person"><strong>👤 一般の方向けひとこと</strong>キノコは雨上がりや夏〜秋によく見られます。一度見つけたら、その後消えても「過去に発生した木」として記録に残しておきましょう。</div>
   </div>
 </details>
@@ -1158,7 +1145,7 @@
 <details class="acc-card blue" id="pestDamage">
   <summary class="acc-head">
     <span class="acc-num">⑩</span>
-    <span class="acc-title-text">穿孔害虫等<span class="acc-subtitle">— 幹の内部を食害する虫</span></span>
+    <span class="acc-title-text">穿孔性害虫等<span class="acc-subtitle">— 幹の内部を食害する虫</span></span>
     <span class="worst-badge wb-warn">最悪 C</span>
     <span class="acc-arrow">▼</span>
   </summary>
@@ -1275,7 +1262,7 @@
     <div class="fungus-card f-red">
       <div class="fungus-head">🔴 ベッコウタケ（腐朽力大）</div>
       <p style="font-size:0.87rem;">茶色〜黒褐色で「べっ甲飴」のような光沢のある半円形のキノコ。サクラ・ケヤキ・カシなど幅広い樹種で発生。<strong>樹木の根や根元に発生し、白色腐朽を引き起こす最強クラスの危険菌</strong>です。発見されたらほぼ確実に内部腐朽が進んでいます。</p>
-      <div class="box box-danger" style="margin-top:8px;"><strong>⚠️ 対応</strong>原則として伐採対象。発見したら速やかに専門家へ。</div>
+      <div class="box box-danger" style="margin-top:8px;"><strong>⚠️ 対応</strong>原則として伐採対象となること多々。発見したら速やかに専門家へ。</div>
     </div>
 
     <div class="fungus-card f-red" style="margin-top:10px;">
@@ -1310,7 +1297,7 @@
       <div class="glossary-item"><div class="glossary-term">梢端（しょうたん）</div><div class="glossary-def">樹木のてっぺん部分。樹冠の最上部。</div></div>
       <div class="glossary-item"><div class="glossary-term">地際（じぎわ）</div><div class="glossary-def">幹と地面が接する境界部分。健全度評価で重要なポイント。</div></div>
       <div class="glossary-item"><div class="glossary-term">根張り・ルートカラー</div><div class="glossary-def">地際で幹が根に向かって広がる部分。健全な木はゾウの足のように広がっている。</div></div>
-      <div class="glossary-item"><div class="glossary-term">幹周（かんしゅう）</div><div class="glossary-def">地面から1.2mの高さで幹を一周した長さ（cm）。胸高周囲ともいう。</div></div>
+      <div class="glossary-item"><div class="glossary-term">幹周（みきしゅう）</div><div class="glossary-def">地面から1.2mの高さで幹を一周した長さ（cm）。胸高周囲ともいう。</div></div>
       <div class="glossary-item"><div class="glossary-term">樹勢（じゅせい）</div><div class="glossary-def">樹木の元気さ・勢いを総合的に表す言葉。</div></div>
       <div class="glossary-item"><div class="glossary-term">胴吹き</div><div class="glossary-def">幹の途中から出る不定芽。樹冠が弱ったときに緊急で出る芽。</div></div>
       <div class="glossary-item"><div class="glossary-term">ひこばえ</div><div class="glossary-def">根元や根から出てくる芽。樹勢低下のサインのことが多い。</div></div>
@@ -1318,8 +1305,8 @@
       <div class="glossary-item"><div class="glossary-term">腐朽（ふきゅう）</div><div class="glossary-def">腐朽菌により木材が分解される現象。白色腐朽と褐色腐朽がある。</div></div>
       <div class="glossary-item"><div class="glossary-term">子実体（しじったい）</div><div class="glossary-def">きのこの本体。胞子を作る器官で、菌糸の集合体。</div></div>
       <div class="glossary-item"><div class="glossary-term">入り皮（いりかわ）</div><div class="glossary-def">幹と枝の又に樹皮が挟まった状態。強風で裂けやすい。</div></div>
-      <div class="glossary-item"><div class="glossary-term">穿孔害虫（せんこうがいちゅう）</div><div class="glossary-def">幹や枝の内部に穴を開けて食害する昆虫類。カミキリムシなど。</div></div>
-      <div class="glossary-item"><div class="glossary-term">フラス</div><div class="glossary-def">穿孔害虫が排出する木屑＋糞の混合物。オガクズ状のものが多い。</div></div>
+      <div class="glossary-item"><div class="glossary-term">穿孔性害虫（せんこうせいがいちゅう）</div><div class="glossary-def">幹や枝の内部に穴を開けて食害する昆虫類。カミキリムシなど。</div></div>
+      <div class="glossary-item"><div class="glossary-term">フラス</div><div class="glossary-def">穿孔性害虫が排出する木屑＋糞の混合物。オガクズ状のものが多い。</div></div>
       <div class="glossary-item"><div class="glossary-term">樹木医</div><div class="glossary-def">樹木の診断・治療を行う専門家。（一財）日本緑化センターが認定する資格。</div></div>
       <div class="glossary-item"><div class="glossary-term">機器診断</div><div class="glossary-def">レジストグラフ、貫入抵抗計、超音波装置などで樹木の内部を非破壊で調べる検査。</div></div>
     </div>
@@ -1341,12 +1328,9 @@
 </footer>
 
 <script>
-  // 全展開 / 全折りたたみ
   function toggleAll(open) {
     document.querySelectorAll('details.acc-card').forEach(d => d.open = open);
   }
-
-  // 目次の開閉
   function toggleToc() {
     const body = document.getElementById('tocBody');
     const toggle = document.getElementById('tocToggle');
@@ -1358,8 +1342,6 @@
       toggle.textContent = '▼ 開く';
     }
   }
-
-  // URLハッシュでページ内リンク先を自動展開
   function openFromHash() {
     const hash = location.hash.slice(1);
     if (!hash) return;
@@ -1369,5 +1351,6 @@
   window.addEventListener('DOMContentLoaded', openFromHash);
   window.addEventListener('hashchange', openFromHash);
 </script>
+
 </body>
 </html>
