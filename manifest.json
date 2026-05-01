@@ -1,7 +1,7 @@
 {
   "name": "樹木点検・診断システム",
   "short_name": "樹木診断",
-  "description": "国交省指針（案）準拠の樹木点検・診断システム",
+  "description": "国交省指針（案）準拠の樹木点検・診断システム v26.7",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
