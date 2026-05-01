@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>樹木点検・診断システム 利用マニュアル</title>
+  <title>樹木点検・診断システム 利用マニュアル v26.7</title>
   <style>
     :root {
       --green-dark: #2d5016;
@@ -135,12 +135,6 @@
     th { background: var(--green-dark); color: white; padding: 9px 10px; text-align: left; }
     td { padding: 9px 10px; border-bottom: 1px solid #eee; vertical-align: top; }
     tr:nth-child(even) td { background: #f9faf6; }
-    .faq-item { border: 1.5px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; }
-    .faq-q { background: #f5f5f5; padding: 13px 16px; font-weight: 700; font-size: 0.95rem; display: flex; gap: 10px; align-items: flex-start; }
-    .faq-a { padding: 12px 16px; font-size: 0.9rem; color: var(--muted); }
-    .site-footer { background: var(--green-dark); color: rgba(255,255,255,0.8); text-align: center; padding: 20px; font-size: 0.8rem; margin-top: 10px; }
-    ul.check { list-style: none; padding: 0; }
-    ul.check li::before { content: "✅ "; }
     [id] { scroll-margin-top: 16px; }
     @media (min-width: 600px) {
       .section, .toc { margin-left: auto; margin-right: auto; max-width: 700px; }
@@ -151,7 +145,7 @@
 
 <header class="site-header">
   <h1>🌳 樹木点検システム 利用マニュアル</h1>
-  <p>はじめての方でも安心して使えるよう、操作手順をやさしく解説します</p>
+  <p>はじめての方でも安心して使えるよう、操作手順をやさしく解説します（v26.7）</p>
   <a href="./" class="back-link">← 点検システムに戻る</a>
   <a href="criteria.html" style="display:inline-block; margin-top:8px; margin-left:8px; color:white; text-decoration:none; font-size:0.8rem; border:1px solid rgba(255,255,255,0.5); border-radius:20px; padding:4px 14px;">📖 判定基準詳細</a>
 </header>
@@ -168,6 +162,9 @@
     <li><a href="#sec-map">全体マップの使いかた（タブ③）</a></li>
     <li><a href="#sec-criteria">判定基準の見かた（タブ④）</a></li>
     <li><a href="#sec-export">データの出力・バックアップ</a></li>
+    <li><a href="#sec-json-merge">JSON統合機能</a></li>
+    <li><a href="#sec-gas">📤 スプレッドシートへ送信（GAS連携）</a></li>
+    <li><a href="#sec-mail">📧 メールで送信</a></li>
     <li><a href="#sec-caution">ご利用上の注意</a></li>
     <li><a href="criteria.html" style="font-weight:700; color:#1565c0;">📖 詳細判定基準を見る</a></li>
   </ol>
@@ -176,15 +173,18 @@
 <section class="section" id="sec-about">
   <div class="section-title"><span>1️⃣</span>このシステムについて</div>
   <div class="section-body">
-    <p>「<strong>樹木点検・診断システム</strong>」は、日本緑化センター(地上部の衰退度判定表)及び国土交通省の点検指針（案）に沿って、公園や街路樹などの樹木の健康状態を記録・診断するためのアプリです。スマートフォンやタブレットのブラウザから無料でご利用いただけます。</p>
+    <p>「<strong>樹木点検・診断システム</strong>」は、日本緑化センター(地上部の衰退度判定表)及び国土交通省の点検指針（案）に沿って、公園や街路樹などの樹木の健康状態を記録・診断するためのアプリです。</p>
     <div class="note">⚠️ 本システムの診断結果は<strong>目安</strong>です。倒木など重大な危険が疑われる場合は、必ず<strong>樹木医等の専門家</strong>にご相談ください。</div>
     <p style="margin-top:12px;"><strong>このシステムでできること：</strong></p>
-    <ul class="check" style="margin-top:8px;">
-      <li>樹木の位置・種類・大きさを記録</li>
-      <li>活力度（元気さ）と健全度（危険度）を自動診断</li>
-      <li>写真撮影・写真への書き込み</li>
-      <li>地図上での全樹木位置表示</li>
-      <li>Excel・CSV・JSONでデータ出力</li>
+    <ul style="list-style:none;padding:0;margin-top:8px;">
+      <li style="padding:3px 0;">✅ 樹木の位置・種類・大きさを記録</li>
+      <li style="padding:3px 0;">✅ 活力度（元気さ）と健全度（危険度）を自動診断</li>
+      <li style="padding:3px 0;">✅ 写真撮影・写真への書き込み</li>
+      <li style="padding:3px 0;">✅ 地図上での全樹木位置表示</li>
+      <li style="padding:3px 0;">✅ Excel・CSV・JSONでデータ出力</li>
+      <li style="padding:3px 0;">✅ JSON統合（複数端末のデータをマージ）</li>
+      <li style="padding:3px 0;">✅ Googleスプレッドシートへのデータ送信（GAS連携）</li>
+      <li style="padding:3px 0;">✅ メールでのデータ送信（アドレス帳付き）</li>
     </ul>
   </div>
 </section>
@@ -192,7 +192,6 @@
 <section class="section" id="sec-start">
   <div class="section-title"><span>2️⃣</span>アプリの始め方（インストール）</div>
   <div class="section-body">
-    <p>URLにアクセスするだけで使えます。ホーム画面に追加しておけば次回から素早く起動できます。</p>
     <div class="step-card">
       <div class="step-head"><div class="step-num">1</div>URLにアクセスする</div>
       <div class="step-body"><p>案内されたURLを<strong>Safari</strong>（iPhone）または<strong>Chrome</strong>（Android）で開いてください。</p></div>
@@ -200,14 +199,10 @@
     <div class="step-card">
       <div class="step-head"><div class="step-num">2</div>ホーム画面に追加する（おすすめ）</div>
       <div class="step-body">
-        <p><strong>iPhone（Safari）：</strong>画面下の「共有」→「ホーム画面に追加」</p>
-        <p><strong>Android（Chrome）：</strong>右上「⋮」→「ホーム画面に追加」</p>
+        <p><strong>iPhone：</strong>Safariで「共有」→「ホーム画面に追加」</p>
+        <p><strong>Android：</strong>Chromeで右上「⋮」→「ホーム画面に追加」</p>
         <div class="tip">🌱 ホーム画面から起動するとアプリのように使えます。</div>
       </div>
-    </div>
-    <div class="step-card">
-      <div class="step-head"><div class="step-num">3</div>初回読み込み</div>
-      <div class="step-body"><p>初回はWi-Fi環境で開いてください。地図などのデータが自動的にキャッシュされます。</p></div>
     </div>
   </div>
 </section>
@@ -219,20 +214,20 @@
       <thead><tr><th>タブ</th><th>できること</th></tr></thead>
       <tbody>
         <tr><td>📋 点検入力</td><td>樹木の情報・評価・写真などを入力して保存する</td></tr>
-        <tr><td>📚 記録一覧</td><td>保存済みの記録を一覧表示・検索・編集・削除する</td></tr>
+        <tr><td>📚 記録一覧</td><td>保存済みの記録を一覧表示・検索・編集・削除・送信する</td></tr>
         <tr><td>🗺️ 全体マップ</td><td>登録した全樹木の位置を地図上で確認する</td></tr>
         <tr><td>📖 判定基準</td><td>活力度・健全度・総合判定の基準を確認する</td></tr>
       </tbody>
     </table>
+    <p style="font-size:0.88rem; color:var(--muted);">※ 設定は「記録一覧」タブ内の各ボタン（⚙️ スプレッドシート設定 など）から行います。</p>
   </div>
 </section>
 
 <section class="section" id="sec-flow">
   <div class="section-title"><span>4️⃣</span>点検の流れ（全体像）</div>
   <div class="section-body">
-    <p>樹木1本あたり、以下の流れで点検・記録します。</p>
     <div style="background:#f0f7ea; padding:16px; border-radius:12px; margin-top:12px; line-height:2.2; font-size:0.9rem; font-weight:500;">
-      ① 基本情報入力　→　② GPSで位置取得　→　③ 写真撮影・メモ　→　④ 活力度評価　→　⑤ 健全度評価　→　⑥ 腐朽菌記録　→　⑦ 総合判定・所見　→　💾 保存
+      ① 基本情報入力　→　② GPSで位置取得　→　③ 写真撮影　→　④ 活力度評価　→　⑤ 健全度評価　→　⑥ 腐朽菌記録　→　⑦ 総合判定・所見　→　💾 保存
     </div>
   </div>
 </section>
@@ -243,15 +238,7 @@
     <div class="step-card">
       <div class="step-head"><div class="step-num" style="border-radius:8px;">Ⅰ-1</div>基本情報を入力</div>
       <div class="step-body">
-        <table>
-          <tr><td><strong>樹木No. ✱</strong></td><td>管理番号（必須）</td></tr>
-          <tr><td><strong>調査日 ✱</strong></td><td>自動入力（編集可）</td></tr>
-          <tr><td>天候</td><td>晴/曇/雨</td></tr>
-          <tr><td><strong>調査者 ✱</strong></td><td>あなたの名前（必須）</td></tr>
-          <tr><td><strong>樹種名 ✱</strong></td><td>木の種類（必須）</td></tr>
-          <tr><td>所在地</td><td>公園名や調査地</td></tr>
-          <tr><td>樹高／幹周</td><td>おおよその値を記入</td></tr>
-        </table>
+        <p>樹木No.（必須）、調査日（必須）、天候、調査者（必須）、樹種名（必須）、所在地、樹高、幹周を入力します。</p>
       </div>
     </div>
     <div class="step-card">
@@ -263,24 +250,14 @@
     <div class="step-card">
       <div class="step-head"><div class="step-num" style="border-radius:8px;">📸</div>写真を撮影・追加</div>
       <div class="step-body">
-        <p>「📷 カメラ」または「🖼️ アルバム」で写真を追加。写真をタップすると、ペン・矢印・テキストで直接書き込めます。</p>
-        <div class="tip">💡 木全体・根元・気になる部位の3枚を撮影するのがおすすめです。</div>
+        <p>「📷 カメラ」または「🖼️ アルバム」で写真を追加。写真をタップするとペン・矢印・テキストで直接書き込めます。</p>
+        <div class="tip">💡 木全体・根元・気になる部位の3枚を撮影するのがおすすめです。写真は端末内の安全な領域（IndexedDB）に保存されます。</div>
       </div>
-    </div>
-    <div class="step-card">
-      <div class="step-head"><div class="step-num" style="border-radius:8px;">🖊️</div>手書きメモ</div>
-      <div class="step-body"><p>指でスケッチやメモを書けます。「💾 メモ保存」で画像として保存できます。</p></div>
     </div>
     <div class="step-card">
       <div class="step-head brown"><div class="step-num" style="background:#6d4c41; border-radius:8px;">Ⅰ-2</div>活力度（衰退度）を評価</div>
       <div class="step-body">
-        <table>
-          <tr><td><strong>0</strong></td><td>正常・健全</td></tr>
-          <tr><td><strong>1</strong></td><td>わずかに異常</td></tr>
-          <tr><td><strong>2</strong></td><td>明らかに異常</td></tr>
-          <tr><td><strong>3</strong></td><td>かなり悪い</td></tr>
-          <tr><td><strong>4</strong></td><td>著しく悪い・枯死寸前</td></tr>
-        </table>
+        <p>17項目を <strong>0（正常）〜4（枯死寸前）</strong> の5段階で評価します。各項目の <strong>？マーク</strong> をタップすると詳しい解説が表示されます。</p>
       </div>
     </div>
     <div class="step-card">
@@ -292,7 +269,7 @@
           <div class="badge badge-C">C 危険性あり</div>
           <div class="badge badge-D">D 非常に危険</div>
         </div>
-        <p>傾き・空洞・根の状態などを評価します。</p>
+        <p>14項目を評価します。各項目の <strong>？マーク</strong> をタップすると詳しい解説が表示されます。</p>
         <div class="note">⚠️ D評価がある場合は速やかに専門家へ報告してください。</div>
       </div>
     </div>
@@ -309,38 +286,115 @@
   <div class="section-title"><span>6️⃣</span>記録一覧の使いかた（タブ②）</div>
   <div class="section-body">
     <p>保存済みの点検記録を一覧表示・検索・編集・削除できます。</p>
-    <p>「📊 全件Excel出力」「📄 CSV出力」「📦 JSONバックアップ」など、データ出力・バックアップもここから行えます。</p>
-    <div class="tip">📄 CSV出力は「樹木番号,樹種名,点検者,所在地,調査日,総合判定,必要な処置,緯度X,経度Y」の形式で出力され、GISなどに取り込めます。</div>
+    <p style="margin-top:10px;">下部のボタンから、以下の操作が可能です：</p>
+    <table>
+      <tr><td>📊 全件Excel出力</td><td>全記録を様式付きExcelで出力</td></tr>
+      <tr><td>📦 JSONバックアップ</td><td>写真を含む全データを保存（定期バックアップ推奨）</td></tr>
+      <tr><td>📋 一覧表Excel出力</td><td>簡易一覧表をExcel出力</td></tr>
+      <tr><td>📄 CSV出力</td><td>他システム連携用CSV</td></tr>
+      <tr><td>📂 JSON復元</td><td>バックアップから復元（上書き）</td></tr>
+      <tr><td>🔗 JSONを統合</td><td>複数のバックアップを重複除去しながらマージ</td></tr>
+      <tr><td>📧 メール送信</td><td>アドレス帳付きメール送信</td></tr>
+      <tr><td>📊 スプレッドシート一括送信</td><td>GAS連携でスプレッドシートに送信</td></tr>
+      <tr><td>⚙️ スプレッドシート設定</td><td>GASのURL・トークン設定</td></tr>
+      <tr><td>🧹 無効記録削除</td><td>破損データを一括削除</td></tr>
+    </table>
+    <div class="tip">📊 SS済 バッジ：スプレッドシート送信済みの記録には青色の「SS済」マークが付きます。</div>
   </div>
 </section>
 
 <section class="section" id="sec-map">
   <div class="section-title"><span>7️⃣</span>全体マップの使いかた（タブ③）</div>
   <div class="section-body">
-    <p>GPSで記録した全樹木の位置を地図上に表示します。ピンをタップすると編集画面に移動できます。</p>
+    <p>GPSで記録した全樹木の位置を地図上に表示します。ピンをタップ→「編集画面へ」で点検入力に移動できます。</p>
   </div>
 </section>
 
 <section class="section" id="sec-criteria">
   <div class="section-title"><span>8️⃣</span>判定基準の見かた（タブ④）</div>
   <div class="section-body">
-    <p>活力度・健全度・総合判定の基準表を確認できます。点検中に迷ったら参照してください。</p>
-    <div style="background: #e3f2fd; border: 1.5px solid #90caf9; border-radius: 12px; padding: 14px; margin-top: 12px; text-align: center;">
-      <p style="font-weight: 700; color: #1565c0; margin-bottom: 8px;">📖 より詳しい判定基準はこちら</p>
-      <p style="font-size: 0.85rem; color: #555; margin-bottom: 10px;">全17項目の活力度・全14項目の健全度の詳細な評価基準、腐朽菌の種類と危険度をまとめたページです。</p>
-      <a href="criteria.html" style="display: inline-block; background: #1565c0; color: white; padding: 10px 22px; border-radius: 30px; text-decoration: none; font-weight: 700; font-size: 0.9rem;">📖 詳細判定基準ページへ →</a>
-    </div>
+    <p>活力度・健全度・総合判定の基準表を確認できます。より詳しい解説は以下のリンクから：</p>
+    <a href="criteria.html" style="display:inline-block;background:#1565c0;color:white;padding:10px 22px;border-radius:30px;text-decoration:none;font-weight:700;font-size:0.9rem;margin-top:10px;">📖 詳細判定基準ページへ →</a>
   </div>
 </section>
 
 <section class="section" id="sec-export">
   <div class="section-title"><span>9️⃣</span>データの出力・バックアップ</div>
   <div class="section-body">
-    <ul class="check">
-      <li><strong>JSONバックアップ</strong>：写真を含む全データを保存。定期的に取得してください。</li>
-      <li><strong>Excel出力</strong>：様式付きExcel（報告書用）または一覧表Excel。</li>
-      <li><strong>CSV出力</strong>：他システム連携用。</li>
+    <ul style="list-style:none;padding:0;">
+      <li style="padding:3px 0;">✅ <strong>JSONバックアップ</strong>：写真を含む全データを保存。定期的に取得してください。</li>
+      <li style="padding:3px 0;">✅ <strong>Excel出力</strong>：様式付きExcel（報告書用）または一覧表Excel。</li>
+      <li style="padding:3px 0;">✅ <strong>CSV出力</strong>：他システム連携用。「樹木No,調査日,天候,調査者,樹種名,所在地,樹高(m),幹周(cm),緯度,経度,総合判定,活力度,健全度,腐朽菌,所見,必要な措置」の並びで出力されます。</li>
     </ul>
+  </div>
+</section>
+
+<section class="section" id="sec-json-merge">
+  <div class="section-title"><span>🔟</span>🔗 JSON統合機能</div>
+  <div class="section-body">
+    <p>複数の端末や調査者で別々に記録したバックアップファイルを、<strong>重複を自動除去しながら1つにまとめる</strong>機能です。</p>
+    <div class="step-card">
+      <div class="step-head"><div class="step-num">1</div>「🔗 JSONを統合」をタップ</div>
+      <div class="step-body"><p>記録一覧タブ下部の「🔗 JSONを統合」ボタンを押します。</p></div>
+    </div>
+    <div class="step-card">
+      <div class="step-head"><div class="step-num">2</div>統合したいファイルを選択</div>
+      <div class="step-body"><p>複数のJSONバックアップファイルを選択できます。同じ樹木Noのデータは後から読み込んだもので上書きされます。</p></div>
+    </div>
+    <div class="step-card">
+      <div class="step-head"><div class="step-num">3</div>統合結果を確認</div>
+      <div class="step-body"><p>統合後の件数が表示されます。問題なければ「OK」で保存します。</p></div>
+    </div>
+    <div class="tip">💡 複数人で手分けして点検したデータを1つにまとめるのに便利です。</div>
+  </div>
+</section>
+
+<section class="section" id="sec-gas">
+  <div class="section-title"><span>1️⃣1️⃣</span>📤 スプレッドシートへ送信（GAS連携）</div>
+  <div class="section-body">
+    <p>現場のデータを事務所の<strong>Google スプレッドシート</strong>に送信できます。</p>
+    <div class="note">⚠️ 事前にPCでのGAS設定が必要です。</div>
+
+    <div class="step-card">
+      <div class="step-head"><div class="step-num">1</div>Googleスプレッドシートを作成</div>
+      <div class="step-body"><p>Googleドライブで新規スプレッドシートを作成します。</p></div>
+    </div>
+    <div class="step-card">
+      <div class="step-head"><div class="step-num">2</div>Apps Scriptを設定</div>
+      <div class="step-body"><p>「拡張機能」→「Apps Script」→ 配布のコード（コード.gs）を貼り付けて保存。</p></div>
+    </div>
+    <div class="step-card">
+      <div class="step-head"><div class="step-num">3</div>ウェブアプリとしてデプロイ</div>
+      <div class="step-body"><p>「デプロイ」→「新しいデプロイ」→「ウェブアプリ」。アクセスは「全員」に設定。表示されたURLをコピー。</p></div>
+    </div>
+    <div class="step-card">
+      <div class="step-head"><div class="step-num">4</div>アプリにURLを設定</div>
+      <div class="step-body"><p>記録一覧タブの「⚙️ スプレッドシート設定」からURLとトークンを入力して保存。</p></div>
+    </div>
+    <div class="step-card">
+      <div class="step-head"><div class="step-num">5</div>データを送信</div>
+      <div class="step-body"><p>「📊 スプレッドシート一括送信」から全件・未送信・判定Dのみを選択して送信できます。各記録の「📊 SS」ボタンで1件ずつ送信も可能です。</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="sec-mail">
+  <div class="section-title"><span>1️⃣2️⃣</span>📧 メールで送信</div>
+  <div class="section-body">
+    <p>記録一覧タブの「📧 メール送信」ボタンから、データをメールで送信できます。</p>
+    <div class="step-card">
+      <div class="step-head"><div class="step-num">1</div>送信先を入力</div>
+      <div class="step-body"><p>メールアドレスを直接入力するか、「📒 アドレス帳」から登録済みの送信先を選択します。</p></div>
+    </div>
+    <div class="step-card">
+      <div class="step-head"><div class="step-num">2</div>送信内容を選択</div>
+      <div class="step-body"><p>一覧データ（本文）、JSONバックアップ、CSVファイルのいずれを含めるか選択します。</p></div>
+    </div>
+    <div class="step-card">
+      <div class="step-head"><div class="step-num">3</div>メールアプリで送信</div>
+      <div class="step-body"><p>「📧 メールアプリで送信」で端末のメールアプリが開きます。JSON/CSVファイルは事前にダウンロードして手動添付してください。</p></div>
+    </div>
+    <div class="tip">💡 アドレス帳に登録しておけば、よく使う送信先を簡単に選択できます。</div>
   </div>
 </section>
 
@@ -350,7 +404,7 @@
     <div class="note" style="font-size:0.92rem; line-height:1.8;">
       <ul style="padding-left:18px;">
         <li>診断結果は<strong>目安</strong>です。最終判断は<strong>専門家</strong>が行ってください。</li>
-        <li>C・D判定や危険木が疑われる場合は、行政や専門家<strong>(樹木医等)<strong>に相談してください。</li>
+        <li>C・D判定や危険木が疑われる場合は、行政や<strong>樹木医等の専門家</strong>に相談してください。</li>
         <li>本システムの利用により生じた損害について、開発者は一切の責任を負いません。</li>
         <li>データは端末内に保存されます。定期的にバックアップをお願いします。</li>
       </ul>
@@ -358,8 +412,9 @@
   </div>
 </section>
 
-<footer class="site-footer">
-  <p>樹木点検・診断システム 利用マニュアル</p>
+<footer style="background:var(--green-dark);color:rgba(255,255,255,0.8);text-align:center;padding:20px;font-size:0.8rem;margin-top:10px;">
+  <p>樹木点検・診断システム 利用マニュアル v26.7</p>
 </footer>
 
 </body>
+</html>
