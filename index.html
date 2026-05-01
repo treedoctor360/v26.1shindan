@@ -315,20 +315,58 @@
           </select>
         </div>
         <div id="recordsList"></div>
-        <div style="margin-top:16px; display:flex; gap:8px; flex-wrap:wrap;">
-          <button class="btn-sec" onclick="printInspectionPage()">🖨️ 現在画面を印刷</button>
-          <button class="btn-sec" onclick="exportAllToExcel()">📊 全件Excel出力</button>
-          <button class="btn-sec" onclick="exportAllToJSON()">📦 JSONバックアップ</button>
-          <button class="btn-sec" onclick="exportSummaryToExcel()">📋 一覧表Excel出力</button>
-          <button class="btn-sec" onclick="exportAllToCSV()">📄 CSV出力</button>
-          <input type="file" id="jsonImportInput" accept=".json,application/json" style="display:none;">
-          <input type="file" id="jsonMergeInput" accept=".json,application/json" multiple style="display:none;">
-          <button class="btn-sec" onclick="document.getElementById('jsonImportInput').click()">📂 JSON復元</button>
-          <button class="btn-sec" onclick="document.getElementById('jsonMergeInput').click()" style="background:#e8f5e9; border-color:#4a7c2f; color:#2d5016;">🔗 JSONを統合</button>
-          <button class="btn-sec" onclick="openMailModal()" style="background:#e3f2fd; border-color:#1565c0; color:#1565c0;">📧 メール送信</button>
-          <button class="btn-sec" onclick="openGasBulkModal()" style="background:#e8f5e9; border-color:#1b5e20; color:#1b5e20;">📊 スプレッドシート一括送信</button>
-          <button class="btn-sec" onclick="openGasSettings()" style="background:#f1f8e9; border-color:#558b2f; color:#33691e;">⚙️ スプレッドシート設定</button>
-          <button class="btn-sec" onclick="removeInvalidRecords()" style="background:#ffcdd2;">🧹 無効記録削除</button>
+
+        <!-- ===== ボタングループ ===== -->
+        <div style="margin-top:16px; display:flex; flex-direction:column; gap:10px;">
+
+          <!-- 出力グループ -->
+          <div style="background:#f8faf5; border:1.5px solid #c8e0b0; border-radius:14px; padding:10px 12px;">
+            <div style="font-size:0.75rem; font-weight:700; color:#2d5016; margin-bottom:8px; letter-spacing:0.04em;">📤 出力・エクスポート</div>
+            <div style="display:flex; flex-wrap:wrap; gap:7px;">
+              <button class="btn-sec" onclick="exportAllToExcel()">📊 全件Excel</button>
+              <button class="btn-sec" onclick="exportSummaryToExcel()">📋 一覧表Excel</button>
+              <button class="btn-sec" onclick="exportAllToCSV()">📄 CSV</button>
+              <button class="btn-sec" onclick="printInspectionPage()">🖨️ 印刷</button>
+            </div>
+          </div>
+
+          <!-- GPXグループ -->
+          <div style="background:#eff3ff; border:1.5px solid #9fa8da; border-radius:14px; padding:10px 12px;">
+            <div style="font-size:0.75rem; font-weight:700; color:#1a237e; margin-bottom:8px; letter-spacing:0.04em;">📍 GPX出力（地図アプリ用）</div>
+            <div style="display:flex; flex-wrap:wrap; gap:7px;">
+              <button class="btn-sec" onclick="exportToGPX('all')" style="background:#e8f0fe; border-color:#3949ab; color:#1a237e;">🗂️ 全件</button>
+              <button class="btn-sec" onclick="exportToGPX('danger')" style="background:#ffebee; border-color:#c62828; color:#b71c1c;">⚠️ 判定Dのみ</button>
+              <button class="btn-sec" onclick="exportToGPX('filtered')" style="background:#e8f5e9; border-color:#2d5016; color:#2d5016;">🔍 表示中のみ</button>
+            </div>
+          </div>
+
+          <!-- バックアップ・連携グループ -->
+          <div style="background:#f5faf5; border:1.5px solid #a5d6a7; border-radius:14px; padding:10px 12px;">
+            <div style="font-size:0.75rem; font-weight:700; color:#1b5e20; margin-bottom:8px; letter-spacing:0.04em;">🔄 バックアップ・データ連携</div>
+            <div style="display:flex; flex-wrap:wrap; gap:7px;">
+              <button class="btn-sec" onclick="exportAllToJSON()">📦 JSONバックアップ</button>
+              <input type="file" id="jsonImportInput" accept=".json,application/json" style="display:none;">
+              <input type="file" id="jsonMergeInput" accept=".json,application/json" multiple style="display:none;">
+              <button class="btn-sec" onclick="document.getElementById('jsonImportInput').click()">📂 JSON復元</button>
+              <button class="btn-sec" onclick="document.getElementById('jsonMergeInput').click()" style="background:#e8f5e9; border-color:#4a7c2f; color:#2d5016;">🔗 JSON統合</button>
+            </div>
+          </div>
+
+          <!-- 送信グループ -->
+          <div style="background:#f0f6ff; border:1.5px solid #90caf9; border-radius:14px; padding:10px 12px;">
+            <div style="font-size:0.75rem; font-weight:700; color:#0d47a1; margin-bottom:8px; letter-spacing:0.04em;">📡 送信・共有</div>
+            <div style="display:flex; flex-wrap:wrap; gap:7px;">
+              <button class="btn-sec" onclick="openMailModal()" style="background:#e3f2fd; border-color:#1565c0; color:#1565c0;">📧 メール送信</button>
+              <button class="btn-sec" onclick="openGasBulkModal()" style="background:#e8f5e9; border-color:#1b5e20; color:#1b5e20;">📊 スプレッドシート送信</button>
+              <button class="btn-sec" onclick="openGasSettings()" style="background:#f1f8e9; border-color:#558b2f; color:#33691e;">⚙️ SS設定</button>
+            </div>
+          </div>
+
+          <!-- メンテナンス -->
+          <div style="display:flex; justify-content:flex-end;">
+            <button class="btn-sec" onclick="removeInvalidRecords()" style="background:#ffcdd2; border-color:#e57373; color:#b71c1c; font-size:0.8rem;">🧹 無効記録を削除</button>
+          </div>
+
         </div>
       </div>
     </div>
@@ -1434,7 +1472,196 @@
 
   window.exportToExcel = () => { const d=collectData(); if(!d.treeNo){alert('樹木Noを入力');return;} printRecord(d.id); };
   window.exportSummaryToExcel = () => { if(!records.filter(r=>r?.id).length){alert('データなし');return;} const wb=XLSX.utils.book_new(); const rows=[['調査日','樹木No','樹種','場所','点検者','樹高','幹周','緯度','経度','判定','所見','必要な措置']]; records.filter(r=>r?.id).forEach(r=>rows.push([r.surveyDate,r.treeNo,r.species,r.location,r.inspector,r.treeHeight,r.trunkGirth,r.latitude,r.longitude,r.overall,r.comment,(r.measures||[]).join('、')])); const ws=XLSX.utils.aoa_to_sheet(rows); setColWidths(ws,[12,10,15,20,12,8,8,12,12,8,30,30]); XLSX.utils.book_append_sheet(wb,ws,'一覧表'); dlBlob(new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:'application/octet-stream'}),'樹木点検一覧.xlsx'); };
-  window.exportAllToExcel = () => { const valid=records.filter(r=>r?.id); if(!valid.length){alert('データなし');return;} const wb=XLSX.utils.book_new(); valid.forEach(r=>{const ws=XLSX.utils.aoa_to_sheet([['樹木No',r.treeNo],['調査日',r.surveyDate],['天候',r.weather],['調査者',r.inspector],['樹種',r.species],['科名',r.family],['学名',r.scientificName],['愛称',r.nickname],['所在地',r.location],['樹高(m)',r.treeHeight],['幹周(cm)',r.trunkGirth],['緯度',r.latitude],['経度',r.longitude],['総合判定',r.overall],['所見',r.comment],['腐朽菌',[...(r.fungus||[]),r.fungusOther].filter(Boolean).join('、')],['必要な措置',(r.measures||[]).join('、')]]);setColWidths(ws,[20,40]);XLSX.utils.book_append_sheet(wb,ws,sanitizeSheetName(r.treeNo||r.id));}); const summary=[['調査日','樹木No','樹種','場所','点検者','樹高','幹周','緯度','経度','判定','所見','必要な措置']]; valid.forEach(r=>summary.push([r.surveyDate,r.treeNo,r.species,r.location,r.inspector,r.treeHeight,r.trunkGirth,r.latitude,r.longitude,r.overall,r.comment,(r.measures||[]).join('、')])); const wsSum=XLSX.utils.aoa_to_sheet(summary);setColWidths(wsSum,[12,10,15,20,12,8,8,12,12,8,30,30]);XLSX.utils.book_append_sheet(wb,wsSum,'一覧表'); dlBlob(new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:'application/octet-stream'}),'全件樹木診断.xlsx'); };
+  window.exportAllToExcel = () => {
+    const valid = records.filter(r => r?.id);
+    if (!valid.length) { alert('データなし'); return; }
+    const wb = XLSX.utils.book_new();
+
+    // ===== スタイル定義ヘルパー =====
+    const S = (bgHex, fontHex, bold, sz, wrapText, align) => ({
+      fill: { fgColor: { rgb: bgHex } },
+      font: { color: { rgb: fontHex }, bold: !!bold, sz: sz||10, name:'メイリオ' },
+      alignment: { horizontal: align||'left', vertical:'center', wrapText: !!wrapText },
+      border: {
+        top:    { style:'thin', color:{rgb:'CCCCCC'} },
+        bottom: { style:'thin', color:{rgb:'CCCCCC'} },
+        left:   { style:'thin', color:{rgb:'CCCCCC'} },
+        right:  { style:'thin', color:{rgb:'CCCCCC'} }
+      }
+    });
+
+    // セクション見出し
+    const HDR_GRAY  = S('444441','F1EFE8',true,11,false,'left'); // タイトル行
+    const HDR_GREEN = S('27500A','EAF3DE',true,10,false,'left'); // 基本情報
+    const HDR_BLUE  = S('0C447C','E6F1FB',true,10,false,'left'); // 活力度
+    const HDR_AMBER = S('633806','FAEEDA',true,10,false,'left'); // 健全度
+    const HDR_RED   = S('791F1F','FCEBEB',true,10,false,'left'); // 総合判定
+    // 表ヘッダー
+    const TH = S('D3D1C7','2C2C2A',true,9,false,'center');
+    // 通常セル
+    const CELL_KEY  = S('F1EFE8','5F5E5A',false,10,false,'left');
+    const CELL_VAL  = S('FFFFFF','2C2C2A',false,10,true,'left');
+    const CELL_DESC = S('FAFAFA','5F5E5A',false,9,true,'left');
+    // 活力度スコア色（0=緑 1=黄緑 2=橙 3=赤橙 4=赤）
+    const SCORE_STYLE = [
+      S('C0DD97','173404',true,10,false,'center'),
+      S('FAC775','412402',true,10,false,'center'),
+      S('EF9F27','412402',true,10,false,'center'),
+      S('D85A30','FFFFFF',true,10,false,'center'),
+      S('A32D2D','FFFFFF',true,10,false,'center'),
+    ];
+    const SCORE_EMPTY = S('F8F8F8','AAAAAA',false,10,false,'center');
+    // 健全度評定色
+    const HEALTH_STYLE = {
+      A: S('C0DD97','173404',true,10,false,'center'),
+      B: S('FAC775','412402',true,10,false,'center'),
+      C: S('EF9F27','412402',true,10,false,'center'),
+      D: S('A32D2D','FFFFFF',true,10,false,'center'),
+    };
+    const HEALTH_EMPTY = SCORE_EMPTY;
+    // 空行
+    const BLANK = S('FFFFFF','FFFFFF',false,6,false,'left');
+
+    // セルアドレス生成
+    const addr = (r,c) => XLSX.utils.encode_cell({r,c});
+
+    // セルに値＋スタイルをセット
+    const setCell = (ws, r, c, v, style, t) => {
+      const a = addr(r,c);
+      ws[a] = { v: v===undefined||v===null?'':v, t: t||(typeof v==='number'?'n':'s'), s: style };
+    };
+
+    // ===== 各樹木の詳細シート =====
+    valid.forEach(rec => {
+      const ws = {};
+      ws['!cols'] = [{wch:18},{wch:10},{wch:22},{wch:22},{wch:22},{wch:22},{wch:22}];
+      ws['!rows'] = [];
+      const merges = [];
+      let R = 0; // 現在行インデックス
+
+      const hdrRow = (text, style, cols) => {
+        setCell(ws, R, 0, text, style);
+        for(let c=1;c<cols;c++) setCell(ws, R, c, '', style);
+        merges.push({s:{r:R,c:0},e:{r:R,c:cols-1}});
+        ws['!rows'][R] = {hpt:18};
+        R++;
+      };
+      const blankRow = () => {
+        for(let c=0;c<7;c++) setCell(ws, R, c, '', BLANK);
+        ws['!rows'][R] = {hpt:6};
+        R++;
+      };
+
+      // ── タイトル行 ──
+      const avg = rec.avg !== undefined ? Number(rec.avg).toFixed(2) : '-';
+      const rankStr = (() => { const a=rec.avg; if(a===undefined||a==='') return '-'; if(a<0.8) return 'Ⅰ（良）'; if(a<1.6) return 'Ⅱ（やや不良）'; if(a<2.4) return 'Ⅲ（不良）'; if(a<3.2) return 'Ⅳ（著しく不良）'; return 'Ⅴ（枯死寸前）'; })();
+      hdrRow(`${rec.treeNo||''}　${rec.species||''}　調査日：${rec.surveyDate||''}　調査者：${rec.inspector||''}　総合判定：${rec.overall||''}`, HDR_GRAY, 7);
+
+      // ── 基本情報 ──
+      hdrRow('▶ 基本情報', HDR_GREEN, 7);
+      const basicFields = [
+        ['樹木No', rec.treeNo],['調査日', rec.surveyDate],['天候', rec.weather],
+        ['調査者', rec.inspector],['樹種', rec.species],['科名', rec.family],
+        ['学名', rec.scientificName],['愛称', rec.nickname],['所在地', rec.location],
+        ['樹高(m)', rec.treeHeight],['幹周(cm)', rec.trunkGirth],['緯度', rec.latitude],['経度', rec.longitude]
+      ];
+      // 2列ペアで並べる
+      for(let i=0;i<basicFields.length;i+=2) {
+        const [k1,v1] = basicFields[i];
+        const [k2,v2] = basicFields[i+1]||['',''];
+        setCell(ws,R,0,k1,CELL_KEY); setCell(ws,R,1,v1||'',CELL_VAL);
+        setCell(ws,R,2,'',BLANK);
+        setCell(ws,R,3,k2,CELL_KEY); setCell(ws,R,4,v2||'',CELL_VAL);
+        setCell(ws,R,5,'',BLANK); setCell(ws,R,6,'',BLANK);
+        ws['!rows'][R]={hpt:16}; R++;
+      }
+      blankRow();
+
+      // ── 活力度調査 ──
+      hdrRow(`▶ 活力度調査　　平均値：${avg}　ランク：${rankStr}　　評価基準：0（最良）〜4（最悪）`, HDR_BLUE, 7);
+      // 表ヘッダー
+      ['項目','評点','0の状態','1の状態','2の状態','3の状態','4の状態'].forEach((h,c)=>setCell(ws,R,c,h,TH));
+      ws['!rows'][R]={hpt:15}; R++;
+      declineItems.forEach(it => {
+        const val = rec.scores?.[it.id];
+        setCell(ws,R,0,it.name,CELL_KEY);
+        if(val!==undefined){ setCell(ws,R,1,val,SCORE_STYLE[val]||SCORE_EMPTY,'n'); }
+        else { setCell(ws,R,1,'',SCORE_EMPTY); }
+        for(let c=2;c<7;c++) setCell(ws,R,c,it.desc[c-2]||'',CELL_DESC);
+        ws['!rows'][R]={hpt:28}; R++;
+      });
+      blankRow();
+
+      // ── 健全度調査 ──
+      hdrRow('▶ 健全度調査　　評価基準：A（異常なし）B（軽微）C（危険性あり）D（非常に危険）', HDR_AMBER, 7);
+      ['項目','評定','Aの状態','Bの状態','Cの状態','Dの状態',''].forEach((h,c)=>setCell(ws,R,c,h,TH));
+      ws['!rows'][R]={hpt:15}; R++;
+      healthItems.forEach(it => {
+        const val = rec.health?.[it.id];
+        setCell(ws,R,0,it.name,CELL_KEY);
+        if(val){ setCell(ws,R,1,val,HEALTH_STYLE[val]||HEALTH_EMPTY); }
+        else { setCell(ws,R,1,'',HEALTH_EMPTY); }
+        for(let c=2;c<6;c++) setCell(ws,R,c,it.desc[c-2]||'',CELL_DESC);
+        setCell(ws,R,6,'',BLANK);
+        ws['!rows'][R]={hpt:28}; R++;
+      });
+      // 腐朽菌
+      const fungusStr = [...(rec.fungus||[]),rec.fungusOther].filter(Boolean).join('、');
+      setCell(ws,R,0,'腐朽菌（子実体）',CELL_KEY);
+      setCell(ws,R,1,fungusStr||'なし',CELL_VAL);
+      for(let c=2;c<7;c++) setCell(ws,R,c,'',BLANK);
+      merges.push({s:{r:R,c:1},e:{r:R,c:6}});
+      ws['!rows'][R]={hpt:16}; R++;
+      blankRow();
+
+      // ── 総合判定 ──
+      const overallStyle = {'A':S('639922','FFFFFF',true,12,false,'center'),'B':S('BA7517','FFFFFF',true,12,false,'center'),'C':S('EF9F27','2C2C2A',true,12,false,'center'),'D':S('A32D2D','FFFFFF',true,12,false,'center')}[rec.overall] || HDR_RED;
+      hdrRow(`▶ 総合判定　${rec.overall||'-'}`, overallStyle, 7);
+      setCell(ws,R,0,'総合所見',CELL_KEY);
+      setCell(ws,R,1,rec.comment||'',CELL_VAL);
+      for(let c=2;c<7;c++) setCell(ws,R,c,'',BLANK);
+      merges.push({s:{r:R,c:1},e:{r:R,c:6}});
+      ws['!rows'][R]={hpt:40}; R++;
+      setCell(ws,R,0,'必要な措置',CELL_KEY);
+      setCell(ws,R,1,(rec.measures||[]).join('、'),CELL_VAL);
+      for(let c=2;c<7;c++) setCell(ws,R,c,'',BLANK);
+      merges.push({s:{r:R,c:1},e:{r:R,c:6}});
+      ws['!rows'][R]={hpt:16}; R++;
+
+      ws['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0},e:{r:R,c:6}});
+      ws['!merges'] = merges;
+      XLSX.utils.book_append_sheet(wb, ws, sanitizeSheetName(rec.treeNo || rec.id));
+    });
+
+    // ===== 一覧表シート（色付き） =====
+    const sumWs = {};
+    sumWs['!cols'] = [{wch:12},{wch:10},{wch:15},{wch:22},{wch:12},{wch:7},{wch:7},{wch:12},{wch:12},{wch:8},{wch:10},{wch:6},{wch:6},{wch:20},{wch:25},{wch:35}];
+    const sumHdrs = ['調査日','樹木No','樹種','場所','点検者','樹高(m)','幹周(cm)','緯度','経度','活力度平均','活力度ランク','健全度','総合判定','腐朽菌','必要な措置','所見'];
+    sumHdrs.forEach((h,c) => { sumWs[addr(0,c)] = {v:h, t:'s', s: S('27500A','EAF3DE',true,10,false,'center')}; });
+    sumWs['!rows'] = [{hpt:16}];
+    let SR = 1;
+    valid.forEach(rec => {
+      const avg = rec.avg !== undefined ? Number(rec.avg).toFixed(2) : '';
+      const rank = (() => { const a=rec.avg; if(a===undefined||a==='') return ''; if(a<0.8) return 'Ⅰ'; if(a<1.6) return 'Ⅱ'; if(a<2.4) return 'Ⅲ'; if(a<3.2) return 'Ⅳ'; return 'Ⅴ'; })();
+      const hw = (() => { if(!rec.health) return ''; const ord={A:0,B:1,C:2,D:3}; let w='A'; Object.values(rec.health).forEach(g=>{if(g&&ord[g]>ord[w])w=g;}); return w; })();
+      const rowBase = S('FFFFFF','2C2C2A',false,10,false,'left');
+      const rowData = [rec.surveyDate,rec.treeNo,rec.species,rec.location,rec.inspector,rec.treeHeight,rec.trunkGirth,rec.latitude,rec.longitude,avg,rank];
+      rowData.forEach((v,c) => { sumWs[addr(SR,c)] = {v:v===undefined?'':v, t:'s', s:rowBase}; });
+      // 健全度最悪値
+      sumWs[addr(SR,11)] = {v:hw, t:'s', s: hw?(HEALTH_STYLE[hw]||rowBase):rowBase};
+      // 総合判定
+      const ov = rec.overall||'';
+      const ovStyle = {'A':S('C0DD97','173404',true,10,false,'center'),'B':S('FAC775','412402',true,10,false,'center'),'C':S('EF9F27','412402',true,10,false,'center'),'D':S('A32D2D','FFFFFF',true,10,false,'center')}[ov]||rowBase;
+      sumWs[addr(SR,12)] = {v:ov, t:'s', s:ovStyle};
+      [[13,[...(rec.fungus||[]),rec.fungusOther].filter(Boolean).join('、')],[14,(rec.measures||[]).join('、')],[15,rec.comment||'']].forEach(([c,v])=>{ sumWs[addr(SR,c)]={v,t:'s',s:rowBase}; });
+      sumWs['!rows'][SR]={hpt:15};
+      SR++;
+    });
+    sumWs['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0},e:{r:SR,c:15}});
+    XLSX.utils.book_append_sheet(wb, sumWs, '一覧表');
+
+    dlBlob(new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array', cellStyles:true})],{type:'application/octet-stream'}), '全件樹木診断.xlsx');
+  };
 
   window.exportAllToJSON = async () => {
     const valid = records.filter(r => r?.id);
@@ -1449,13 +1676,158 @@
   };
 
   window.exportAllToCSV = function() {
+  const valid = records.filter(r => r?.id);
+  if (!valid.length) { alert('出力する記録がありません'); return; }
+  
+  // 活力度・健全度の文字列表現を取得するヘルパー
+  const getDeclineLevel = (avg) => {
+    if (avg === undefined || avg === null) return '';
+    if (avg < 0.8) return 'Ⅰ（良）';
+    if (avg < 1.6) return 'Ⅱ（やや不良）';
+    if (avg < 2.4) return 'Ⅲ（不良）';
+    if (avg < 3.2) return 'Ⅳ（著しく不良）';
+    return 'Ⅴ（枯死寸前）';
+  };
+  
+  const getHealthWorst = (health) => {
+    if (!health || !Object.keys(health).length) return '';
+    const order = {A:0, B:1, C:2, D:3};
+    let worst = 'A';
+    Object.values(health).forEach(g => {
+      if (g && order[g] > (order[worst] || 0)) worst = g;
+    });
+    return worst;
+  };
+  
+  const header = [
+    '樹木No', '調査日', '天候', '調査者', '樹種名', '所在地',
+    '樹高(m)', '幹周(cm)', '緯度', '経度', '総合判定',
+    '活力度', '健全度', '腐朽菌', '所見', '必要な措置'
+  ];
+  
+  const rows = valid.map(r => [
+    r.treeNo || '',
+    r.surveyDate || '',
+    r.weather || '',
+    r.inspector || '',
+    r.species || '',
+    r.location || '',
+    r.treeHeight || '',
+    r.trunkGirth || '',
+    r.latitude || '',
+    r.longitude || '',
+    r.overall || '',
+    getDeclineLevel(r.avg),
+    getHealthWorst(r.health),
+    [...(r.fungus || []), r.fungusOther || ''].filter(Boolean).join('、'),
+    r.comment || '',
+    (r.measures || []).join('、')
+  ]);
+  
+  const csvContent = [header, ...rows]
+    .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+    .join('\n');
+  
+  dlBlob(
+    new Blob(['\uFEFF' + csvContent], {type:'text/csv;charset=utf-8;'}),
+    `樹木点検一覧_${new Date().toISOString().slice(0,10)}.csv`
+  );
+  alert('✅ CSVを出力しました');
+};
+
+
+  // ===== GPX出力（全件・判定Dのみ・表示中） =====
+  window.exportToGPX = function(mode) {
     const valid = records.filter(r => r?.id);
-    if (!valid.length) { alert('出力する記録がありません'); return; }
-    const header = ['通し番号','樹木番号','樹種名','点検者','所在地','調査日','総合判定','必要な処置','緯度X','経度Y'];
-    const rows = valid.map((r, i) => [i+1, r.treeNo||'', r.species||'', r.inspector||'', r.location||'', r.surveyDate||'', r.overall||'', (r.measures||[]).join('、'), r.latitude||'', r.longitude||'']);
-    const csvContent = [header, ...rows].map(row => row.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
-    dlBlob(new Blob(['\uFEFF' + csvContent], {type:'text/csv;charset=utf-8;'}), `樹木点検一覧_${new Date().toISOString().slice(0,10)}.csv`);
-    alert('CSVを出力しました');
+    if (!valid.length) { alert('記録がありません'); return; }
+    
+    let targets = [];
+    const q = (document.getElementById('searchInput').value || '').toLowerCase();
+    
+    if (mode === 'all') {
+      // 全件（位置情報があるもののみ）
+      targets = valid.filter(r => r.latitude && r.longitude);
+    } else if (mode === 'danger') {
+      // 判定Dのみ
+      targets = valid.filter(r => r.overall === 'D' && r.latitude && r.longitude);
+    } else if (mode === 'filtered') {
+      // 現在の検索結果から
+      let filtered = valid.filter(r =>
+        (r.species || '').toLowerCase().includes(q) ||
+        (r.location || '').toLowerCase().includes(q) ||
+        (r.inspector || '').toLowerCase().includes(q)
+      );
+      const s = document.getElementById('sortSelect').value;
+      if (s === 'date-desc') filtered.sort((a, b) => a.surveyDate < b.surveyDate ? 1 : -1);
+      else if (s === 'date-asc') filtered.sort((a, b) => a.surveyDate > b.surveyDate ? 1 : -1);
+      else { const o = {A:1, B:2, C:3, D:4}; filtered.sort((a, b) => (o[a.overall] || 5) - (o[b.overall] || 5)); }
+      targets = filtered.filter(r => r.latitude && r.longitude);
+    }
+    
+    if (!targets.length) {
+      alert('位置情報のある対象記録がありません。\n（緯度・経度が入力されたデータが必要です）');
+      return;
+    }
+    
+    const escXml = s => String(s || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
+    
+    const now = new Date().toISOString();
+    
+    const gradeLabel = r => {
+      const g = (r.overall || '').charAt(0);
+      return {A: '健全', B: '健全に近い', C: '要注意', D: '危険木'}[g] || r.overall || '';
+    };
+    
+    const wpts = targets.map(r => {
+      const lat = parseFloat(r.latitude);
+      const lon = parseFloat(r.longitude);
+      if (isNaN(lat) || isNaN(lon)) return '';
+      
+      const name = escXml(r.treeNo || r.id);
+      const sym = r.overall === 'D' ? 'Danger' :
+                  r.overall === 'C' ? 'Caution' :
+                  r.overall === 'B' ? 'Flag, Blue' : 'Flag, Green';
+      const desc = escXml([
+        `樹種: ${r.species || '不明'}`,
+        `調査日: ${r.surveyDate || ''}`,
+        `調査者: ${r.inspector || ''}`,
+        `場所: ${r.location || ''}`,
+        `樹高: ${r.treeHeight || ''}m  幹周: ${r.trunkGirth || ''}cm`,
+        `総合判定: ${gradeLabel(r)}`,
+        r.comment ? `所見: ${r.comment}` : '',
+        r.measures?.length ? `措置: ${r.measures.join('、')}` : ''
+      ].filter(Boolean).join(' | '));
+      
+      return `  <wpt lat="${lat}" lon="${lon}">
+    <name>${name}</name>
+    <desc>${desc}</desc>
+    <sym>${sym}</sym>
+    <type>${escXml(r.overall || '')}</type>
+    <time>${r.surveyDate ? r.surveyDate + 'T00:00:00Z' : now}</time>
+  </wpt>`;
+    }).filter(Boolean).join('\n');
+    
+    const modeLabel = mode === 'danger' ? '危険木のみ' : mode === 'filtered' ? '検索結果' : '全件';
+    const gpx = `<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="樹木診断・点検システム" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata>
+    <name>樹木点検データ（${modeLabel}）</name>
+    <desc>樹木診断・点検システム エクスポート（${targets.length}件 / ${modeLabel}）</desc>
+    <time>${now}</time>
+  </metadata>
+${wpts}
+</gpx>`;
+    
+    dlBlob(
+      new Blob([gpx], {type: 'application/gpx+xml;charset=utf-8;'}),
+      `樹木点検_${modeLabel}_${new Date().toISOString().slice(0, 10)}.gpx`
+    );
+    alert(`✅ GPXファイルを出力しました（${targets.length}件 / ${modeLabel}）\n位置情報のない記録は除外されています。`);
   };
 
   // ===== JSON統合 =====
