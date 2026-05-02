@@ -85,7 +85,6 @@
     .pe-save-btn { background: #2d5016; color: white; padding: 8px 16px; border: none; border-radius: 20px; font-weight: 600; }
     .pe-close-btn { background: #555; color: white; padding: 8px 16px; border: none; border-radius: 20px; }
 
-```
 .help-icon {
   display: inline-flex; align-items: center; justify-content: center;
   width: 22px; height: 22px; border-radius: 50%;
@@ -158,7 +157,6 @@
   #map, #allMap { height: 350px !important; border: 1px solid #000; break-inside: avoid; }
   .card-body { padding: 8px; }
 }
-```
 
   </style>
 </head>
@@ -327,7 +325,6 @@
         </div>
         <div id="recordsList"></div>
 
-```
     <!-- ===== ボタングループ ===== -->
     <div style="margin-top:16px; display:flex; flex-direction:column; gap:10px;">
 
@@ -382,7 +379,6 @@
     </div>
   </div>
 </div>
-```
 
   </div>
 
@@ -554,7 +550,6 @@
       <button class="modal-close-btn" onclick="closeExcelSelectModal()">✕</button>
     </div>
 
-```
 <!-- モード選択タブ -->
 <div style="display:flex; gap:6px; margin-bottom:16px; background:#f2f2f2; padding:5px; border-radius:40px;">
   <button id="xlsMode-all"      onclick="setXlsMode('all')"      style="flex:1;padding:8px 4px;border:none;border-radius:30px;font-weight:600;font-size:0.85rem;cursor:pointer;background:#4a7c2f;color:white;">全件</button>
@@ -599,7 +594,6 @@
 
 <!-- 出力ボタン -->
 <button onclick="runExcelExport()" style="width:100%;margin-top:18px;padding:14px;background:#2d5016;color:white;border:none;border-radius:40px;font-weight:700;font-size:1rem;cursor:pointer;font-family:inherit;">📥 Excelを出力する</button>
-```
 
   </div>
 </div>
@@ -1568,8 +1562,9 @@
     const valid = records.filter(r => r?.id);
     if (!valid.length) { alert('データなし'); return; }
 
-    // 樹木Noリスト構築
-    const nos = valid.map(r => r.treeNo || r.id);
+    // 樹木Noリスト構築（昇順ソート）
+    const sorted = [...valid].sort((a, b) => naturalSortNo(a, b));
+    const nos = sorted.map(r => r.treeNo || r.id);
 
     // 範囲指定セレクト
     ['xlsRangeFrom','xlsRangeTo'].forEach(id => {
@@ -1628,18 +1623,19 @@
 
   window.runExcelExport = () => {
     const valid = records.filter(r => r?.id);
+    const sorted = [...valid].sort((a, b) => naturalSortNo(a, b));
     let targets = [];
     if (_xlsMode === 'all') {
-      targets = valid;
+      targets = sorted;
     } else if (_xlsMode === 'range') {
       const from = parseInt(document.getElementById('xlsRangeFrom').value);
       const to   = parseInt(document.getElementById('xlsRangeTo').value);
       if (from > to) { alert('開始が終了より後になっています'); return; }
-      targets = valid.slice(from, to + 1);
+      targets = sorted.slice(from, to + 1);
     } else {
       const checked = [...document.querySelectorAll('.xls-pick-cb:checked')].map(cb => parseInt(cb.dataset.idx));
       if (!checked.length) { alert('1件以上選択してください'); return; }
-      targets = checked.map(i => valid[i]);
+      targets = checked.map(i => sorted[i]);
     }
     if (!targets.length) { alert('対象データがありません'); return; }
     closeExcelSelectModal();
