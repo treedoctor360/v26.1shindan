@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
@@ -84,74 +85,77 @@
     .pe-save-btn { background: #2d5016; color: white; padding: 8px 16px; border: none; border-radius: 20px; font-weight: 600; }
     .pe-close-btn { background: #555; color: white; padding: 8px 16px; border: none; border-radius: 20px; }
 
-    .help-icon {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 20px; height: 20px; border-radius: 50%;
-      background: #e0e0e0; color: #555; font-size: 0.7rem; font-weight: 700;
-      cursor: pointer; margin-left: 4px; text-decoration: none; transition: all 0.15s;
-    }
-    .help-icon:hover { background: #4a7c2f; color: white; }
-    .help-popup-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5); z-index: 9998;
-      display: none; align-items: center; justify-content: center;
-    }
-    .help-popup-overlay.open { display: flex; }
-    .help-popup {
-      background: white; border-radius: 20px; width: 90vw; max-width: 500px;
-      max-height: 80vh; overflow-y: auto; padding: 20px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.3); position: relative;
-    }
-    .help-popup h3 { font-size: 1.1rem; color: #2d5016; margin-bottom: 4px; }
-    .help-popup .help-source { font-size: 0.7rem; color: #888; margin-bottom: 14px; }
-    .help-popup .help-summary { font-size: 0.88rem; margin-bottom: 14px; line-height: 1.6; }
-    .help-popup .help-criteria { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 0.82rem; }
-    .help-popup .help-criteria th { background: #2d5016; color: white; padding: 6px 8px; text-align: left; }
-    .help-popup .help-criteria td { padding: 6px 8px; border-bottom: 1px solid #eee; }
-    .help-popup .help-check { background: #e8f5e9; padding: 10px 12px; border-radius: 8px; font-size: 0.82rem; margin-bottom: 8px; }
-    .help-popup .help-danger { background: #ffebee; color: #b71c1c; padding: 10px 12px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; }
-    .help-popup .help-close {
-      position: absolute; top: 12px; right: 14px;
-      width: 28px; height: 28px; border-radius: 50%;
-      border: none; background: #eee; font-size: 1rem;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-    }
+```
+.help-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: #e0e0e0; color: #555; font-size: 0.7rem; font-weight: 700;
+  cursor: pointer; margin-left: 4px; text-decoration: none; transition: all 0.15s;
+}
+.help-icon:hover { background: #4a7c2f; color: white; }
+.help-popup-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5); z-index: 9998;
+  display: none; align-items: center; justify-content: center;
+}
+.help-popup-overlay.open { display: flex; }
+.help-popup {
+  background: white; border-radius: 20px; width: 90vw; max-width: 500px;
+  max-height: 80vh; overflow-y: auto; padding: 20px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3); position: relative;
+}
+.help-popup h3 { font-size: 1.1rem; color: #2d5016; margin-bottom: 4px; }
+.help-popup .help-source { font-size: 0.7rem; color: #888; margin-bottom: 14px; }
+.help-popup .help-summary { font-size: 0.88rem; margin-bottom: 14px; line-height: 1.6; }
+.help-popup .help-criteria { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 0.82rem; }
+.help-popup .help-criteria th { background: #2d5016; color: white; padding: 6px 8px; text-align: left; }
+.help-popup .help-criteria td { padding: 6px 8px; border-bottom: 1px solid #eee; }
+.help-popup .help-check { background: #e8f5e9; padding: 10px 12px; border-radius: 8px; font-size: 0.82rem; margin-bottom: 8px; }
+.help-popup .help-danger { background: #ffebee; color: #b71c1c; padding: 10px 12px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; }
+.help-popup .help-close {
+  position: absolute; top: 12px; right: 14px;
+  width: 28px; height: 28px; border-radius: 50%;
+  border: none; background: #eee; font-size: 1rem;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
 
-    /* モーダル共通 */
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 9200;
-      overflow-y: auto; padding: 20px 14px; display: none;
-    }
-    .modal-overlay.open { display: block; }
-    .modal-panel {
-      background: white; border-radius: 20px; max-width: 520px; margin: 0 auto;
-      padding: 22px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-    }
-    .modal-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 18px;
-    }
-    .modal-header h2 { font-size: 1.1rem; }
-    .modal-close-btn {
-      background: none; border: none; font-size: 1.4rem;
-      cursor: pointer; color: #888;
-    }
-    .modal-form-group { margin-bottom: 14px; }
-    .modal-form-group label { font-size: 0.85rem; font-weight: 700; color: #333; display: block; margin-bottom: 6px; }
-    .modal-input { width: 100%; padding: 10px 12px; border: 1.5px solid #ddd; border-radius: 10px; font-size: 0.88rem; font-family: inherit; }
-    .modal-code { background: #f0f0f0; padding: 1px 5px; border-radius: 4px; font-size: 0.82rem; }
+/* モーダル共通 */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 9200;
+  overflow-y: auto; padding: 20px 14px; display: none;
+}
+.modal-overlay.open { display: block; }
+.modal-panel {
+  background: white; border-radius: 20px; max-width: 520px; margin: 0 auto;
+  padding: 22px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 18px;
+}
+.modal-header h2 { font-size: 1.1rem; }
+.modal-close-btn {
+  background: none; border: none; font-size: 1.4rem;
+  cursor: pointer; color: #888;
+}
+.modal-form-group { margin-bottom: 14px; }
+.modal-form-group label { font-size: 0.85rem; font-weight: 700; color: #333; display: block; margin-bottom: 6px; }
+.modal-input { width: 100%; padding: 10px 12px; border: 1.5px solid #ddd; border-radius: 10px; font-size: 0.88rem; font-family: inherit; }
+.modal-code { background: #f0f0f0; padding: 1px 5px; border-radius: 4px; font-size: 0.82rem; }
 
-    @media print {
-      body { background: white; padding: 0; }
-      .hdr, .tabs, .submit-area, .photo-del, .photo-save, .photo-edit,
-      .btn-sec, .btn-pri, .btn-cancel, .search-bar, .record-actions,
-      .tab-btn, .modal-overlay { display: none !important; }
-      .card { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; }
-      .content { padding: 0; }
-      .tab-panel { display: block !important; }
-      #map, #allMap { height: 350px !important; border: 1px solid #000; break-inside: avoid; }
-      .card-body { padding: 8px; }
-    }
+@media print {
+  body { background: white; padding: 0; }
+  .hdr, .tabs, .submit-area, .photo-del, .photo-save, .photo-edit,
+  .btn-sec, .btn-pri, .btn-cancel, .search-bar, .record-actions,
+  .tab-btn, .modal-overlay { display: none !important; }
+  .card { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; }
+  .content { padding: 0; }
+  .tab-panel { display: block !important; }
+  #map, #allMap { height: 350px !important; border: 1px solid #000; break-inside: avoid; }
+  .card-body { padding: 8px; }
+}
+```
+
   </style>
 </head>
 <body>
@@ -303,6 +307,7 @@
   </div>
 
   <!-- 記録一覧タブ -->
+
   <div class="tab-panel" id="tab-records">
     <div class="card">
       <div class="card-body">
@@ -316,63 +321,67 @@
         </div>
         <div id="recordsList"></div>
 
-        <!-- ===== ボタングループ ===== -->
-        <div style="margin-top:16px; display:flex; flex-direction:column; gap:10px;">
+```
+    <!-- ===== ボタングループ ===== -->
+    <div style="margin-top:16px; display:flex; flex-direction:column; gap:10px;">
 
-          <!-- 出力グループ -->
-          <div style="background:#f8faf5; border:1.5px solid #c8e0b0; border-radius:14px; padding:10px 12px;">
-            <div style="font-size:0.75rem; font-weight:700; color:#2d5016; margin-bottom:8px; letter-spacing:0.04em;">📤 出力・エクスポート</div>
-            <div style="display:flex; flex-wrap:wrap; gap:7px;">
-              <button class="btn-sec" onclick="exportAllToExcel()">📊 全件Excel</button>
-              <button class="btn-sec" onclick="exportSummaryToExcel()">📋 一覧表Excel</button>
-              <button class="btn-sec" onclick="exportAllToCSV()">📄 CSV</button>
-              <button class="btn-sec" onclick="printInspectionPage()">🖨️ 印刷</button>
-            </div>
-          </div>
-
-          <!-- GPXグループ -->
-          <div style="background:#eff3ff; border:1.5px solid #9fa8da; border-radius:14px; padding:10px 12px;">
-            <div style="font-size:0.75rem; font-weight:700; color:#1a237e; margin-bottom:8px; letter-spacing:0.04em;">📍 GPX出力（地図アプリ用）</div>
-            <div style="display:flex; flex-wrap:wrap; gap:7px;">
-              <button class="btn-sec" onclick="exportToGPX('all')" style="background:#e8f0fe; border-color:#3949ab; color:#1a237e;">🗂️ 全件</button>
-              <button class="btn-sec" onclick="exportToGPX('danger')" style="background:#ffebee; border-color:#c62828; color:#b71c1c;">⚠️ 判定Dのみ</button>
-              <button class="btn-sec" onclick="exportToGPX('filtered')" style="background:#e8f5e9; border-color:#2d5016; color:#2d5016;">🔍 表示中のみ</button>
-            </div>
-          </div>
-
-          <!-- バックアップ・連携グループ -->
-          <div style="background:#f5faf5; border:1.5px solid #a5d6a7; border-radius:14px; padding:10px 12px;">
-            <div style="font-size:0.75rem; font-weight:700; color:#1b5e20; margin-bottom:8px; letter-spacing:0.04em;">🔄 バックアップ・データ連携</div>
-            <div style="display:flex; flex-wrap:wrap; gap:7px;">
-              <button class="btn-sec" onclick="exportAllToJSON()">📦 JSONバックアップ</button>
-              <input type="file" id="jsonImportInput" accept=".json,application/json" style="display:none;">
-              <input type="file" id="jsonMergeInput" accept=".json,application/json" multiple style="display:none;">
-              <button class="btn-sec" onclick="document.getElementById('jsonImportInput').click()">📂 JSON復元</button>
-              <button class="btn-sec" onclick="document.getElementById('jsonMergeInput').click()" style="background:#e8f5e9; border-color:#4a7c2f; color:#2d5016;">🔗 JSON統合</button>
-            </div>
-          </div>
-
-          <!-- 送信グループ -->
-          <div style="background:#f0f6ff; border:1.5px solid #90caf9; border-radius:14px; padding:10px 12px;">
-            <div style="font-size:0.75rem; font-weight:700; color:#0d47a1; margin-bottom:8px; letter-spacing:0.04em;">📡 送信・共有</div>
-            <div style="display:flex; flex-wrap:wrap; gap:7px;">
-              <button class="btn-sec" onclick="openMailModal()" style="background:#e3f2fd; border-color:#1565c0; color:#1565c0;">📧 メール送信</button>
-              <button class="btn-sec" onclick="openGasBulkModal()" style="background:#e8f5e9; border-color:#1b5e20; color:#1b5e20;">📊 スプレッドシート送信</button>
-              <button class="btn-sec" onclick="openGasSettings()" style="background:#f1f8e9; border-color:#558b2f; color:#33691e;">⚙️ SS設定</button>
-            </div>
-          </div>
-
-          <!-- メンテナンス -->
-          <div style="display:flex; justify-content:flex-end;">
-            <button class="btn-sec" onclick="removeInvalidRecords()" style="background:#ffcdd2; border-color:#e57373; color:#b71c1c; font-size:0.8rem;">🧹 無効記録を削除</button>
-          </div>
-
+      <!-- 出力グループ -->
+      <div style="background:#f8faf5; border:1.5px solid #c8e0b0; border-radius:14px; padding:10px 12px;">
+        <div style="font-size:0.75rem; font-weight:700; color:#2d5016; margin-bottom:8px; letter-spacing:0.04em;">📤 出力・エクスポート</div>
+        <div style="display:flex; flex-wrap:wrap; gap:7px;">
+          <button class="btn-sec" onclick="openExcelSelectModal()">📊 全件Excel</button>
+          <button class="btn-sec" onclick="exportSummaryToExcel()">📋 一覧表Excel</button>
+          <button class="btn-sec" onclick="exportAllToCSV()">📄 CSV</button>
+          <button class="btn-sec" onclick="printInspectionPage()">🖨️ 印刷</button>
         </div>
       </div>
+
+      <!-- GPXグループ -->
+      <div style="background:#eff3ff; border:1.5px solid #9fa8da; border-radius:14px; padding:10px 12px;">
+        <div style="font-size:0.75rem; font-weight:700; color:#1a237e; margin-bottom:8px; letter-spacing:0.04em;">📍 GPX出力（地図アプリ用）</div>
+        <div style="display:flex; flex-wrap:wrap; gap:7px;">
+          <button class="btn-sec" onclick="exportToGPX('all')" style="background:#e8f0fe; border-color:#3949ab; color:#1a237e;">🗂️ 全件</button>
+          <button class="btn-sec" onclick="exportToGPX('danger')" style="background:#ffebee; border-color:#c62828; color:#b71c1c;">⚠️ 判定Dのみ</button>
+          <button class="btn-sec" onclick="exportToGPX('filtered')" style="background:#e8f5e9; border-color:#2d5016; color:#2d5016;">🔍 表示中のみ</button>
+        </div>
+      </div>
+
+      <!-- バックアップ・連携グループ -->
+      <div style="background:#f5faf5; border:1.5px solid #a5d6a7; border-radius:14px; padding:10px 12px;">
+        <div style="font-size:0.75rem; font-weight:700; color:#1b5e20; margin-bottom:8px; letter-spacing:0.04em;">🔄 バックアップ・データ連携</div>
+        <div style="display:flex; flex-wrap:wrap; gap:7px;">
+          <button class="btn-sec" onclick="exportAllToJSON()">📦 JSONバックアップ</button>
+          <input type="file" id="jsonImportInput" accept=".json,application/json" style="display:none;">
+          <input type="file" id="jsonMergeInput" accept=".json,application/json" multiple style="display:none;">
+          <button class="btn-sec" onclick="document.getElementById('jsonImportInput').click()">📂 JSON復元</button>
+          <button class="btn-sec" onclick="document.getElementById('jsonMergeInput').click()" style="background:#e8f5e9; border-color:#4a7c2f; color:#2d5016;">🔗 JSON統合</button>
+        </div>
+      </div>
+
+      <!-- 送信グループ -->
+      <div style="background:#f0f6ff; border:1.5px solid #90caf9; border-radius:14px; padding:10px 12px;">
+        <div style="font-size:0.75rem; font-weight:700; color:#0d47a1; margin-bottom:8px; letter-spacing:0.04em;">📡 送信・共有</div>
+        <div style="display:flex; flex-wrap:wrap; gap:7px;">
+          <button class="btn-sec" onclick="openMailModal()" style="background:#e3f2fd; border-color:#1565c0; color:#1565c0;">📧 メール送信</button>
+          <button class="btn-sec" onclick="openGasBulkModal()" style="background:#e8f5e9; border-color:#1b5e20; color:#1b5e20;">📊 スプレッドシート送信</button>
+          <button class="btn-sec" onclick="openGasSettings()" style="background:#f1f8e9; border-color:#558b2f; color:#33691e;">⚙️ SS設定</button>
+        </div>
+      </div>
+
+      <!-- メンテナンス -->
+      <div style="display:flex; justify-content:flex-end;">
+        <button class="btn-sec" onclick="removeInvalidRecords()" style="background:#ffcdd2; border-color:#e57373; color:#b71c1c; font-size:0.8rem;">🧹 無効記録を削除</button>
+      </div>
+
     </div>
+  </div>
+</div>
+```
+
   </div>
 
   <!-- 全体マップタブ -->
+
   <div class="tab-panel" id="tab-allmap">
     <div class="card">
       <div class="card-hdr green">🗺️ 全樹木位置マップ</div>
@@ -388,6 +397,7 @@
   </div>
 
   <!-- 判定基準タブ -->
+
   <div class="tab-panel" id="tab-guide">
     <div class="card"><div class="card-body">
       <h3>活力度 0〜4</h3><p>各項目の状態を0(最良)〜4(最悪)で評価</p>
@@ -408,6 +418,7 @@
 </div>
 
 <!-- ヘルプポップアップ -->
+
 <div class="help-popup-overlay" id="helpPopupOverlay" onclick="closeHelpPopup()">
   <div class="help-popup" id="helpPopup" onclick="event.stopPropagation()">
     <button class="help-close" onclick="closeHelpPopup()">✕</button>
@@ -416,6 +427,7 @@
 </div>
 
 <!-- 写真編集モーダル -->
+
 <div id="photoEditModal">
   <div class="pe-container">
     <div class="pe-toolbar">
@@ -460,6 +472,7 @@
 </div>
 
 <!-- メール送信モーダル -->
+
 <div class="modal-overlay" id="mailModal">
   <div class="modal-panel">
     <div class="modal-header">
@@ -508,6 +521,7 @@
 </div>
 
 <!-- アドレス帳モーダル -->
+
 <div class="modal-overlay" id="addressModal">
   <div class="modal-panel">
     <div class="modal-header">
@@ -525,7 +539,67 @@
   </div>
 </div>
 
+<!-- Excel出力範囲選択モーダル -->
+
+<div class="modal-overlay" id="excelSelectModal">
+  <div class="modal-panel" style="max-width:480px;">
+    <div class="modal-header">
+      <h2 style="color:#2d5016;">📊 Excel出力　範囲・対象を選択</h2>
+      <button class="modal-close-btn" onclick="closeExcelSelectModal()">✕</button>
+    </div>
+
+```
+<!-- モード選択タブ -->
+<div style="display:flex; gap:6px; margin-bottom:16px; background:#f2f2f2; padding:5px; border-radius:40px;">
+  <button id="xlsMode-all"      onclick="setXlsMode('all')"      style="flex:1;padding:8px 4px;border:none;border-radius:30px;font-weight:600;font-size:0.85rem;cursor:pointer;background:#4a7c2f;color:white;">全件</button>
+  <button id="xlsMode-range"    onclick="setXlsMode('range')"    style="flex:1;padding:8px 4px;border:none;border-radius:30px;font-weight:600;font-size:0.85rem;cursor:pointer;background:transparent;color:#555;">範囲指定</button>
+  <button id="xlsMode-pick"     onclick="setXlsMode('pick')"     style="flex:1;padding:8px 4px;border:none;border-radius:30px;font-weight:600;font-size:0.85rem;cursor:pointer;background:transparent;color:#555;">個別指定</button>
+</div>
+
+<!-- 全件モード -->
+<div id="xlsPanel-all" style="display:block;">
+  <p style="font-size:0.88rem;color:#555;padding:12px;background:#f8faf5;border-radius:10px;">登録されている全件を出力します。</p>
+</div>
+
+<!-- 範囲指定モード -->
+<div id="xlsPanel-range" style="display:none;">
+  <p style="font-size:0.82rem;color:#555;margin-bottom:10px;">樹木Noの開始〜終了を選択してください。</p>
+  <div style="display:flex;gap:10px;align-items:center;">
+    <div style="flex:1;">
+      <label style="font-size:0.8rem;font-weight:700;color:#333;display:block;margin-bottom:4px;">開始</label>
+      <select id="xlsRangeFrom" class="modal-input" style="padding:10px 8px;"></select>
+    </div>
+    <div style="padding-top:18px;color:#888;font-size:1.2rem;">〜</div>
+    <div style="flex:1;">
+      <label style="font-size:0.8rem;font-weight:700;color:#333;display:block;margin-bottom:4px;">終了</label>
+      <select id="xlsRangeTo" class="modal-input" style="padding:10px 8px;"></select>
+    </div>
+  </div>
+  <p id="xlsRangeCount" style="font-size:0.82rem;color:#4a7c2f;font-weight:700;margin-top:10px;text-align:right;"></p>
+</div>
+
+<!-- 個別指定モード -->
+<div id="xlsPanel-pick" style="display:none;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+    <p style="font-size:0.82rem;color:#555;">出力したい樹木Noにチェックを入れてください。</p>
+    <div style="display:flex;gap:6px;">
+      <button onclick="xlsPickAll(true)"  style="font-size:0.75rem;padding:4px 10px;background:#e8f5e9;border:1px solid #4a7c2f;border-radius:20px;color:#2d5016;cursor:pointer;">全選択</button>
+      <button onclick="xlsPickAll(false)" style="font-size:0.75rem;padding:4px 10px;background:#f5f5f5;border:1px solid #bbb;border-radius:20px;color:#555;cursor:pointer;">全解除</button>
+    </div>
+  </div>
+  <div id="xlsPickList" style="display:flex;flex-wrap:wrap;gap:6px;max-height:240px;overflow-y:auto;padding:10px;background:#fafafa;border:1.5px solid #eee;border-radius:12px;"></div>
+  <p id="xlsPickCount" style="font-size:0.82rem;color:#4a7c2f;font-weight:700;margin-top:8px;text-align:right;"></p>
+</div>
+
+<!-- 出力ボタン -->
+<button onclick="runExcelExport()" style="width:100%;margin-top:18px;padding:14px;background:#2d5016;color:white;border:none;border-radius:40px;font-weight:700;font-size:1rem;cursor:pointer;font-family:inherit;">📥 Excelを出力する</button>
+```
+
+  </div>
+</div>
+
 <!-- スプレッドシート設定モーダル -->
+
 <div class="modal-overlay" id="gasSettingsModal">
   <div class="modal-panel">
     <div class="modal-header">
@@ -565,6 +639,7 @@
 </div>
 
 <!-- スプレッドシート一括送信モーダル -->
+
 <div class="modal-overlay" id="gasBulkModal">
   <div class="modal-panel" style="max-width:540px;">
     <div class="modal-header">
@@ -1472,8 +1547,94 @@
 
   window.exportToExcel = () => { const d=collectData(); if(!d.treeNo){alert('樹木Noを入力');return;} printRecord(d.id); };
   window.exportSummaryToExcel = () => { if(!records.filter(r=>r?.id).length){alert('データなし');return;} const wb=XLSX.utils.book_new(); const rows=[['調査日','樹木No','樹種','場所','点検者','樹高','幹周','緯度','経度','判定','所見','必要な措置']]; records.filter(r=>r?.id).forEach(r=>rows.push([r.surveyDate,r.treeNo,r.species,r.location,r.inspector,r.treeHeight,r.trunkGirth,r.latitude,r.longitude,r.overall,r.comment,(r.measures||[]).join('、')])); const ws=XLSX.utils.aoa_to_sheet(rows); setColWidths(ws,[12,10,15,20,12,8,8,12,12,8,30,30]); XLSX.utils.book_append_sheet(wb,ws,'一覧表'); dlBlob(new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:'application/octet-stream'}),'樹木点検一覧.xlsx'); };
-  window.exportAllToExcel = () => {
+  // ===== Excel出力範囲選択モーダル =====
+  let _xlsMode = 'all';
+
+  window.openExcelSelectModal = () => {
     const valid = records.filter(r => r?.id);
+    if (!valid.length) { alert('データなし'); return; }
+
+    // 樹木Noリスト構築
+    const nos = valid.map(r => r.treeNo || r.id);
+
+    // 範囲指定セレクト
+    ['xlsRangeFrom','xlsRangeTo'].forEach(id => {
+      const sel = document.getElementById(id);
+      sel.innerHTML = nos.map((n,i) => `<option value="${i}">${n}</option>`).join('');
+    });
+    document.getElementById('xlsRangeTo').value = nos.length - 1;
+
+    // 個別チェックリスト
+    const list = document.getElementById('xlsPickList');
+    list.innerHTML = nos.map((n,i) => `
+      <label style="display:flex;align-items:center;gap:5px;padding:5px 10px;background:white;border:1.5px solid #ddd;border-radius:20px;font-size:0.85rem;cursor:pointer;user-select:none;">
+        <input type="checkbox" class="xls-pick-cb" data-idx="${i}" checked style="width:15px;height:15px;">
+        ${n}
+      </label>`).join('');
+    list.querySelectorAll('.xls-pick-cb').forEach(cb => cb.addEventListener('change', updateXlsPickCount));
+
+    setXlsMode('all');
+    updateXlsRangeCount();
+    updateXlsPickCount();
+    document.getElementById('excelSelectModal').classList.add('open');
+  };
+
+  window.closeExcelSelectModal = () => document.getElementById('excelSelectModal').classList.remove('open');
+
+  window.setXlsMode = (mode) => {
+    _xlsMode = mode;
+    ['all','range','pick'].forEach(m => {
+      const btn = document.getElementById(`xlsMode-${m}`);
+      btn.style.background = m === mode ? '#4a7c2f' : 'transparent';
+      btn.style.color      = m === mode ? 'white'   : '#555';
+      document.getElementById(`xlsPanel-${m}`).style.display = m === mode ? 'block' : 'none';
+    });
+  };
+
+  function updateXlsRangeCount() {
+    const valid = records.filter(r => r?.id);
+    const from = parseInt(document.getElementById('xlsRangeFrom').value);
+    const to   = parseInt(document.getElementById('xlsRangeTo').value);
+    const cnt  = Math.max(0, to - from + 1);
+    document.getElementById('xlsRangeCount').textContent = `対象：${cnt} 件`;
+  }
+  function updateXlsPickCount() {
+    const cnt = document.querySelectorAll('.xls-pick-cb:checked').length;
+    document.getElementById('xlsPickCount').textContent = `選択中：${cnt} 件`;
+  }
+  window.xlsPickAll = (checked) => {
+    document.querySelectorAll('.xls-pick-cb').forEach(cb => cb.checked = checked);
+    updateXlsPickCount();
+  };
+
+  // 範囲セレクト変化時にカウント更新
+  document.addEventListener('change', e => {
+    if (e.target.id === 'xlsRangeFrom' || e.target.id === 'xlsRangeTo') updateXlsRangeCount();
+  });
+
+  window.runExcelExport = () => {
+    const valid = records.filter(r => r?.id);
+    let targets = [];
+    if (_xlsMode === 'all') {
+      targets = valid;
+    } else if (_xlsMode === 'range') {
+      const from = parseInt(document.getElementById('xlsRangeFrom').value);
+      const to   = parseInt(document.getElementById('xlsRangeTo').value);
+      if (from > to) { alert('開始が終了より後になっています'); return; }
+      targets = valid.slice(from, to + 1);
+    } else {
+      const checked = [...document.querySelectorAll('.xls-pick-cb:checked')].map(cb => parseInt(cb.dataset.idx));
+      if (!checked.length) { alert('1件以上選択してください'); return; }
+      targets = checked.map(i => valid[i]);
+    }
+    if (!targets.length) { alert('対象データがありません'); return; }
+    closeExcelSelectModal();
+    exportAllToExcel(targets);
+  };
+
+
+  window.exportAllToExcel = (targets) => {
+    const valid = targets || records.filter(r => r?.id);
     if (!valid.length) { alert('データなし'); return; }
     const wb = XLSX.utils.book_new();
 
