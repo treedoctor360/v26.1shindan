@@ -7,6 +7,7 @@
   <title>樹木診断・点検システム（26.7）</title>
   <link rel="manifest" href="manifest.json">
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -336,6 +337,7 @@
           <button class="btn-sec" onclick="exportSummaryToExcel()">📋 一覧表Excel</button>
           <button class="btn-sec" onclick="exportAllToCSV()">📄 CSV</button>
           <button class="btn-sec" onclick="printInspectionPage()">🖨️ 印刷</button>
+          <button class="btn-sec" onclick="openPhotoZipModal()" style="background:#fff8e1; border-color:#f9a825; color:#e65100;">🖼️ 写真ZIP</button>
         </div>
       </div>
 
@@ -538,6 +540,65 @@
     </div>
     <div style="font-size:0.85rem; font-weight:700; color:#333; margin-bottom:8px;">📋 登録済み送信先</div>
     <div id="addressList" style="max-height:280px; overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- 写真ZIP出力モーダル -->
+
+<div class="modal-overlay" id="photoZipModal">
+  <div class="modal-panel" style="max-width:480px;">
+    <div class="modal-header">
+      <h2 style="color:#e65100;">🖼️ 写真ZIP出力</h2>
+      <button class="modal-close-btn" onclick="closePhotoZipModal()">✕</button>
+    </div>
+    <p style="font-size:0.83rem; color:#555; margin-bottom:14px; line-height:1.6;">
+      樹木Noごとにフォルダ分けして ZIP でダウンロードします。<br>
+      ファイル名：<code style="background:#f4f4f4;padding:2px 6px;border-radius:4px;">C001_01.jpg, C001_02.jpg …</code>
+    </p>
+    
+<!-- 対象選択タブ -->
+<div style="display:flex; gap:6px; margin-bottom:14px; background:#f2f2f2; padding:5px; border-radius:40px;">
+  <button id="zipMode-all"   onclick="setZipMode('all')"   style="flex:1;padding:8px 4px;border:none;border-radius:30px;font-weight:600;font-size:0.85rem;cursor:pointer;background:#e65100;color:white;">全件</button>
+  <button id="zipMode-pick"  onclick="setZipMode('pick')"  style="flex:1;padding:8px 4px;border:none;border-radius:30px;font-weight:600;font-size:0.85rem;cursor:pointer;background:transparent;color:#555;">個別指定</button>
+</div>
+
+<!-- 全件パネル -->
+<div id="zipPanel-all">
+  <p id="zipAllCount" style="font-size:0.85rem;color:#e65100;font-weight:700;background:#fff8e1;padding:10px 14px;border-radius:10px;"></p>
+</div>
+
+<!-- 個別指定パネル -->
+<div id="zipPanel-pick" style="display:none;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+    <p style="font-size:0.82rem;color:#555;">写真のある樹木Noを選択</p>
+    <div style="display:flex;gap:6px;">
+      <button onclick="zipPickAll(true)"  style="font-size:0.75rem;padding:4px 10px;background:#fff8e1;border:1px solid #f9a825;border-radius:20px;color:#e65100;cursor:pointer;">全選択</button>
+      <button onclick="zipPickAll(false)" style="font-size:0.75rem;padding:4px 10px;background:#f5f5f5;border:1px solid #bbb;border-radius:20px;color:#555;cursor:pointer;">全解除</button>
+    </div>
+  </div>
+  <div id="zipPickList" style="display:flex;flex-wrap:wrap;gap:6px;max-height:220px;overflow-y:auto;padding:10px;background:#fafafa;border:1.5px solid #eee;border-radius:12px;"></div>
+  <p id="zipPickCount" style="font-size:0.82rem;color:#e65100;font-weight:700;margin-top:8px;text-align:right;"></p>
+</div>
+
+<!-- フォルダ分け設定 -->
+<div style="margin-top:14px;background:#f8f8f8;border-radius:12px;padding:10px 14px;">
+  <label style="font-size:0.82rem;font-weight:700;color:#333;display:flex;align-items:center;gap:8px;cursor:pointer;">
+    <input type="checkbox" id="zipFolderSplit" checked style="width:16px;height:16px;">
+    樹木Noごとにフォルダ分け（例：<code>C001/C001_01.jpg</code>）
+  </label>
+  <p style="font-size:0.75rem;color:#888;margin-top:4px;">オフにすると全写真がフラットに並びます</p>
+</div>
+
+<div id="zipProgress" style="display:none;margin-top:12px;text-align:center;">
+  <p style="font-size:0.88rem;color:#e65100;font-weight:700;">📦 ZIP作成中...</p>
+  <div style="background:#eee;border-radius:20px;height:8px;margin-top:8px;overflow:hidden;">
+    <div id="zipProgressBar" style="background:#e65100;height:100%;width:0%;transition:width 0.2s;border-radius:20px;"></div>
+  </div>
+  <p id="zipProgressText" style="font-size:0.78rem;color:#888;margin-top:4px;"></p>
+</div>
+
+<button onclick="runPhotoZipExport()" id="zipRunBtn" style="width:100%;margin-top:18px;padding:14px;background:#e65100;color:white;border:none;border-radius:40px;font-weight:700;font-size:1rem;cursor:pointer;font-family:inherit;">📥 ZIPをダウンロード</button>
+
   </div>
 </div>
 
@@ -1555,6 +1616,125 @@
 
   window.exportToExcel = () => { const d=collectData(); if(!d.treeNo){alert('樹木Noを入力');return;} printRecord(d.id); };
   window.exportSummaryToExcel = () => { if(!records.filter(r=>r?.id).length){alert('データなし');return;} const wb=XLSX.utils.book_new(); const rows=[['調査日','樹木No','樹種','場所','点検者','樹高','幹周','緯度','経度','判定','所見','必要な措置']]; records.filter(r=>r?.id).forEach(r=>rows.push([r.surveyDate,r.treeNo,r.species,r.location,r.inspector,r.treeHeight,r.trunkGirth,r.latitude,r.longitude,r.overall,r.comment,(r.measures||[]).join('、')])); const ws=XLSX.utils.aoa_to_sheet(rows); setColWidths(ws,[12,10,15,20,12,8,8,12,12,8,30,30]); XLSX.utils.book_append_sheet(wb,ws,'一覧表'); dlBlob(new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:'application/octet-stream'}),'樹木点検一覧.xlsx'); };
+  // ===== 写真ZIP出力 =====
+  let _zipMode = 'all';
+
+  window.openPhotoZipModal = async () => {
+    const valid = records.filter(r => r?.id);
+    if (!valid.length) { alert('データなし'); return; }
+    const sorted = [...valid].sort((a, b) => naturalSortNo(a, b));
+
+    // 写真を持つレコードだけ対象
+    const withPhotos = [];
+    for (const r of sorted) {
+      const photos = await loadPhotosFromIDB(r.id);
+      if (photos && photos.length > 0) withPhotos.push({ r, photos });
+    }
+    if (!withPhotos.length) { alert('写真が保存されているデータがありません'); return; }
+
+    // 全件カウント表示
+    const totalPhotos = withPhotos.reduce((s, x) => s + x.photos.length, 0);
+    document.getElementById('zipAllCount').textContent =
+      `対象：${withPhotos.length} 件 / 写真 ${totalPhotos} 枚`;
+
+    // 個別選択リスト
+    const list = document.getElementById('zipPickList');
+    list.innerHTML = withPhotos.map((x, i) => `
+      <label style="display:flex;align-items:center;gap:5px;padding:5px 10px;background:white;border:1.5px solid #ddd;border-radius:20px;font-size:0.83rem;cursor:pointer;">
+        <input type="checkbox" class="zip-pick-cb" data-idx="${i}" checked style="width:15px;height:15px;">
+        ${x.r.treeNo || x.r.id}
+        <span style="font-size:0.75rem;color:#aaa;">(${x.photos.length}枚)</span>
+      </label>`).join('');
+    list.querySelectorAll('.zip-pick-cb').forEach(cb => cb.addEventListener('change', updateZipPickCount));
+
+    // モーダルにデータを保持
+    document.getElementById('photoZipModal')._data = withPhotos;
+    setZipMode('all');
+    updateZipPickCount();
+    document.getElementById('zipProgress').style.display = 'none';
+    document.getElementById('zipRunBtn').disabled = false;
+    document.getElementById('photoZipModal').classList.add('open');
+  };
+
+  window.closePhotoZipModal = () => document.getElementById('photoZipModal').classList.remove('open');
+
+  window.setZipMode = (mode) => {
+    _zipMode = mode;
+    ['all','pick'].forEach(m => {
+      document.getElementById(`zipMode-${m}`).style.background = m === mode ? '#e65100' : 'transparent';
+      document.getElementById(`zipMode-${m}`).style.color      = m === mode ? 'white'   : '#555';
+      document.getElementById(`zipPanel-${m}`).style.display   = m === mode ? 'block'   : 'none';
+    });
+  };
+
+  function updateZipPickCount() {
+    const cnt = document.querySelectorAll('.zip-pick-cb:checked').length;
+    const modal = document.getElementById('photoZipModal');
+    const withPhotos = modal._data || [];
+    const total = [...document.querySelectorAll('.zip-pick-cb:checked')]
+      .reduce((s, cb) => s + (withPhotos[parseInt(cb.dataset.idx)]?.photos.length || 0), 0);
+    document.getElementById('zipPickCount').textContent = `選択中：${cnt} 件 / ${total} 枚`;
+  }
+
+  window.zipPickAll = (checked) => {
+    document.querySelectorAll('.zip-pick-cb').forEach(cb => cb.checked = checked);
+    updateZipPickCount();
+  };
+
+  window.runPhotoZipExport = async () => {
+    const modal = document.getElementById('photoZipModal');
+    const withPhotos = modal._data || [];
+    let targets = [];
+
+    if (_zipMode === 'all') {
+      targets = withPhotos;
+    } else {
+      const checked = [...document.querySelectorAll('.zip-pick-cb:checked')].map(cb => parseInt(cb.dataset.idx));
+      if (!checked.length) { alert('1件以上選択してください'); return; }
+      targets = checked.map(i => withPhotos[i]);
+    }
+    if (!targets.length) { alert('対象データがありません'); return; }
+
+    const folderSplit = document.getElementById('zipFolderSplit').checked;
+    const zip = new JSZip();
+    const totalPhotos = targets.reduce((s, x) => s + x.photos.length, 0);
+    let done = 0;
+
+    document.getElementById('zipProgress').style.display = 'block';
+    document.getElementById('zipRunBtn').disabled = true;
+
+    for (const { r, photos } of targets) {
+      const no = (r.treeNo || r.id).replace(/[\\/:*?"<>|]/g, '_');
+      const folder = folderSplit ? zip.folder(no) : zip;
+
+      for (let i = 0; i < photos.length; i++) {
+        const dataUrl = photos[i];
+        // base64部分だけ取り出す
+        const match = dataUrl.match(/^data:image\/(jpeg|png|webp);base64,(.+)$/);
+        if (!match) continue;
+        const ext = match[1] === 'jpeg' ? 'jpg' : match[1];
+        const b64 = match[2];
+        const filename = `${no}_${String(i + 1).padStart(2, '0')}.${ext}`;
+        folder.file(filename, b64, { base64: true });
+
+        done++;
+        const pct = Math.round(done / totalPhotos * 100);
+        document.getElementById('zipProgressBar').style.width = pct + '%';
+        document.getElementById('zipProgressText').textContent = `${done} / ${totalPhotos} 枚処理中…`;
+        await new Promise(r => setTimeout(r, 0)); // UI更新
+      }
+    }
+
+    document.getElementById('zipProgressText').textContent = 'ZIPを生成中…';
+    const blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
+    const date = new Date().toISOString().slice(0, 10);
+    dlBlob(blob, `樹木写真_${date}.zip`);
+
+    document.getElementById('zipProgress').style.display = 'none';
+    document.getElementById('zipRunBtn').disabled = false;
+    closePhotoZipModal();
+  };
+
   // ===== Excel出力範囲選択モーダル =====
   let _xlsMode = 'all';
 
