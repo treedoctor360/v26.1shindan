@@ -88,11 +88,15 @@
 ```
 .help-icon {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 20px; height: 20px; border-radius: 50%;
-  background: #e0e0e0; color: #555; font-size: 0.7rem; font-weight: 700;
-  cursor: pointer; margin-left: 4px; text-decoration: none; transition: all 0.15s;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: #d1d1d1; color: #666; font-size: 0.75rem; font-weight: 700;
+  cursor: pointer; margin-left: 6px; text-decoration: none;
+  transition: all 0.15s; vertical-align: middle; flex-shrink: 0;
+  border: none; line-height: 1;
 }
-.help-icon:hover { background: #4a7c2f; color: white; }
+.help-icon:hover { background: #b0b0b0; color: #333; transform: scale(1.12); }
+.help-icon::after { content: '解説'; display: none; }
+.lbl { display: flex; align-items: center; gap: 2px; flex-wrap: wrap; }
 .help-popup-overlay {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
   background: rgba(0,0,0,0.5); z-index: 9998;
@@ -162,7 +166,7 @@
 
 <header class="hdr">
   <h1>樹木点検・診断システム</h1>
-  <div style="font-size:0.9rem;">26.7</div>
+  <div style="font-size:0.9rem;">26.7（IndexedDB写真保存・JSON統合・メール/SS送信）</div>
   <div style="font-size:0.72rem; color:rgba(255,255,255,0.8); margin-top:4px; line-height:1.4;">
     ※診断結果は参考になります。専門家(樹木医等)の判断を併せてご検討ください。
   </div>
@@ -313,10 +317,12 @@
       <div class="card-body">
         <div class="search-bar">
           <input type="text" class="inp" id="searchInput" placeholder="樹種・場所・点検者で検索">
-          <select class="inp" id="sortSelect">
-            <option value="date-desc">日付(新→古)</option>
-            <option value="date-asc">日付(古→新)</option>
-            <option value="grade">判定順</option>
+          <select class="inp" id="sortSelect" onchange="renderRecordsList()">
+            <option value="no-asc">樹木No（昇順）</option>
+            <option value="no-desc">樹木No（降順）</option>
+            <option value="date-desc">日付（新→古）</option>
+            <option value="date-asc">日付（古→新）</option>
+            <option value="grade">判定順（A→D）</option>
           </select>
         </div>
         <div id="recordsList"></div>
@@ -1228,7 +1234,7 @@
         <div class="fg">
           <label class="lbl">
             ${item.name}
-            <span class="help-icon" onclick="event.stopPropagation(); showHelpPopup('${item.id}', 'decline')" title="クリックで詳しい解説を表示">?</span>
+            <span class="help-icon" onclick="event.stopPropagation(); showHelpPopup('${item.id}', 'decline')" title="クリックで詳しい解説を表示">？</span>
           </label>
           <div class="rgroup">
             ${[0,1,2,3,4].map(v => `<button class="rbtn" data-type="decline" data-id="${item.id}" data-val="${v}" onclick="setScore(this)">${v}<small>${item.desc[v]}</small></button>`).join('')}
@@ -1242,7 +1248,7 @@
         <div class="fg">
           <label class="lbl">
             ${item.name}
-            <span class="help-icon" onclick="event.stopPropagation(); showHelpPopup('${item.id}', 'health')" title="クリックで詳しい解説を表示">?</span>
+            <span class="help-icon" onclick="event.stopPropagation(); showHelpPopup('${item.id}', 'health')" title="クリックで詳しい解説を表示">？</span>
           </label>
           <div class="rgroup">
             ${item.grades.map((g, i) => {
@@ -1443,21 +1449,29 @@
   window.copyFormData = async () => { const d=collectData(); delete d.id; try{await navigator.clipboard.writeText(JSON.stringify(d));alert('コピーしました');}catch(e){prompt('手動コピー',JSON.stringify(d));} };
   window.pasteFormData = async () => { try{ const t=await navigator.clipboard.readText(); const d=JSON.parse(t); const map={'treeNo':'treeNo','surveyDate':'surveyDate','weather':'weather','inspector':'inspector','species':'species','family':'family','scientificName':'scientificName','nickname':'nickname','location':'location','treeHeight':'treeHeight','trunkGirth':'trunkGirth','latitude':'latitude','longitude':'longitude','comment':'overallComment','fungusOther':'fungusOther'}; Object.entries(map).forEach(([dk,fk])=>{if(d[dk])document.getElementById(fk).value=d[dk];}); alert('貼り付けました'); }catch{alert('貼り付け失敗');} };
 
+  function naturalSortNo(a, b) {
+    // 例: 001 < 002 < A001 < A002 < B001
+    const toKey = s => (s || '').replace(/(\d+)/g, n => n.padStart(6, '0')).toLowerCase();
+    return toKey(a.treeNo).localeCompare(toKey(b.treeNo));
+  }
+
   function renderRecordsList() {
     const valid=records.filter(r=>r?.id);
     const q=document.getElementById('searchInput').value.toLowerCase();
-    let f=valid.filter(r=>(r.species||'').toLowerCase().includes(q)||(r.location||'').toLowerCase().includes(q)||(r.inspector||'').toLowerCase().includes(q));
+    let f=valid.filter(r=>(r.species||'').toLowerCase().includes(q)||(r.location||'').toLowerCase().includes(q)||(r.inspector||'').toLowerCase().includes(q)||(r.treeNo||'').toLowerCase().includes(q));
     const s=document.getElementById('sortSelect').value;
-    if(s==='date-desc')f.sort((a,b)=>a.surveyDate<b.surveyDate?1:-1);
-    else if(s==='date-asc')f.sort((a,b)=>a.surveyDate>b.surveyDate?1:-1);
+    if(s==='no-asc')  f.sort((a,b)=> naturalSortNo(a,b));
+    else if(s==='no-desc')  f.sort((a,b)=> naturalSortNo(b,a));
+    else if(s==='date-desc') f.sort((a,b)=>a.surveyDate<b.surveyDate?1:-1);
+    else if(s==='date-asc')  f.sort((a,b)=>a.surveyDate>b.surveyDate?1:-1);
     else{const o={A:1,B:2,C:3,D:4};f.sort((a,b)=>(o[a.overall]||5)-(o[b.overall]||5));}
     document.getElementById('recordsList').innerHTML = f.map(r=>`<div class="record-item">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
-        <div><strong>${r.species} (${r.treeNo})</strong>${r._sentToGAS?'<span style="display:inline-block;margin-left:5px;font-size:0.7rem;background:#e3f2fd;color:#1565c0;padding:1px 7px;border-radius:10px;font-weight:700;">📊 SS済</span>':''}</div>
-        <span class="grade-badge grade-${r.overall}">${r.overall}</span>
+        <div><strong>${r.species||''}（${r.treeNo||''}）</strong>${r._sentToGAS?'<span style="display:inline-block;margin-left:5px;font-size:0.7rem;background:#e3f2fd;color:#1565c0;padding:1px 7px;border-radius:10px;font-weight:700;">📊 SS済</span>':''}</div>
+        <span class="grade-badge grade-${r.overall||''}">${r.overall||'-'}</span>
       </div>
-      <div>📍 ${r.location} 📅 ${r.surveyDate}</div>
-      <div>👤 ${r.inspector}</div>
+      <div>📍 ${r.location||'場所未登録'} 📅 ${r.surveyDate||''}</div>
+      <div>👤 ${r.inspector||''}</div>
       <div class="record-actions">
         <button class="btn-small" onclick="editRecord('${r.id}')">✏️ 編集</button>
         <button class="btn-small" onclick="deleteRecord('${r.id}')">🗑️ 削除</button>
@@ -1919,7 +1933,9 @@
         (r.inspector || '').toLowerCase().includes(q)
       );
       const s = document.getElementById('sortSelect').value;
-      if (s === 'date-desc') filtered.sort((a, b) => a.surveyDate < b.surveyDate ? 1 : -1);
+      if (s === 'no-asc')   filtered.sort((a, b) => naturalSortNo(a, b));
+      else if (s === 'no-desc')  filtered.sort((a, b) => naturalSortNo(b, a));
+      else if (s === 'date-desc') filtered.sort((a, b) => a.surveyDate < b.surveyDate ? 1 : -1);
       else if (s === 'date-asc') filtered.sort((a, b) => a.surveyDate > b.surveyDate ? 1 : -1);
       else { const o = {A:1, B:2, C:3, D:4}; filtered.sort((a, b) => (o[a.overall] || 5) - (o[b.overall] || 5)); }
       targets = filtered.filter(r => r.latitude && r.longitude);
