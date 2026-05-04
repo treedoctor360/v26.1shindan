@@ -666,7 +666,7 @@
       </div>
       <div>
         <label style="font-size:0.85rem; font-weight:700; color:#333; display:block; margin-bottom:6px;">🔑 アクセストークン（パスワード）</label>
-        <input type="text" id="gasToken" class="modal-input" placeholder="例：tree_inspect_2024">
+        <input type="text" id="gasToken" class="modal-input" placeholder="例：tree_inspect_2026">
         <div style="font-size:0.75rem; color:#888; margin-top:4px;">GASスクリプト内の <code class="modal-code">ACCESS_TOKEN</code> と同じ値にしてください</div>
       </div>
       <div>
@@ -2260,7 +2260,7 @@ ${wpts}
   window.openGasSettings = () => {
     const s = loadGasSettings();
     document.getElementById('gasUrl').value = s.url || '';
-    document.getElementById('gasToken').value = s.token || 'tree_inspect_2024';
+    document.getElementById('gasToken').value = s.token || 'tree_inspect_2026';
     document.getElementById('gasSenderName').value = s.senderName || '';
     document.getElementById('gasDriveEnabled').checked = s.driveEnabled || false;
     document.getElementById('gasDriveFolderId').value = s.driveFolderId || '';
