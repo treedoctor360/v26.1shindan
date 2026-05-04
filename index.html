@@ -2289,7 +2289,7 @@ ${wpts}
     const url=document.getElementById('gasUrl').value.trim(), result=document.getElementById('gasTestResult');
     result.style.display='block'; result.style.background='#fff8e1'; result.textContent='🔌 接続テスト中...';
     if(!url){result.style.background='#ffebee';result.textContent='❌ URLを入力してください';return;}
-    try{const res=await fetch(url,{method:'GET'});const data=await res.json();if(data.status==='ok'){result.style.background='#e8f5e9';result.textContent=`✅ 接続成功！（${data.message}）`;}else{result.style.background='#ffebee';result.textContent=`⚠️ レスポンス異常: ${JSON.stringify(data)}`;}}
+    try{const token=document.getElementById('gasToken').value.trim();const res=await fetch(url+'?token='+encodeURIComponent(token),{method:'GET'});const data=await res.json();if(data.status==='ok'){result.style.background='#e8f5e9';result.textContent=`✅ 接続成功！（${data.message}）`;}else{result.style.background='#ffebee';result.textContent=`⚠️ レスポンス異常: ${JSON.stringify(data)}`;}}
     catch(e){result.style.background='#ffebee';result.innerHTML=`❌ 接続失敗: ${e.message}`;}
   };
 
