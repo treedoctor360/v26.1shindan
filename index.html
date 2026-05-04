@@ -666,7 +666,7 @@
       </div>
       <div>
         <label style="font-size:0.85rem; font-weight:700; color:#333; display:block; margin-bottom:6px;">🔑 アクセストークン（パスワード）</label>
-        <input type="text" id="gasToken" class="modal-input" placeholder="例：tree_inspect_2026">
+        <input type="text" id="gasToken" class="modal-input" placeholder="例：tree_inspect_2024">
         <div style="font-size:0.75rem; color:#888; margin-top:4px;">GASスクリプト内の <code class="modal-code">ACCESS_TOKEN</code> と同じ値にしてください</div>
       </div>
       <div>
@@ -2260,7 +2260,7 @@ ${wpts}
   window.openGasSettings = () => {
     const s = loadGasSettings();
     document.getElementById('gasUrl').value = s.url || '';
-    document.getElementById('gasToken').value = s.token || 'tree_inspect_2026';
+    document.getElementById('gasToken').value = s.token || 'tree_inspect_2024';
     document.getElementById('gasSenderName').value = s.senderName || '';
     document.getElementById('gasDriveEnabled').checked = s.driveEnabled || false;
     document.getElementById('gasDriveFolderId').value = s.driveFolderId || '';
@@ -2280,11 +2280,7 @@ ${wpts}
     const token = document.getElementById('gasToken').value.trim();
     const senderName = document.getElementById('gasSenderName').value.trim();
     const driveEnabled = document.getElementById('gasDriveEnabled').checked;
-    // DriveフォルダにURLが貼られた場合、IDだけを自動抽出
-    let rawFolder = document.getElementById('gasDriveFolderId').value.trim();
-    const folderMatch = rawFolder.match(/folders\/([A-Za-z0-9_-]+)/);
-    if (folderMatch) { rawFolder = folderMatch[1]; document.getElementById('gasDriveFolderId').value = rawFolder; }
-    const driveFolderId = rawFolder;
+    const driveFolderId = document.getElementById('gasDriveFolderId').value.trim();
     if (!url || !token) { alert('URLとアクセストークンは必須です'); return; }
     saveGasSettingsData({ url, token, senderName, driveEnabled, driveFolderId });
     alert('✅ 設定を保存しました'); closeGasSettings();
@@ -2304,7 +2300,7 @@ ${wpts}
     };
     const res = await fetch(settings.url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify(payload),
       redirect: 'follow'
     });
@@ -2331,7 +2327,7 @@ ${wpts}
             surveyDate: r.surveyDate||'', species: r.species||'',
           };
           const pRes = await fetch(settings.url, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            method: 'POST', headers: { 'Content-Type': 'text/plain' },
             body: JSON.stringify(photoPayload), redirect: 'follow'
           });
           const pText = await pRes.text();
@@ -2423,7 +2419,7 @@ ${wpts}
         document.getElementById('gasProgressBar').style.width = `${Math.round((Math.min(i + CHUNK, targets.length) / targets.length) * 100)}%`;
         try {
           const payload = { token:s.token, action:'upsert', senderName:s.senderName||'', records:chunk.map(r=>({id:r.id,treeNo:r.treeNo,surveyDate:r.surveyDate,weather:r.weather,inspector:r.inspector,species:r.species,family:r.family,scientificName:r.scientificName,location:r.location,treeHeight:r.treeHeight,trunkGirth:r.trunkGirth,latitude:r.latitude,longitude:r.longitude,overall:r.overall,scores:r.scores||{},health:r.health||{},fungus:r.fungus||[],fungusOther:r.fungusOther||'',comment:r.comment||'',measures:r.measures||[],avg:r.avg,senderName:s.senderName||''})) };
-          const res = await fetch(s.url, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload), redirect:'follow'});
+          const res = await fetch(s.url, {method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(payload), redirect:'follow'});
           const text = await res.text();
           let data; try { data = JSON.parse(text); } catch { throw new Error(`レスポンス解析失敗: ${text.substring(0,60)}`); }
           if (data.status !== 'ok') throw new Error(data.message || '送信エラー');
