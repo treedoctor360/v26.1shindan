@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
@@ -162,8 +163,10 @@
     <li><a href="#sec-map">全体マップの使いかた（タブ③）</a></li>
     <li><a href="#sec-criteria">判定基準の見かた（タブ④）</a></li>
     <li><a href="#sec-export">データの出力・バックアップ</a></li>
+    <li><a href="#sec-photo-zip">📷 写真ZIP出力</a></li>
     <li><a href="#sec-json-merge">JSON統合機能</a></li>
     <li><a href="#sec-gas">📤 スプレッドシートへ送信（GAS連携）</a></li>
+    <li><a href="#sec-drive">📁 Google Drive写真保存連携</a></li>
     <li><a href="#sec-mail">📧 メールで送信</a></li>
     <li><a href="#sec-caution">ご利用上の注意</a></li>
     <li><a href="criteria.html" style="font-weight:700; color:#1565c0;">📖 詳細判定基準を見る</a></li>
@@ -288,18 +291,22 @@
     <p>保存済みの点検記録を一覧表示・検索・編集・削除できます。</p>
     <p style="margin-top:10px;">下部のボタンから、以下の操作が可能です：</p>
     <table>
-      <tr><td>📊 全件Excel出力</td><td>全記録を様式付きExcelで出力</td></tr>
-      <tr><td>📦 JSONバックアップ</td><td>写真を含む全データを保存（定期バックアップ推奨）</td></tr>
+      <tr><td>📊 全件Excel出力</td><td>範囲・個別指定が可能。色付き様式付きExcelで出力</td></tr>
       <tr><td>📋 一覧表Excel出力</td><td>簡易一覧表をExcel出力</td></tr>
       <tr><td>📄 CSV出力</td><td>他システム連携用CSV</td></tr>
+      <tr><td>🖨️ 印刷</td><td>現在の画面を印刷</td></tr>
+      <tr><td>🖼️ 写真ZIP出力</td><td>撮影済み写真を樹木No別にフォルダ分けしてZIP保存</td></tr>
+      <tr><td>📍 GPX出力</td><td>全件・判定Dのみ・表示中のみを地図アプリ用GPXで出力</td></tr>
+      <tr><td>📦 JSONバックアップ</td><td>写真を含む全データを保存（定期バックアップ推奨）</td></tr>
       <tr><td>📂 JSON復元</td><td>バックアップから復元（上書き）</td></tr>
       <tr><td>🔗 JSONを統合</td><td>複数のバックアップを重複除去しながらマージ</td></tr>
       <tr><td>📧 メール送信</td><td>アドレス帳付きメール送信</td></tr>
-      <tr><td>📊 スプレッドシート一括送信</td><td>GAS連携でスプレッドシートに送信</td></tr>
-      <tr><td>⚙️ スプレッドシート設定</td><td>GASのURL・トークン設定</td></tr>
+      <tr><td>📊 スプレッドシート送信</td><td>GAS連携でスプレッドシートに送信（写真Drive保存も可）</td></tr>
+      <tr><td>⚙️ SS設定</td><td>GASのURL・トークン・Drive連携設定</td></tr>
       <tr><td>🧹 無効記録削除</td><td>破損データを一括削除</td></tr>
     </table>
     <div class="tip">📊 SS済 バッジ：スプレッドシート送信済みの記録には青色の「SS済」マークが付きます。</div>
+    <div class="tip">🔢 ソート：樹木No昇順・降順、日付順、判定順の4種類から選択できます。</div>
   </div>
 </section>
 
@@ -329,8 +336,38 @@
   </div>
 </section>
 
+<section class="section" id="sec-photo-zip">
+  <div class="section-title"><span>1️⃣0️⃣</span>📷 写真ZIP出力</div>
+  <div class="section-body">
+    <p>撮影した写真を<strong>樹木Noごとにフォルダ分け</strong>してZIPファイルでダウンロードできます。報告書作成や写真整理に活用してください。</p>
+    <div class="step-card">
+      <div class="step-head"><div class="step-num">1</div>「🖼️ 写真ZIP」をタップ</div>
+      <div class="step-body"><p>記録一覧タブ「出力・エクスポート」グループの「🖼️ 写真ZIP」ボタンを押します。写真が保存されていない場合は対象外になります。</p></div>
+    </div>
+    <div class="step-card">
+      <div class="step-head"><div class="step-num">2</div>対象を選ぶ</div>
+      <div class="step-body">
+        <p><strong>全件</strong>：写真がある全樹木が対象。<br>
+        <strong>個別指定</strong>：チェックボックスで任意の樹木Noを選択。</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-head"><div class="step-num">3</div>フォルダ分け設定を確認</div>
+      <div class="step-body">
+        <p><strong>フォルダ分けON（推奨）</strong>：<code>C001/C001_01.jpg</code> のように樹木Noごとにフォルダが作られます。<br>
+        <strong>フォルダ分けOFF</strong>：<code>C001_01.jpg, C002_01.jpg</code> とフラットに並びます。</p>
+      </div>
+    </div>
+    <div class="step-card">
+      <div class="step-head"><div class="step-num">4</div>ZIPをダウンロード</div>
+      <div class="step-body"><p>「📥 ZIPをダウンロード」をタップ。進捗バーが表示され完了後に自動ダウンロードされます。</p></div>
+    </div>
+    <div class="tip">💡 ファイル名は <strong>樹木No_連番.jpg</strong>（例：C001_01.jpg）で自動命名されます。写真を選んで報告書に貼り付ける際の整理に便利です。</div>
+  </div>
+</section>
+
 <section class="section" id="sec-json-merge">
-  <div class="section-title"><span>🔟</span>🔗 JSON統合機能</div>
+  <div class="section-title"><span>1️⃣1️⃣</span>🔗 JSON統合機能</div>
   <div class="section-body">
     <p>複数の端末や調査者で別々に記録したバックアップファイルを、<strong>重複を自動除去しながら1つにまとめる</strong>機能です。</p>
     <div class="step-card">
@@ -350,31 +387,127 @@
 </section>
 
 <section class="section" id="sec-gas">
-  <div class="section-title"><span>1️⃣1️⃣</span>📤 スプレッドシートへ送信（GAS連携）</div>
+  <div class="section-title"><span>1️⃣2️⃣</span>📤 スプレッドシートへ送信（GAS連携）</div>
   <div class="section-body">
     <p>現場のデータを事務所の<strong>Google スプレッドシート</strong>に送信できます。</p>
-    <div class="note">⚠️ 事前にPCでのGAS設定が必要です。</div>
+    <div class="note">⚠️ 事前にPCでのGAS設定が必要です。設定は一度だけ行えばOKです。</div>
 
-    <div class="step-card">
-      <div class="step-head"><div class="step-num">1</div>Googleスプレッドシートを作成</div>
-      <div class="step-body"><p>Googleドライブで新規スプレッドシートを作成します。</p></div>
+```
+<div class="step-card">
+  <div class="step-head"><div class="step-num">1</div>Googleスプレッドシートを作成</div>
+  <div class="step-body"><p>Googleドライブで新規スプレッドシートを作成します。名前は任意（例：樹木診断データ2025）。</p></div>
+</div>
+<div class="step-card">
+  <div class="step-head"><div class="step-num">2</div>Apps Scriptにコードを設置</div>
+  <div class="step-body">
+    <p>スプレッドシートのメニュー「拡張機能」→「<strong>Apps Script</strong>」を開きます。<br>
+    既存のコードを全部削除し、配布の <strong>gas_code.js</strong> の内容を貼り付けて保存します。</p>
+    <div class="note">⚠️ コード内の <code>ACCESS_TOKEN</code> をアプリ側と同じ文字列に変更してください。</div>
+  </div>
+</div>
+<div class="step-card">
+  <div class="step-head"><div class="step-num">3</div>ウェブアプリとしてデプロイ</div>
+  <div class="step-body">
+    <p>「デプロイ」→「新しいデプロイ」→ 種類「<strong>ウェブアプリ</strong>」を選択。</p>
+    <table style="margin-top:8px;">
+      <tr><th>次のユーザーとして実行</th><td><strong>自分</strong></td></tr>
+      <tr><th>アクセスできるユーザー</th><td><strong>全員</strong></td></tr>
+    </table>
+    <p style="margin-top:8px;">「デプロイ」後に表示される<strong>ウェブアプリのURL</strong>をコピーしてください。</p>
+    <div class="tip">💡 権限確認ダイアログが出たら「詳細を表示」→「安全でないページに移動」→「許可」を選択します。</div>
+  </div>
+</div>
+<div class="step-card">
+  <div class="step-head"><div class="step-num">4</div>アプリに設定を入力</div>
+  <div class="step-body">
+    <p>記録一覧タブ「⚙️ SS設定」を開き、以下を入力して保存します。</p>
+    <table style="margin-top:8px;">
+      <tr><th>GASのURL</th><td>コピーしたウェブアプリのURL</td></tr>
+      <tr><th>アクセストークン</th><td>GASコード内と同じ文字列</td></tr>
+      <tr><th>送信者名</th><td>自分の名前</td></tr>
+    </table>
+    <p style="margin-top:8px;">「🔌 接続テスト」で <strong>✅ 接続成功</strong> を確認してください。</p>
+  </div>
+</div>
+<div class="step-card">
+  <div class="step-head"><div class="step-num">5</div>データを送信</div>
+  <div class="step-body">
+    <p>「📊 スプレッドシート送信」ボタンから送信対象を選択して送信します。<br>
+    各記録カードの「📊 SS」ボタンで1件だけ送信することもできます。</p>
+    <div class="tip">💡 送信が完了したレコードには青色の <strong>SS済</strong> バッジが表示されます。</div>
+  </div>
+</div>
+<div class="note">⚠️ GASのコードを修正した場合は、「デプロイを管理」→「編集」→ バージョンを<strong>新しいバージョン</strong>に変更して再デプロイが必要です（URLは変わりません）。</div>
+```
+
+  </div>
+</section>
+
+<section class="section" id="sec-drive">
+  <div class="section-title"><span>1️⃣3️⃣</span>📁 Google Drive写真保存連携</div>
+  <div class="section-body">
+    <p>撮影した写真をGoogle Driveに自動保存し、スプレッドシートへのデータ送信と同時に写真も整理できます。</p>
+
+```
+<div class="step-card">
+  <div class="step-head"><div class="step-num">1</div>保存先フォルダを作成（任意）</div>
+  <div class="step-body">
+    <p>Googleドライブで保存先フォルダを作成します（例：「樹木写真_2025」）。<br>
+    フォルダを開いたときのURLの末尾部分が<strong>フォルダID</strong>です。</p>
+    <div style="background:#f4f4f4; border-radius:8px; padding:10px; margin-top:8px; font-size:0.85rem; font-family:monospace; word-break:break-all;">
+      https://drive.google.com/drive/folders/<strong style="color:#1565c0;">1aBcXxxxxxxxxxxxxxxxxxxx</strong>
     </div>
-    <div class="step-card">
-      <div class="step-head"><div class="step-num">2</div>Apps Scriptを設定</div>
-      <div class="step-body"><p>「拡張機能」→「Apps Script」→ 配布のコード（コード.gs）を貼り付けて保存。</p></div>
+    <div class="tip">💡 フォルダIDを省略した場合は、マイドライブ直下に「樹木写真」フォルダが自動作成されます。</div>
+  </div>
+</div>
+
+<div class="step-card">
+  <div class="step-head"><div class="step-num">2</div>アプリのSS設定でDrive連携を有効化</div>
+  <div class="step-body">
+    <p>記録一覧タブ「⚙️ SS設定」を開き、以下を設定します。</p>
+    <table style="margin-top:8px;">
+      <tr><th>📁 Google Drive写真保存を有効にする</th><td>✅ チェックを入れる</td></tr>
+      <tr><th>保存先フォルダID</th><td>①でコピーしたフォルダID（省略可）</td></tr>
+    </table>
+    <p style="margin-top:8px;">「💾 設定を保存」を押して完了。</p>
+  </div>
+</div>
+
+<div class="step-card">
+  <div class="step-head"><div class="step-num">3</div>写真付きで送信する</div>
+  <div class="step-body">
+    <p>「📊 スプレッドシート送信」を開くと、Drive連携が有効な場合のみ<br>
+    「<strong>📷 写真もGoogle Driveに送信する</strong>」チェックボックスが表示されます。<br>
+    チェックを入れて送信すると、写真がDriveに自動保存されます。</p>
+    <div class="note">⚠️ 写真の送信は1枚ずつ行うため、枚数が多い場合は時間がかかります。Wi-Fi環境での送信を推奨します。</div>
+  </div>
+</div>
+
+<div class="step-card">
+  <div class="step-head"><div class="step-num">4</div>Driveの保存構造を確認</div>
+  <div class="step-body">
+    <div style="background:#f4f4f4; border-radius:8px; padding:12px; font-size:0.85rem; line-height:2;">
+      📁 指定フォルダ（またはマイドライブ）<br>
+      &nbsp;&nbsp;└─ 📁 樹木写真<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├─ 📁 C001<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;├─ 🖼 C001_01.jpg<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;└─ 🖼 C001_02.jpg<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─ 📁 C002<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└─ 🖼 C002_01.jpg
     </div>
-    <div class="step-card">
-      <div class="step-head"><div class="step-num">3</div>ウェブアプリとしてデプロイ</div>
-      <div class="step-body"><p>「デプロイ」→「新しいデプロイ」→「ウェブアプリ」。アクセスは「全員」に設定。表示されたURLをコピー。</p></div>
-    </div>
-    <div class="step-card">
-      <div class="step-head"><div class="step-num">4</div>アプリにURLを設定</div>
-      <div class="step-body"><p>記録一覧タブの「⚙️ スプレッドシート設定」からURLとトークンを入力して保存。</p></div>
-    </div>
-    <div class="step-card">
-      <div class="step-head"><div class="step-num">5</div>データを送信</div>
-      <div class="step-body"><p>「📊 スプレッドシート一括送信」から全件・未送信・判定Dのみを選択して送信できます。各記録の「📊 SS」ボタンで1件ずつ送信も可能です。</p></div>
-    </div>
+  </div>
+</div>
+
+<div class="step-card">
+  <div class="step-head"><div class="step-num">Q</div>フォルダIDを変えれば別フォルダに保存できますか？</div>
+  <div class="step-body">
+    <p>はい、できます。アプリの設定画面で別のフォルダIDを入力して保存すれば、次の送信から新しいフォルダに保存されます。案件ごとにフォルダを切り替えて管理することが可能です。</p>
+  </div>
+</div>
+
+<div class="note">⚠️ Drive連携にはGASのデプロイ時に「Driveへのアクセス」権限の許可が必要です。権限ダイアログが出たら許可してください。</div>
+```
+
   </div>
 </section>
 
@@ -413,7 +546,7 @@
 </section>
 
 <footer style="background:var(--green-dark);color:rgba(255,255,255,0.8);text-align:center;padding:20px;font-size:0.8rem;margin-top:10px;">
-  <p>樹木点検・診断システム 利用マニュアル v26.7</p>
+  <p>樹木点検・診断システム 利用マニュアル v26.7（Google Drive連携対応版）</p>
 </footer>
 
 </body>
