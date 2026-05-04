@@ -666,7 +666,7 @@
       </div>
       <div>
         <label style="font-size:0.85rem; font-weight:700; color:#333; display:block; margin-bottom:6px;">🔑 アクセストークン（パスワード）</label>
-        <input type="text" id="gasToken" class="modal-input" placeholder="例：tree_inspect_2026">
+        <input type="text" id="gasToken" class="modal-input" placeholder="例：tree_inspect_2024">
         <div style="font-size:0.75rem; color:#888; margin-top:4px;">GASスクリプト内の <code class="modal-code">ACCESS_TOKEN</code> と同じ値にしてください</div>
       </div>
       <div>
@@ -2280,7 +2280,11 @@ ${wpts}
     const token = document.getElementById('gasToken').value.trim();
     const senderName = document.getElementById('gasSenderName').value.trim();
     const driveEnabled = document.getElementById('gasDriveEnabled').checked;
-    const driveFolderId = document.getElementById('gasDriveFolderId').value.trim();
+    // DriveフォルダにURLが貼られた場合、IDだけを自動抽出
+    let rawFolder = document.getElementById('gasDriveFolderId').value.trim();
+    const folderMatch = rawFolder.match(/folders\/([A-Za-z0-9_-]+)/);
+    if (folderMatch) { rawFolder = folderMatch[1]; document.getElementById('gasDriveFolderId').value = rawFolder; }
+    const driveFolderId = rawFolder;
     if (!url || !token) { alert('URLとアクセストークンは必須です'); return; }
     saveGasSettingsData({ url, token, senderName, driveEnabled, driveFolderId });
     alert('✅ 設定を保存しました'); closeGasSettings();
