@@ -2497,6 +2497,7 @@ ${wpts}
     document.getElementById('projName').value = '';
     ['projEnableVitality','projEnableHealth','projEnableFungus','projEnableInference'].forEach(id=>document.getElementById(id).checked=true);
     const _pgurl = document.getElementById('projGasUrl'); if(_pgurl) _pgurl.value='';
+    const _pdrive = document.getElementById('projDriveFolderId'); if(_pdrive) _pdrive.value='';
     ALL_SCORE_IDS.forEach(id=>{const cb=document.getElementById('ps_'+id);if(cb)cb.checked=true;});
     ALL_HEALTH_IDS.forEach(id=>{const cb=document.getElementById('ph_'+id);if(cb)cb.checked=true;});
     updateProjScoreSection(); updateProjHealthSection();
@@ -2515,6 +2516,8 @@ ${wpts}
     document.getElementById('projEnableInference').checked = p.enableInference !== false;
     const projGasUrlEl = document.getElementById('projGasUrl');
     if(projGasUrlEl) projGasUrlEl.value = p.gasUrl || '';
+    const projDriveEl = document.getElementById('projDriveFolderId');
+    if(projDriveEl) projDriveEl.value = p.driveFolderId || '';
     ALL_SCORE_IDS.forEach(id=>{const cb=document.getElementById('ps_'+id);if(cb)cb.checked=(p.enabledScores||ALL_SCORE_IDS).includes(id);});
     ALL_HEALTH_IDS.forEach(id=>{const cb=document.getElementById('ph_'+id);if(cb)cb.checked=(p.enabledHealth||ALL_HEALTH_IDS).includes(id);});
     updateProjScoreSection(); updateProjHealthSection();
@@ -2539,6 +2542,7 @@ ${wpts}
       enableFungus: document.getElementById('projEnableFungus').checked,
       enableInference: document.getElementById('projEnableInference').checked,
       gasUrl: (document.getElementById('projGasUrl')?.value || '').trim(),
+      driveFolderId: (document.getElementById('projDriveFolderId')?.value || '').trim(),
       updatedAt: new Date().toISOString()
     };
     const data = loadProjects();
@@ -2632,6 +2636,7 @@ ${wpts}
             fileName: `${(r.treeNo||r.id).replace(/[\/:*?"<>|]/g,'_')}_${String(i+1).padStart(2,'0')}.${ext}`,
             mimeType: `image/${match[1]}`, base64: match[2],
             surveyDate: r.surveyDate||'', species: r.species||'',
+            folderId: settings.driveFolderId || '',
           };
           const pRes = await fetch(settings.url, {
             method: 'POST', headers: { 'Content-Type': 'text/plain' },
@@ -2656,6 +2661,7 @@ ${wpts}
       const pdata = loadProjects();
       const proj = pdata.projects.find(p=>p.id===r.projectId);
       if(proj && proj.gasUrl) s.url = proj.gasUrl;
+      if(proj && proj.driveFolderId) s.driveFolderId = proj.driveFolderId;
     }
     if(!s.url||!s.token){alert('SS設定のURLとトークンを設定してください');return;}
     try{
@@ -2707,6 +2713,9 @@ ${wpts}
     const activeProj = getActiveProject();
     if (activeProj && activeProj.gasUrl) {
       s.url = activeProj.gasUrl;
+    }
+    if (activeProj && activeProj.driveFolderId) {
+      s.driveFolderId = activeProj.driveFolderId;
     }
     if (!s.url || !s.token) { alert('SS設定のURLとトークンを設定してください'); return; }
     const mode = document.querySelector('input[name="gasSendMode"]:checked')?.value || 'all';
@@ -3038,6 +3047,11 @@ ${wpts}
         <label style="font-size:0.85rem;font-weight:700;color:#0d47a1;display:block;margin-bottom:4px;">📊 この案件専用のスプレッドシートURL（任意）</label>
         <input type="url" id="projGasUrl" class="modal-input" placeholder="空欄の場合はSS設定の共通URLを使用">
         <div style="font-size:0.75rem;color:#666;margin-top:4px;">案件ごとに別のGoogle Sheetsに送信したい場合に入力してください</div>
+        <div style="margin-top:10px;">
+          <label style="font-size:0.85rem;font-weight:700;color:#0d47a1;display:block;margin-bottom:4px;">📁 この案件専用のDriveフォルダID（任意）</label>
+          <input type="text" id="projDriveFolderId" class="modal-input" placeholder="空欄の場合はSS設定の共通フォルダIDを使用">
+          <div style="font-size:0.75rem;color:#666;margin-top:4px;">Drive URL末尾の英数字文字列を入力　例：1aBcDeFgH...</div>
+        </div>
       </div>
       <div style="margin-bottom:12px;background:#e8f3df;border-radius:10px;padding:10px 14px;">
         <div style="font-size:0.82rem;font-weight:700;color:#2d5016;margin-bottom:8px;">使用するセクション</div>
