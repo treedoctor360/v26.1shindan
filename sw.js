@@ -114,4 +114,8 @@ async function trimTileCache(cache, maxEntries) {
   const keys = await cache.keys();
   if (keys.length > maxEntries) {
     const toDelete = keys.slice(0, keys.length - maxEntries);
-    for (const key of toDelete) await cache.delete(key);
+    for (const key of toDelete) {
+      await cache.delete(key);
+    }
+  }
+}
