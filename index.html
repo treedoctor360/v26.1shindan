@@ -2765,11 +2765,25 @@ ${wpts}
 
 <script>
   if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('./sw.js?v=267a',{scope:'./'})  .then(reg=>{
-      if(reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});
-      reg.addEventListener('updatefound',()=>{const nw=reg.installing;nw.addEventListener('statechange',()=>{if(nw.state==='installed'&&navigator.serviceWorker.controller){if(confirm('最新バージョンがあります。更新しますか？')){nw.postMessage({type:'SKIP_WAITING'});window.location.reload();}}});});
-    }).catch(()=>{});
-    navigator.serviceWorker.addEventListener('controllerchange',()=>window.location.reload());
+    // 古いキャッシュを全削除してから新しいSWを登録
+    navigator.serviceWorker.getRegistrations().then(regs => {
+      return Promise.all(regs.map(r => r.unregister()));
+    }).then(() => {
+      return caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))));
+    }).then(() => {
+      return navigator.serviceWorker.register('./sw.js', {scope: './'});
+    }).then(reg => {
+      reg.addEventListener('updatefound', () => {
+        const nw = reg.installing;
+        nw.addEventListener('statechange', () => {
+          if(nw.state==='installed' && navigator.serviceWorker.controller){
+            nw.postMessage({type:'SKIP_WAITING'});
+            window.location.reload();
+          }
+        });
+      });
+    }).catch(() => {});
+    navigator.serviceWorker.addEventListener('controllerchange', () => window.location.reload());
   }
 </script>
 
