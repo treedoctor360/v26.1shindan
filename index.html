@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>樹木診断・点検システム（26.7）</title>
+  <title>樹木診断・点検システム（26.7a）</title>
   <link rel="manifest" href="manifest.json">
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -89,13 +89,13 @@
 ```
 .help-icon {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 20px; height: 20px; border-radius: 50%;
-  background: #d1d1d1; color: #555; font-size: 0.72rem; font-weight: 700;
-  cursor: pointer; margin-left: 5px; flex-shrink: 0;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: #4a7c2f; color: white; font-size: 0.65rem; font-weight: 700;
+  cursor: pointer; margin-left: 4px; flex-shrink: 0;
   transition: all 0.15s; vertical-align: middle;
-  border: none; line-height: 1; font-style: normal;
+  border: none; line-height: 1; font-style: normal; opacity: 0.7;
 }
-.help-icon:hover { background: #b0b0b0; color: #333; transform: scale(1.12); }
+.help-icon:hover { opacity: 1; transform: scale(1.12); }
 .help-popup-overlay {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
   background: rgba(0,0,0,0.5); z-index: 9998;
@@ -165,7 +165,7 @@
 
 <header class="hdr">
   <h1>樹木点検・診断システム</h1>
-  <div style="font-size:0.9rem;">26.7</div>
+  <div style="font-size:0.9rem;">26.7a（推論・案件管理対応）</div>
   <div style="margin-top:6px;">
     <button id="activeProjBadge" onclick="openProjectModal()" style="display:inline-block;padding:4px 12px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.4);border-radius:20px;color:white;font-size:0.78rem;cursor:pointer;font-family:inherit;">📋 案件未設定（全項目）</button>
   </div>
@@ -2367,6 +2367,7 @@ ${wpts}
       updatedAt:      new Date().toISOString(),
     };
     localStorage.setItem('treeRecords', JSON.stringify(records));
+    populateInferenceSelect();
     alert(`✅ ${records[idx].treeNo||''} の推論データを保存しました`);
   };
 
@@ -2572,7 +2573,8 @@ ${wpts}
     document.getElementById('gasSenderName').value = s.senderName || '';
     document.getElementById('gasDriveEnabled').checked = s.driveEnabled || false;
     document.getElementById('gasDriveFolderId').value = s.driveFolderId || '';
-    document.getElementById('driveSettingsArea').style.display = s.driveEnabled ? 'flex' : 'none';
+    const driveArea = document.getElementById('driveSettingsArea');
+    if (driveArea) driveArea.style.display = s.driveEnabled ? 'flex' : 'none';
     document.getElementById('gasTestResult').style.display = 'none';
     document.getElementById('gasSettingsModal').classList.add('open');
   };
