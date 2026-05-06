@@ -162,7 +162,7 @@
 
 <header class="hdr">
   <h1>樹木点検・診断システム</h1>
-  <div style="font-size:0.9rem;">26.7a（推論・案件管理対応）</div>
+  <div style="font-size:0.9rem;">26.7a</div>
   <div style="margin-top:6px;">
     <button id="activeProjBadge" onclick="openProjectModal()" style="display:inline-block;padding:4px 12px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.4);border-radius:20px;color:white;font-size:0.78rem;cursor:pointer;font-family:inherit;">📋 案件未設定（全項目）</button>
   </div>
@@ -449,18 +449,20 @@
   <div class="tab-panel" id="tab-records">
     <div class="card">
       <div class="card-body">
-        <div class="search-bar">
-          <input type="text" class="inp" id="searchInput" placeholder="樹種・場所・点検者で検索">
-          <select class="inp" id="projectFilter" onchange="renderRecordsList()" style="max-width:120px;font-size:0.82rem;">
-            <option value="">全案件</option>
-          </select>
-          <select class="inp" id="sortSelect" onchange="renderRecordsList()">
-            <option value="no-asc">樹木No（昇順）</option>
-            <option value="no-desc">樹木No（降順）</option>
-            <option value="date-desc">日付（新→古）</option>
-            <option value="date-asc">日付（古→新）</option>
-            <option value="grade">判定順（A→D）</option>
-          </select>
+        <div style="margin-bottom:16px;">
+          <input type="text" class="inp" id="searchInput" placeholder="🔍 樹種・場所・点検者・樹木Noで検索" style="width:100%;margin-bottom:8px;">
+          <div style="display:flex;gap:8px;">
+            <select class="inp" id="projectFilter" onchange="renderRecordsList()" style="flex:1;font-size:0.82rem;padding:10px 8px;">
+              <option value="">📋 全案件</option>
+            </select>
+            <select class="inp" id="sortSelect" onchange="renderRecordsList()" style="flex:1;font-size:0.82rem;padding:10px 8px;">
+              <option value="no-asc">樹木No↑</option>
+              <option value="no-desc">樹木No↓</option>
+              <option value="date-desc">日付（新→古）</option>
+              <option value="date-asc">日付（古→新）</option>
+              <option value="grade">判定（A→D）</option>
+            </select>
+          </div>
         </div>
         <div id="recordsList"></div>
 
@@ -484,8 +486,11 @@
             <div style="font-size:0.75rem; font-weight:700; color:#1a237e; margin-bottom:8px; letter-spacing:0.04em;">📍 GPX出力（地図アプリ用）</div>
             <div style="display:flex; flex-wrap:wrap; gap:7px;">
               <button class="btn-sec" onclick="exportToGPX('all')" style="background:#e8f0fe; border-color:#3949ab; color:#1a237e;">🗂️ 全件</button>
-              <button class="btn-sec" onclick="exportToGPX('danger')" style="background:#ffebee; border-color:#c62828; color:#b71c1c;">⚠️ 判定Dのみ</button>
-              <button class="btn-sec" onclick="exportToGPX('filtered')" style="background:#e8f5e9; border-color:#2d5016; color:#2d5016;">🔍 表示中のみ</button>
+              <button class="btn-sec" onclick="exportToGPX('A')" style="background:#e8f5e9; border-color:#2e7d32; color:#1b5e20;">🟢 A</button>
+              <button class="btn-sec" onclick="exportToGPX('B')" style="background:#fff8e1; border-color:#f9a825; color:#e65100;">🟡 B</button>
+              <button class="btn-sec" onclick="exportToGPX('C')" style="background:#fff3e0; border-color:#ef6c00; color:#bf360c;">🟠 C</button>
+              <button class="btn-sec" onclick="exportToGPX('danger')" style="background:#ffebee; border-color:#c62828; color:#b71c1c;">🔴 D</button>
+              <button class="btn-sec" onclick="exportToGPX('filtered')" style="background:#f3e5f5; border-color:#7b1fa2; color:#4a148c;">🔍 表示中のみ</button>
             </div>
           </div>
 
@@ -1466,9 +1471,12 @@
     if (projFilterEl) {
       const pdata = loadProjects();
       const cv = projFilterEl.value;
-      projFilterEl.innerHTML = '<option value="">全案件</option>' +
-        pdata.projects.map(p => `<option value="${p.id}" ${p.id===cv?'selected':''}>${p.name}</option>`).join('');
-      projFilterEl.value = cv;
+      const newOpts = '<option value="">📋 全案件</option>' +
+        pdata.projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+      if(projFilterEl.innerHTML !== newOpts) {
+        projFilterEl.innerHTML = newOpts;
+        projFilterEl.value = cv;
+      }
     }
     const projId = projFilterEl ? projFilterEl.value : '';
     const valid=records.filter(r=>r?.id);
@@ -2488,6 +2496,7 @@ ${wpts}
     document.getElementById('projEditId').value = '';
     document.getElementById('projName').value = '';
     ['projEnableVitality','projEnableHealth','projEnableFungus','projEnableInference'].forEach(id=>document.getElementById(id).checked=true);
+    const _pgurl = document.getElementById('projGasUrl'); if(_pgurl) _pgurl.value='';
     ALL_SCORE_IDS.forEach(id=>{const cb=document.getElementById('ps_'+id);if(cb)cb.checked=true;});
     ALL_HEALTH_IDS.forEach(id=>{const cb=document.getElementById('ph_'+id);if(cb)cb.checked=true;});
     updateProjScoreSection(); updateProjHealthSection();
@@ -2504,6 +2513,8 @@ ${wpts}
     document.getElementById('projEnableHealth').checked = p.enableHealth !== false;
     document.getElementById('projEnableFungus').checked = p.enableFungus !== false;
     document.getElementById('projEnableInference').checked = p.enableInference !== false;
+    const projGasUrlEl = document.getElementById('projGasUrl');
+    if(projGasUrlEl) projGasUrlEl.value = p.gasUrl || '';
     ALL_SCORE_IDS.forEach(id=>{const cb=document.getElementById('ps_'+id);if(cb)cb.checked=(p.enabledScores||ALL_SCORE_IDS).includes(id);});
     ALL_HEALTH_IDS.forEach(id=>{const cb=document.getElementById('ph_'+id);if(cb)cb.checked=(p.enabledHealth||ALL_HEALTH_IDS).includes(id);});
     updateProjScoreSection(); updateProjHealthSection();
@@ -2527,6 +2538,7 @@ ${wpts}
       enabledHealth: enableHealth ? ALL_HEALTH_IDS.filter(sid=>document.getElementById('ph_'+sid)?.checked) : [],
       enableFungus: document.getElementById('projEnableFungus').checked,
       enableInference: document.getElementById('projEnableInference').checked,
+      gasUrl: (document.getElementById('projGasUrl')?.value || '').trim(),
       updatedAt: new Date().toISOString()
     };
     const data = loadProjects();
@@ -2638,7 +2650,14 @@ ${wpts}
 
   window.sendSingleToGAS = async (id) => {
     const r=records.find(rec=>rec.id===id); if(!r)return;
-    const s=loadGasSettings(); if(!s.url||!s.token){alert('設定が未完了です');return;}
+    const s=loadGasSettings();
+    // レコードのprojectIdに対応する案件のURLがあれば優先
+    if(r.projectId) {
+      const pdata = loadProjects();
+      const proj = pdata.projects.find(p=>p.id===r.projectId);
+      if(proj && proj.gasUrl) s.url = proj.gasUrl;
+    }
+    if(!s.url||!s.token){alert('SS設定のURLとトークンを設定してください');return;}
     try{
       await sendOneToGAS(r,s);
       const idx=records.findIndex(rec=>rec.id===id);
@@ -2652,11 +2671,14 @@ ${wpts}
   window.openGasBulkModal = () => {
     const s = loadGasSettings();
     const connEl = document.getElementById('gasConnectionInfo');
-    if (!s.url || !s.token) {
-      connEl.innerHTML = '⚠️ 設定が未完了です';
+    const _ap = getActiveProject();
+    const _effectiveUrl = (_ap && _ap.gasUrl) ? _ap.gasUrl : s.url;
+    if (!_effectiveUrl || !s.token) {
+      connEl.innerHTML = '⚠️ 設定が未完了です（SS設定でURLを入力してください）';
       connEl.style.background = '#ffebee'; connEl.style.color = '#b71c1c';
     } else {
-      connEl.innerHTML = `✅ 送信先: <strong>設定済み</strong> / 送信者: <strong>${s.senderName || '(未設定)'}</strong>${s.driveEnabled ? ' / 📁 Drive連携：<strong style="color:#1565c0;">有効</strong>' : ''}`;
+      const _urlLabel = (_ap && _ap.gasUrl) ? `📋 ${_ap.name}専用SS` : '共通SS';
+      connEl.innerHTML = `✅ 送信先: <strong>${_urlLabel}</strong> / 送信者: <strong>${s.senderName || '(未設定)'}</strong>${s.driveEnabled ? ' / 📁 Drive連携：<strong style="color:#1565c0;">有効</strong>' : ''}`;
       connEl.style.background = '#f1f8e9'; connEl.style.color = '#1b5e20';
     }
     document.getElementById('gasSendPhotosArea').style.display = s.driveEnabled ? 'block' : 'none';
@@ -2681,7 +2703,12 @@ ${wpts}
 
   window.startGasBulkSend = async () => {
     const s = loadGasSettings();
-    if (!s.url || !s.token) { alert('設定が未完了です'); return; }
+    // 案件専用URLがあれば優先して使う
+    const activeProj = getActiveProject();
+    if (activeProj && activeProj.gasUrl) {
+      s.url = activeProj.gasUrl;
+    }
+    if (!s.url || !s.token) { alert('SS設定のURLとトークンを設定してください'); return; }
     const mode = document.querySelector('input[name="gasSendMode"]:checked')?.value || 'all';
     const valid = records.filter(r => r?.id);
     let targets;
@@ -3006,6 +3033,11 @@ ${wpts}
       <div style="margin-bottom:14px;">
         <label style="font-size:0.85rem;font-weight:700;color:#333;display:block;margin-bottom:6px;">案件名 <span style="color:#c62828;">*</span></label>
         <input type="text" id="projName" class="modal-input" placeholder="例：○○市街路樹診断2026">
+      </div>
+      <div style="margin-bottom:14px;background:#f0f6ff;border-radius:10px;padding:12px;">
+        <label style="font-size:0.85rem;font-weight:700;color:#0d47a1;display:block;margin-bottom:4px;">📊 この案件専用のスプレッドシートURL（任意）</label>
+        <input type="url" id="projGasUrl" class="modal-input" placeholder="空欄の場合はSS設定の共通URLを使用">
+        <div style="font-size:0.75rem;color:#666;margin-top:4px;">案件ごとに別のGoogle Sheetsに送信したい場合に入力してください</div>
       </div>
       <div style="margin-bottom:12px;background:#e8f3df;border-radius:10px;padding:10px 14px;">
         <div style="font-size:0.82rem;font-weight:700;color:#2d5016;margin-bottom:8px;">使用するセクション</div>
