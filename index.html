@@ -3,7 +3,7 @@
   <meta charset="UTF-8">
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>樹木診断・点検システム（26.7a）</title>
+  <title>樹木診断・点検システム（26.8）</title>
   <link rel="manifest" href="manifest.json">
   <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -161,7 +161,7 @@
 
 <header class="hdr">
   <h1>樹木点検・診断システム</h1>
-  <div style="font-size:0.9rem;">26.7a</div>
+  <div style="font-size:0.9rem;">26.8</div>
   <div style="margin-top:6px;">
     <button id="activeProjBadge" onclick="openProjectModal()" style="display:inline-block;padding:4px 12px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.4);border-radius:20px;color:white;font-size:0.78rem;cursor:pointer;font-family:inherit;">📋 案件未設定（全項目）</button>
   </div>
@@ -270,6 +270,12 @@
           <button class="btn-sec" onclick="takePhoto()">📷 カメラ</button>
           <button class="btn-sec" onclick="selectFromAlbum()">🖼️ アルバム</button>
           <span id="photoCounter" style="font-size:0.8rem;color:#555;margin-left:4px;">📸 0枚</span>
+          <select id="photoCompressSelect" title="写真の圧縮レベル（次に取り込む写真から適用）" style="margin-left:auto;font-size:0.78rem;padding:5px 6px;border:1px solid #c8c8c8;border-radius:8px;font-family:inherit;background:#fff;">
+            <option value="none">圧縮:元</option>
+            <option value="high">圧縮:高</option>
+            <option value="mid">圧縮:中</option>
+            <option value="low">圧縮:低</option>
+          </select>
         </div>
         <div id="photoContainer" class="photo-area"></div>
       </div>
@@ -744,8 +750,24 @@
     });
   }
 
-  function resizeImage(dataUrl, maxSize = 2400) {
+  // ===== 写真圧縮プロファイル（v26.8 追加） =====
+  // 長辺(px)とJPEG品質の組み合わせ。選択はlocalStorageに保存し次回も維持する。
+  const PHOTO_COMPRESS_KEY = 'treeInspect_photoCompress';
+  const COMPRESS_PROFILES = {
+    none: { maxSize: 100000, quality: 1.0,  label: '元（無圧縮）' }, // 実質リサイズなし＋JPEG最高品質
+    high: { maxSize: 2400,   quality: 0.90, label: '高（高画質）' }, // 旧既定値
+    mid:  { maxSize: 1600,   quality: 0.82, label: '中（標準）' },  // ★新既定（点検用途の推奨）
+    low:  { maxSize: 1200,   quality: 0.72, label: '低（軽量）' }   // 電波の弱い現場・容量節約用
+  };
+  // 現在の圧縮プロファイルを返す（未設定時は「中」を既定とする）
+  function getCompressProfile() {
+    return COMPRESS_PROFILES[localStorage.getItem(PHOTO_COMPRESS_KEY)] || COMPRESS_PROFILES.mid;
+  }
+
+  function resizeImage(dataUrl) {
     return new Promise(resolve => {
+      const prof = getCompressProfile();   // 選択中の圧縮設定（長辺・品質）
+      const maxSize = prof.maxSize;
       const img = new Image();
       img.onload = () => {
         let w = img.width, h = img.height;
@@ -756,7 +778,8 @@
         const canvas = document.createElement('canvas');
         canvas.width = w; canvas.height = h;
         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL('image/jpeg', 0.90));
+        // 「元」もPNG化せずJPEG品質1.0で再エンコード（容量過大を避けるため）
+        resolve(canvas.toDataURL('image/jpeg', prof.quality));
       };
       img.onerror = () => resolve(dataUrl);
       img.src = dataUrl;
@@ -1359,13 +1382,20 @@
   function drawShape(tool, x1, y1, x2, y2) { peCtx.strokeStyle = peColor; peCtx.fillStyle = peColor; peCtx.lineWidth = peSize; peCtx.lineCap = 'round'; if (tool === 'line') { peCtx.beginPath(); peCtx.moveTo(x1,y1); peCtx.lineTo(x2,y2); peCtx.stroke(); } else if (tool === 'rect') { peCtx.beginPath(); peCtx.strokeRect(x1, y1, x2-x1, y2-y1); } else if (tool === 'circle') { const rx=Math.abs(x2-x1)/2, ry=Math.abs(y2-y1)/2; const cx=(x1+x2)/2, cy=(y1+y2)/2; peCtx.beginPath(); peCtx.ellipse(cx,cy,rx,ry,0,0,2*Math.PI); peCtx.stroke(); } else if (tool === 'arrow') { const headLen = Math.max(peSize*4, 20); const angle = Math.atan2(y2-y1, x2-x1); peCtx.beginPath(); peCtx.moveTo(x1,y1); peCtx.lineTo(x2,y2); peCtx.stroke(); peCtx.beginPath(); peCtx.moveTo(x2, y2); peCtx.lineTo(x2 - headLen * Math.cos(angle - Math.PI/6), y2 - headLen * Math.sin(angle - Math.PI/6)); peCtx.lineTo(x2 - headLen * Math.cos(angle + Math.PI/6), y2 - headLen * Math.sin(angle + Math.PI/6)); peCtx.closePath(); peCtx.fill(); } }
   function placeText(e) { const text = document.getElementById('peTextInput').value.trim(); if (!text) { alert('テキストを入力'); return; } const fs = parseInt(document.getElementById('peFontSize').value) || 28; peSaveUndo(); const p = getPEPos(e); peCtx.font = `bold ${fs}px 'Noto Sans JP', sans-serif`; peCtx.fillStyle = peColor; peCtx.shadowColor = 'rgba(0,0,0,0.6)'; peCtx.shadowBlur = 3; peCtx.fillText(text, p.x, p.y); peCtx.shadowBlur = 0; }
   window.openPhotoEditor = function(index) { peIndex = index; peUndoStack = []; const img = new Image(); img.onload = function() { const maxW = Math.min(img.width, window.innerWidth - 40); const maxH = Math.min(img.height, window.innerHeight * 0.45); const scale = Math.min(maxW / img.width, maxH / img.height); peCanvas.width = img.width * scale; peCanvas.height = img.height * scale; peCtx.clearRect(0, 0, peCanvas.width, peCanvas.height); peCtx.drawImage(img, 0, 0, peCanvas.width, peCanvas.height); peOrigData = peCtx.getImageData(0, 0, peCanvas.width, peCanvas.height); setPETool('pen'); updatePESize(5); document.getElementById('peSizeSlider').value = 5; document.getElementById('photoEditModal').classList.add('open'); }; img.src = photos[index]; };
-  window.savePECanvas = function() { if (peIndex >= 0) { photos[peIndex] = peCanvas.toDataURL('image/jpeg', 0.9); renderPhotos(); } closePEModal(); };
+  window.savePECanvas = function() { if (peIndex >= 0) { photos[peIndex] = peCanvas.toDataURL('image/jpeg', getCompressProfile().quality); renderPhotos(); } closePEModal(); };
   window.closePEModal = function() { document.getElementById('photoEditModal').classList.remove('open'); peIndex = -1; };
 
   window.takeLocationPhoto = () => { const inp=document.getElementById('locPhotoInput'); inp.setAttribute('capture','environment'); inp.click(); };
   window.selectLocationPhoto = () => { const inp=document.getElementById('locPhotoInput'); inp.removeAttribute('capture'); inp.click(); };
-  document.getElementById('locPhotoInput').addEventListener('change', e => { const file = e.target.files[0]; if (file) { const r=new FileReader(); r.onload=ev=>{ locationPhoto=ev.target.result; const preview=document.getElementById('locPhotoPreview'); preview.src=locationPhoto; preview.style.display='block'; }; r.readAsDataURL(file); } e.target.value = ''; });
+  document.getElementById('locPhotoInput').addEventListener('change', e => { const file = e.target.files[0]; if (file) { const r=new FileReader(); r.onload=async ev=>{ locationPhoto=await resizeImage(ev.target.result); const preview=document.getElementById('locPhotoPreview'); preview.src=locationPhoto; preview.style.display='block'; }; r.readAsDataURL(file); } e.target.value = ''; });
   window.clearLocationPhoto = () => { locationPhoto=null; document.getElementById('locPhotoPreview').style.display='none'; };
+  // 写真圧縮レベルの選択を復元し、変更をlocalStorageへ保存（v26.8）
+  (function initPhotoCompress(){
+    const sel = document.getElementById('photoCompressSelect');
+    if (!sel) return;
+    sel.value = localStorage.getItem(PHOTO_COMPRESS_KEY) || 'mid';  // 既定は「中」
+    sel.addEventListener('change', () => { localStorage.setItem(PHOTO_COMPRESS_KEY, sel.value); });
+  })();
 
   function initMap() { const defaultLat=35.681236, defaultLng=139.767125; map = L.map('map').setView([defaultLat, defaultLng], 17); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'©OSM',crossOrigin:true}).addTo(map); const treeNo = document.getElementById('treeNo').value || '●'; marker = L.marker([defaultLat, defaultLng], { draggable:true, icon:createLabelIcon(treeNo) }).addTo(map); marker.on('dragend', e => { const pos = marker.getLatLng(); document.getElementById('latitude').value = pos.lat.toFixed(6); document.getElementById('longitude').value = pos.lng.toFixed(6); }); map.on('click', e => { marker.setLatLng(e.latlng); document.getElementById('latitude').value = e.latlng.lat.toFixed(6); document.getElementById('longitude').value = e.latlng.lng.toFixed(6); }); document.getElementById('treeNo').addEventListener('input', function(){ marker.setIcon(createLabelIcon(this.value||'●')); }); }
   function initAllMap() { if(allMap) return; allMap = L.map('allMap').setView([35.681236, 139.767125], 12); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'©OSM',crossOrigin:true}).addTo(allMap); markersLayer = L.layerGroup().addTo(allMap); updateAllMapMarkers(); }
