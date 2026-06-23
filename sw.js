@@ -1,8 +1,8 @@
 // ============================================================
 // 樹木点検システム - Service Worker v26.7a
 // ============================================================
-const CACHE_NAME = 'tree-inspect-v26-7a';
-const TILE_CACHE = 'tree-inspect-tiles-v26-7a';
+const CACHE_NAME = 'tree-inspect-v26-8';
+const TILE_CACHE = 'tree-inspect-tiles-v26-8';
 
 const APP_SHELL = [
   './',
